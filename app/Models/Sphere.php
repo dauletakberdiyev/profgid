@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Sphere extends Model
 {
@@ -39,6 +40,16 @@ class Sphere extends Model
     public function activeProfessions(): HasMany
     {
         return $this->professions()->where('is_active', true);
+    }
+
+    /**
+     * Получить таланты, связанные со сферой
+     */
+    public function talents(): BelongsToMany
+    {
+        return $this->belongsToMany(Talent::class)
+                    ->withPivot('coefficient')
+                    ->withTimestamps();
     }
 
     /**

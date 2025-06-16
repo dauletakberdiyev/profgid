@@ -54,6 +54,21 @@
                                                     {{ $sphere->localized_description }}
                                                 </p>
                                             @endif
+                                            
+                                            @if($sphere->talents->count() > 0)
+                                                <div class="mb-4">
+                                                    <h4 class="text-sm font-medium text-gray-900 mb-2">Ключевые таланты:</h4>
+                                                    <div class="flex flex-wrap gap-2">
+                                                        @foreach($sphere->talents->sortByDesc('pivot.coefficient')->take(8) as $talent)
+                                                            <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                                {{ $talent->name }}
+                                                                <span class="ml-1 text-blue-600">({{ number_format($talent->pivot->coefficient, 2) }})</span>
+                                                            </span>
+                                                        @endforeach
+                                                    </div>
+                                                </div>
+                                            @endif
+
                                             <div class="flex justify-end">
                                                 <button wire:click.stop="removeSphere({{ $sphere->id }})" 
                                                     class="text-gray-400 hover:text-red-600 transition-colors duration-200 p-2 text-sm flex items-center"
@@ -111,6 +126,24 @@
                                             </td>
                                             <td class="py-4 px-6 text-sm text-gray-700">
                                                 {{ $sphere->localized_description }}
+                                            </td>
+                                        </tr>
+                                    @endif
+                                    
+                                    @if($sphere->talents->count() > 0)
+                                        <tr class="border-b border-gray-100">
+                                            <td class="py-4 px-6 text-xs font-medium text-gray-500 uppercase tracking-wide align-top">
+                                                Ключевые таланты
+                                            </td>
+                                            <td class="py-4 px-6">
+                                                <div class="flex flex-wrap gap-2">
+                                                    @foreach($sphere->talents->sortByDesc('pivot.coefficient')->take(8) as $talent)
+                                                        <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                            {{ $talent->name }}
+                                                            <span class="ml-1 text-blue-600">({{ number_format($talent->pivot->coefficient, 2) }})</span>
+                                                        </span>
+                                                    @endforeach
+                                                </div>
                                             </td>
                                         </tr>
                                     @endif

@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\SphereResource\Pages;
 use App\Filament\Resources\SphereResource\RelationManagers;
 use App\Models\Sphere;
+use App\Models\Talent;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -78,6 +79,33 @@ class SphereResource extends Resource
                             ->label('Активна')
                             ->default(true),
                     ])->columns(2),
+
+                Forms\Components\Repeater::make('talent_coefficients')
+                    ->label('Таланты и коэффициенты')
+                    ->schema([
+                        Forms\Components\Select::make('talent_id')
+                            ->label('Талант')
+                            ->options(Talent::pluck('name', 'id'))
+                            ->required()
+                            ->distinct()
+                            ->disableOptionsWhenSelectedInSiblingRepeaterItems(),
+                            
+                        Forms\Components\TextInput::make('coefficient')
+                            ->label('Коэффициент')
+                            ->numeric()
+                            ->step(0.01)
+                            ->minValue(0.01)
+                            ->maxValue(0.99)
+                            ->default(0.50)
+                            ->required(),
+                    ])
+                    ->columns(2)
+                    ->defaultItems(0)
+                    ->collapsible()
+                    ->collapsed()
+                    ->itemLabel(fn (array $state): ?string => 
+                        isset($state['talent_id']) ? Talent::find($state['talent_id'])?->name : null
+                    ),
             ]);
     }
 
@@ -96,6 +124,11 @@ class SphereResource extends Resource
                 Tables\Columns\TextColumn::make('professions_count')
                     ->label('Профессий')
                     ->counts('professions')
+                    ->badge(),
+
+                Tables\Columns\TextColumn::make('talents_count')
+                    ->label('Талантов')
+                    ->counts('talents')
                     ->badge(),
                 
                 Tables\Columns\TextColumn::make('sort_order')

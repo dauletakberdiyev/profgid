@@ -35,4 +35,11 @@ class Talent extends Model
                     ->withPivot('coefficient')
                     ->withTimestamps();
     }
+
+    public function spheres(): BelongsToMany
+    {
+        return $this->belongsToMany(Sphere::class)
+                    ->withPivot('coefficient')
+                    ->withTimestamps();
+    }
 }

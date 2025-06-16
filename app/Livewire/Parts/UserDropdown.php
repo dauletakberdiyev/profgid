@@ -97,6 +97,7 @@ class UserDropdown extends Component
     {
         return view('livewire.parts.user-dropdown', [
             'favoriteProfessions' => $this->getUserFavoriteProfessions(),
+            'favoriteSpheres' => $this->getUserFavoriteSpheres(),
         ]);
     }
 }
