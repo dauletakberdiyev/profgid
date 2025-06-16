@@ -25,6 +25,7 @@ class User extends Authenticatable
         'avatar',
         'language',
         'favorite_professions',
+        'favorite_spheres',
     ];
 
     /**
@@ -48,6 +49,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'favorite_professions' => 'array',
+            'favorite_spheres' => 'array',
         ];
     }
 }

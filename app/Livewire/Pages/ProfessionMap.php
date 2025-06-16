@@ -4,6 +4,7 @@ namespace App\Livewire\Pages;
 
 use Livewire\Component;
 use App\Models\Sphere;
+use Illuminate\Support\Facades\Auth;
 
 class ProfessionMap extends Component
 {
@@ -47,8 +48,27 @@ class ProfessionMap extends Component
 
     public function likeSphere($sphereId)
     {
-        // TODO: Implement logic to add sphere to user favorites
-        $this->dispatch('sphere-liked', ['sphereId' => $sphereId]);
+        $user = Auth::user();
+        if (!$user) {
+            return;
+        }
+
+        $favoriteSpheres = $user->favorite_spheres ?? [];
+        
+        if (!in_array($sphereId, $favoriteSpheres)) {
+            $favoriteSpheres[] = $sphereId;
+            $user->update(['favorite_spheres' => $favoriteSpheres]);
+            
+            session()->flash('sphere-added', 'Сфера добавлена в избранное!');
+        } else {
+            // Удаляем из избранного
+            $favoriteSpheres = array_filter($favoriteSpheres, function($id) use ($sphereId) {
+                return $id != $sphereId;
+            });
+            $user->update(['favorite_spheres' => array_values($favoriteSpheres)]);
+            
+            session()->flash('sphere-added', 'Сфера удалена из избранного!');
+        }
     }
 
     public function sortBy($field)
@@ -102,9 +122,12 @@ class ProfessionMap extends Component
 
         $spheres = $query->get();
 
+        // Получаем избранные сферы пользователя
+        $userFavoriteSpheres = Auth::check() ? (Auth::user()->favorite_spheres ?? []) : [];
+
         // Загружаем профессии только для раскрытых сфер
         if (!empty($this->expandedSpheres)) {
-            $spheres = $spheres->map(function($sphere) {
+            $spheres = $spheres->map(function($sphere) use ($userFavoriteSpheres) {
                 if (in_array($sphere->id, $this->expandedSpheres)) {
                     $professionsQuery = $sphere->professions();
                     if (!$this->showInactive) {
@@ -114,11 +137,13 @@ class ProfessionMap extends Component
                 } else {
                     $sphere->loadedProfessions = collect();
                 }
+                $sphere->is_favorite = in_array($sphere->id, $userFavoriteSpheres);
                 return $sphere;
             });
         } else {
-            $spheres = $spheres->map(function($sphere) {
+            $spheres = $spheres->map(function($sphere) use ($userFavoriteSpheres) {
                 $sphere->loadedProfessions = collect();
+                $sphere->is_favorite = in_array($sphere->id, $userFavoriteSpheres);
                 return $sphere;
             });
         }

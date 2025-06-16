@@ -9,6 +9,7 @@ use App\Livewire\Pages\TalentTest;
 use App\Livewire\Pages\TalentTestResults;
 use App\Livewire\Pages\ProfessionRecommendations;
 use App\Livewire\Pages\MyProfessions;
+use App\Livewire\Pages\MySpheres;
 use App\Livewire\Pages\ProfessionMap;
 use App\Livewire\Pages\TestHistory;
 use App\Livewire\PaymentPage;
@@ -60,6 +61,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/talent-test-results/{sessionId?}', TalentTestResults::class)->name('talent-test-results');
     Route::get('/profession-recommendations/{sessionId?}', ProfessionRecommendations::class)->name('profession-recommendations');
     Route::get('/my-professions', MyProfessions::class)->name('my-professions');
+    Route::get('/my-spheres', MySpheres::class)->name('my-spheres');
     Route::get('/profession-map', ProfessionMap::class)->name('profession-map');
     Route::get('/test/history', TestHistory::class)->name('test.history');
     Route::get('/payment/{sessionId?}', PaymentPage::class)->name('payment');

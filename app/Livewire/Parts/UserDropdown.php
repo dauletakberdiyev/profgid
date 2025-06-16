@@ -4,6 +4,7 @@ namespace App\Livewire\Parts;
 
 use Livewire\Component;
 use App\Models\Profession;
+use App\Models\Sphere;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
@@ -11,12 +12,14 @@ class UserDropdown extends Component
 {
     public $showProfessionMap = false;
     public $userProfessions = [];
+    public $userSpheres = [];
     public $availableProfessions = [];
 
     public function mount()
     {
         if (Auth::check()) {
             $this->loadUserProfessions();
+            $this->loadUserSpheres();
             $this->loadAvailableProfessions();
         }
     }
@@ -25,6 +28,12 @@ class UserDropdown extends Component
     {
         $user = Auth::user();
         $this->userProfessions = $user->favorite_professions ?? [];
+    }
+
+    public function loadUserSpheres()
+    {
+        $user = Auth::user();
+        $this->userSpheres = $user->favorite_spheres ?? [];
     }
 
     public function loadAvailableProfessions()
@@ -73,6 +82,15 @@ class UserDropdown extends Component
         }
         
         return Profession::whereIn('id', $this->userProfessions)->get();
+    }
+
+    public function getUserFavoriteSpheres()
+    {
+        if (empty($this->userSpheres)) {
+            return collect();
+        }
+        
+        return Sphere::whereIn('id', $this->userSpheres)->get();
     }
 
     public function render()
