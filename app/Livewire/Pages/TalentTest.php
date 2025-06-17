@@ -42,6 +42,9 @@ class TalentTest extends Component
             ];
         }
 
+        // Перемешиваем вопросы для случайного порядка
+        shuffle($this->allQuestions);
+
         // Создаем запись TestSession
         TestSession::create([
             'session_id' => $this->testSessionId,
