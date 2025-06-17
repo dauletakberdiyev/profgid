@@ -2,6 +2,8 @@
 
 use App\Livewire\Pages\Home;
 use App\Livewire\Pages\Login;
+use App\Livewire\Pages\ForgotPassword;
+use App\Livewire\Pages\ResetPassword;
 use App\Livewire\Pages\Profile;
 use App\Livewire\Pages\Register;
 use App\Livewire\Pages\Settings;
@@ -40,6 +42,8 @@ Route::get('/about', function() {
 
 Route::get('/login', Login::class)->name('login');
 Route::get('/register', Register::class)->name('register');
+Route::get('/forgot-password', ForgotPassword::class)->name('forgot-password');
+Route::get('/reset-password/{token}', ResetPassword::class)->name('reset-password');
 
 Route::get('/auth/google', [\App\Http\Controllers\Auth\GoogleController::class, 'redirectToGoogle'])->name('auth.google');
 Route::get('/auth/google/callback', [\App\Http\Controllers\Auth\GoogleController::class, 'handleGoogleCallback']);
