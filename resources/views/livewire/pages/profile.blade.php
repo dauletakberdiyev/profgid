@@ -149,6 +149,7 @@
                         </p>
                     </div>
                     <button type="button" 
+                            wire:click="confirmDeleteAccount"
                             class="inline-flex items-center px-4 py-2 text-sm font-medium text-red-700 bg-white hover:bg-red-50 border border-red-200 hover:border-red-300 rounded-lg transition-colors duration-200">
                         Удалить аккаунт
                     </button>
@@ -156,4 +157,48 @@
             </div>
         </div>
     </div>
+
+    <!-- Delete Account Modal -->
+    @if($showDeleteModal)
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4" style="background-color: rgba(0, 0, 0, 0.4);" wire:click="cancelDeleteAccount">
+        <div class="relative w-full max-w-sm mx-auto" wire:click.stop>
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                <!-- Header -->
+                <div class="px-6 py-5 border-b border-gray-100">
+                    <h3 class="text-lg font-medium text-gray-900">Удалить аккаунт</h3>
+                    <p class="mt-1 text-sm text-gray-500">Это действие необратимо</p>
+                </div>
+
+                <!-- Content -->
+                <div class="px-6 py-4">
+                    <div class="mb-4">
+                        <label for="deletePassword" class="block text-sm font-medium text-gray-700 mb-2">
+                            Введите пароль для подтверждения
+                        </label>
+                        <input wire:model="deletePassword" 
+                               type="password" 
+                               id="deletePassword" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-red-500 focus:border-red-500"
+                               placeholder="Ваш пароль">
+                        @if($errors->has('deletePassword'))
+                            <p class="mt-1 text-sm text-red-600">{{ $errors->first('deletePassword') }}</p>
+                        @endif
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="px-6 py-4 bg-gray-50 flex gap-3">
+                    <button wire:click="cancelDeleteAccount"
+                            class="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-gray-500">
+                        Отмена
+                    </button>
+                    <button wire:click="deleteAccount"
+                            class="flex-1 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded hover:bg-red-700 focus:outline-none focus:ring-1 focus:ring-red-500">
+                        Удалить
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
 </div>

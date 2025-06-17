@@ -14,6 +14,8 @@ class Profile extends Component
     public $current_password = '';
     public $password = '';
     public $password_confirmation = '';
+    public $showDeleteModal = false;
+    public $deletePassword = '';
 
     protected $rules = [
         'name' => 'required|min:2',
@@ -69,6 +71,47 @@ class Profile extends Component
         $this->password_confirmation = '';
 
         session()->flash('password_message', 'Пароль успешно обновлен');
+    }
+
+    public function confirmDeleteAccount()
+    {
+        $this->showDeleteModal = true;
+        $this->deletePassword = '';
+    }
+
+    public function cancelDeleteAccount()
+    {
+        $this->showDeleteModal = false;
+        $this->deletePassword = '';
+        $this->resetErrorBag('deletePassword');
+    }
+
+    public function deleteAccount()
+    {
+        $this->validate([
+            'deletePassword' => 'required',
+        ], [
+            'deletePassword.required' => 'Введите пароль для подтверждения удаления аккаунта'
+        ]);
+
+        $user = Auth::user();
+
+        if (!Hash::check($this->deletePassword, $user->password)) {
+            $this->addError('deletePassword', 'Неверный пароль');
+            return;
+        }
+
+        // Удаляем связанные данные пользователя
+        $user->userAnswers()->delete();
+        $user->testSessions()->delete();
+        
+        // Удаляем самого пользователя
+        $user->delete();
+
+        // Выходим из системы и перенаправляем на главную
+        Auth::logout();
+        
+        return redirect('/')->with('message', 'Аккаунт успешно удален');
     }
 
     public function render()

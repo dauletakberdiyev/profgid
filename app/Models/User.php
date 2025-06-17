@@ -52,4 +52,20 @@ class User extends Authenticatable
             'favorite_spheres' => 'array',
         ];
     }
+
+    /**
+     * Get the user answers for the user.
+     */
+    public function userAnswers()
+    {
+        return $this->hasMany(UserAnswer::class);
+    }
+
+    /**
+     * Get the test sessions for the user.
+     */
+    public function testSessions()
+    {
+        return $this->hasMany(TestSession::class);
+    }
 }
