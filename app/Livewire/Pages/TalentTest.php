@@ -22,6 +22,7 @@ class TalentTest extends Component
     public $testSessionId; // ID сессии теста
     public $questionStartTime; // время начала текущего вопроса
     public $responseTimes = []; // массив времен ответов
+    public $isProcessing = false; // флаг для предотвращения двойных кликов
 
     public function mount()
     {
@@ -158,24 +159,17 @@ class TalentTest extends Component
                 $question = $this->allQuestions[$index];
                 $responseTime = $this->responseTimes[$index] ?? $this->timePerQuestion;
                 
-                $answersToSave[] = [
+                // Используем updateOrCreate для предотвращения дублирования
+                UserAnswer::updateOrCreate([
                     'user_id' => Auth::id() ?? 1,
                     'question_id' => $question['id'],
-                    'test_session_id' => $this->testSessionId,
+                    'test_session_id' => $this->testSessionId
+                ], [
                     'answer_value' => $value,
                     'response_time_seconds' => $responseTime,
                     'answered_at' => now(),
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
+                ]);
             }
-        }
-        
-        if (!empty($answersToSave)) {
-            // Удаляем старые ответы для этой сессии
-            UserAnswer::where('test_session_id', $this->testSessionId)->delete();
-            // Вставляем все ответы одним запросом
-            UserAnswer::insert($answersToSave);
         }
         
         // Обновляем прогресс в TestSession
@@ -241,38 +235,52 @@ class TalentTest extends Component
     
     public function selectAnswerAndNext($answerValue)
     {
-        // Устанавливаем выбранный ответ
-        $this->selectedAnswer = (int)$answerValue;
-        $this->answers[$this->currentQuestionIndex] = $this->selectedAnswer;
-        
-        // Записываем время ответа на текущий вопрос
-        if ($this->questionStartTime) {
-            $responseTime = now()->diffInSeconds($this->questionStartTime);
-            $this->responseTimes[$this->currentQuestionIndex] = $responseTime;
-        } else {
-            $this->responseTimes[$this->currentQuestionIndex] = 1;
+        // Защита от двойного клика
+        if ($this->isProcessing) {
+            return;
         }
         
-        // Переходим к следующему вопросу или завершаем тест
-        if ($this->currentQuestionIndex < count($this->allQuestions) - 1) {
-            // Переход к следующему вопросу
-            $this->currentQuestionIndex++;
-            $this->selectedAnswer = $this->answers[$this->currentQuestionIndex] ?? null;
-            $this->timeRemaining = $this->timePerQuestion;
-            $this->questionStartTime = now();
+        $this->isProcessing = true;
+        
+        try {
+            // Устанавливаем выбранный ответ
+            $this->selectedAnswer = (int)$answerValue;
+            $this->answers[$this->currentQuestionIndex] = $this->selectedAnswer;
+            
+            // Записываем время ответа на текущий вопрос
+            if ($this->questionStartTime) {
+                $responseTime = now()->diffInSeconds($this->questionStartTime);
+                $this->responseTimes[$this->currentQuestionIndex] = $responseTime;
+            } else {
+                $this->responseTimes[$this->currentQuestionIndex] = 1;
+            }
             
             // Обновляем прогресс асинхронно (только локально, без БД)
             $this->updateProgressLocal();
             
-            // Автосохранение каждые 10 вопросов для предотвращения потери данных
-            if (($this->currentQuestionIndex + 1) % 10 === 0) {
-                $this->saveProgressBatch();
+            // Переходим к следующему вопросу или завершаем тест
+            if ($this->currentQuestionIndex < count($this->allQuestions) - 1) {
+                // Переход к следующему вопросу
+                $this->currentQuestionIndex++;
+                $this->selectedAnswer = $this->answers[$this->currentQuestionIndex] ?? null;
+                $this->timeRemaining = $this->timePerQuestion;
+                $this->questionStartTime = now();
+                
+                // Автосохранение каждые 10 вопросов для предотвращения потери данных
+                // Исправляем условие: используем текущий индекс, а не +1
+                if ($this->currentQuestionIndex > 0 && $this->currentQuestionIndex % 10 === 0) {
+                    $this->saveProgressBatch();
+                }
+                
+                $this->dispatch('question-changed');
+            } else {
+                // Если это последний вопрос, завершаем тест
+                $this->submit();
+                return; // Выходим, не сбрасывая флаг, так как тест завершен
             }
-            
-            $this->dispatch('question-changed');
-        } else {
-            // Если это последний вопрос, завершаем тест
-            $this->submit();
+        } finally {
+            // Сбрасываем флаг обработки
+            $this->isProcessing = false;
         }
     }
 

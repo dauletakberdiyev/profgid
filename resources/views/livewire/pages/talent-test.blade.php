@@ -37,10 +37,11 @@
                 <div class="space-y-3 md:space-y-4 mb-6 md:mb-8" wire:key="question-{{ $currentQuestionIndex }}">
                     @foreach (['Совсем не согласен', 'Скорее не согласен', 'Затрудняюсь ответить', 'Скорее согласен', 'Полностью согласен'] as $index => $option)
                         <label
-                            class="flex items-center p-3 md:p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition-all duration-200 {{ $selectedAnswer == $index + 1 ? 'border-blue-500 bg-blue-50 scale-[1.02]' : 'border-gray-200' }}"
-                            wire:click="selectAnswerAndNext({{ $index + 1 }})">
+                            class="flex items-center p-3 md:p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition-all duration-200 {{ $selectedAnswer == $index + 1 ? 'border-blue-500 bg-blue-50 scale-[1.02]' : 'border-gray-200' }} {{ $isProcessing ? 'pointer-events-none opacity-70' : '' }}">
                             <input type="radio" class="h-4 w-4 md:h-5 md:w-5 text-blue-600 focus:ring-blue-500 flex-shrink-0"
-                                wire:model="selectedAnswer" name="question_answer" value="{{ $index + 1 }}">
+                                wire:click="selectAnswerAndNext({{ $index + 1 }})" name="question_answer" value="{{ $index + 1 }}"
+                                @if($selectedAnswer == $index + 1) checked @endif
+                                @if($isProcessing) disabled @endif>
                             <span class="ml-3 text-sm md:text-base text-gray-700">{{ $option }}</span>
                         </label>
                     @endforeach
