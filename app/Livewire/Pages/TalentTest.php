@@ -23,6 +23,7 @@ class TalentTest extends Component
     public $questionStartTime; // время начала текущего вопроса
     public $responseTimes = []; // массив времен ответов
     public $isProcessing = false; // флаг для предотвращения двойных кликов
+    private $testSessionModel = null; // кэш для модели TestSession
 
     public function mount()
     {
@@ -73,6 +74,14 @@ class TalentTest extends Component
         
         // Записываем время начала первого вопроса
         $this->questionStartTime = now();
+    }
+    
+    private function getTestSession()
+    {
+        if ($this->testSessionModel === null) {
+            $this->testSessionModel = TestSession::where('session_id', $this->testSessionId)->first();
+        }
+        return $this->testSessionModel;
     }
 
     public function nextQuestion()
@@ -129,14 +138,21 @@ class TalentTest extends Component
         }));
         $this->progress = ($answered / count($this->allQuestions)) * 100;
         
-        // Обновляем прогресс в TestSession
-        $testSession = TestSession::where('session_id', $this->testSessionId)->first();
-        if ($testSession) {
-            $testSession->update([
-                'answered_questions' => $answered,
-                'completion_percentage' => $this->progress,
-                'status' => $answered > 0 ? 'in_progress' : 'started'
-            ]);
+        // Обновляем прогресс в TestSession только периодически для уменьшения нагрузки
+        // Обновляем каждые 5% прогресса или при завершении
+        static $lastUpdatedProgress = 0;
+        $progressRounded = round($this->progress, 0);
+        
+        if ($progressRounded >= $lastUpdatedProgress + 5 || $progressRounded >= 100) {
+            $testSession = $this->getTestSession();
+            if ($testSession) {
+                $testSession->update([
+                    'answered_questions' => $answered,
+                    'completion_percentage' => $this->progress,
+                    'status' => $answered > 0 ? 'in_progress' : 'started'
+                ]);
+                $lastUpdatedProgress = $progressRounded;
+            }
         }
     }
     
@@ -151,29 +167,69 @@ class TalentTest extends Component
     
     public function saveProgressBatch()
     {
-        // Сохраняем все ответы партиями для улучшения производительности
-        $answersToSave = [];
+        // Сохраняем только новые/измененные ответы для улучшения производительности
+        $newAnswers = [];
+        $existingAnswers = [];
+        
+        // Получаем уже существующие ответы для этой сессии одним запросом
+        $existingUserAnswers = UserAnswer::where('test_session_id', $this->testSessionId)
+            ->pluck('answer_value', 'question_id')
+            ->toArray();
         
         foreach ($this->answers as $index => $value) {
             if ($value !== null) {
                 $question = $this->allQuestions[$index];
+                $questionId = $question['id'];
                 $responseTime = $this->responseTimes[$index] ?? $this->timePerQuestion;
                 
-                // Используем updateOrCreate для предотвращения дублирования
-                UserAnswer::updateOrCreate([
-                    'user_id' => Auth::id() ?? 1,
-                    'question_id' => $question['id'],
-                    'test_session_id' => $this->testSessionId
-                ], [
-                    'answer_value' => $value,
-                    'response_time_seconds' => $responseTime,
-                    'answered_at' => now(),
-                ]);
+                // Проверяем, нужно ли обновлять этот ответ
+                if (!isset($existingUserAnswers[$questionId]) || $existingUserAnswers[$questionId] != $value) {
+                    if (isset($existingUserAnswers[$questionId])) {
+                        // Ответ существует, но изменился - обновляем
+                        $existingAnswers[] = [
+                            'question_id' => $questionId,
+                            'answer_value' => $value,
+                            'response_time_seconds' => $responseTime,
+                            'answered_at' => now(),
+                        ];
+                    } else {
+                        // Новый ответ - создаем
+                        $newAnswers[] = [
+                            'user_id' => Auth::id() ?? 1,
+                            'question_id' => $questionId,
+                            'test_session_id' => $this->testSessionId,
+                            'answer_value' => $value,
+                            'response_time_seconds' => $responseTime,
+                            'answered_at' => now(),
+                            'created_at' => now(),
+                            'updated_at' => now(),
+                        ];
+                    }
+                }
             }
         }
         
-        // Обновляем прогресс в TestSession
-        $this->updateProgress();
+        // Вставляем новые ответы одним запросом
+        if (!empty($newAnswers)) {
+            UserAnswer::insert($newAnswers);
+        }
+        
+        // Обновляем существующие ответы пакетно
+        foreach ($existingAnswers as $answerData) {
+            UserAnswer::where('test_session_id', $this->testSessionId)
+                ->where('question_id', $answerData['question_id'])
+                ->update([
+                    'answer_value' => $answerData['answer_value'],
+                    'response_time_seconds' => $answerData['response_time_seconds'],
+                    'answered_at' => $answerData['answered_at'],
+                    'updated_at' => now(),
+                ]);
+        }
+        
+        // Обновляем прогресс в TestSession только если есть изменения
+        if (!empty($newAnswers) || !empty($existingAnswers)) {
+            $this->updateProgress();
+        }
     }
     
     public function set($property, $value)
@@ -202,7 +258,7 @@ class TalentTest extends Component
         $this->saveProgressBatch();
 
         // Обновляем TestSession при завершении теста
-        $testSession = TestSession::where('session_id', $this->testSessionId)->first();
+        $testSession = $this->getTestSession();
         if ($testSession) {
             $testSession->updateProgress();
             $testSession->updateTimeMetrics();
@@ -266,9 +322,9 @@ class TalentTest extends Component
                 $this->timeRemaining = $this->timePerQuestion;
                 $this->questionStartTime = now();
                 
-                // Автосохранение каждые 10 вопросов для предотвращения потери данных
-                // Исправляем условие: используем текущий индекс, а не +1
-                if ($this->currentQuestionIndex > 0 && $this->currentQuestionIndex % 10 === 0) {
+                // Автосохранение каждые 20 вопросов для предотвращения потери данных
+                // Уменьшаем частоту для улучшения производительности
+                if ($this->currentQuestionIndex > 0 && $this->currentQuestionIndex % 20 === 0) {
                     $this->saveProgressBatch();
                 }
                 
