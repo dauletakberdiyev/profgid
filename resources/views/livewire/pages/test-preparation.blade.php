@@ -74,7 +74,7 @@
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 text-center">
                 <div>
-                    <div class="text-2xl md:text-3xl font-light text-blue-600 mb-2">34</div>
+                    <div class="text-2xl md:text-3xl font-light text-blue-600 mb-2">24</div>
                     <p class="text-sm md:text-base text-gray-600">персональных таланта</p>
                 </div>
                 <div>

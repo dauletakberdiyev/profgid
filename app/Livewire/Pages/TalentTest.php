@@ -87,7 +87,7 @@ class TalentTest extends Component
             $this->timeRemaining = $this->timePerQuestion;
             
             // Dispatch event to notify Alpine.js
-            $this->dispatch('question-changed');
+            $this->dispatch(event: 'question-changed');
         } else {
             // If it's the last question, submit the form
             $this->submit();
@@ -166,15 +166,15 @@ class TalentTest extends Component
                 $responseTime = $this->responseTimes[$index] ?? $this->timePerQuestion;
 
                 // Use updateOrCreate to prevent duplicate answers for the same question in the same session
-                UserAnswer::updateOrCreate([
-                    'user_id' => Auth::id() ?? 1,
-                    'question_id' => $question['question_number'],
-                    'test_session_id' => $this->testSessionId
-                ], [
-                    'answer_value' => $value,
-                    'response_time_seconds' => $responseTime,
-                    'answered_at' => now(),
-                ]);
+                // UserAnswer::updateOrCreate([
+                //     'user_id' => Auth::id() ?? 1,
+                //     'question_id' => $question['question_number'],
+                //     'test_session_id' => $this->testSessionId
+                // ], [
+                //     'answer_value' => $value,
+                //     'response_time_seconds' => $responseTime,
+                //     'answered_at' => now(),
+                // ]);
             }
         }
 
@@ -228,15 +228,15 @@ class TalentTest extends Component
         $question = $this->allQuestions[$this->currentQuestionIndex];
         $responseTime = $this->responseTimes[$this->currentQuestionIndex] ?? 1;
         
-        UserAnswer::updateOrCreate([
-            'user_id' => Auth::id() ?? 1,
-            'question_id' => $question['question_number'],
-            'test_session_id' => $this->testSessionId
-        ], [
-            'answer_value' => $this->selectedAnswer,
-            'response_time_seconds' => $responseTime,
-            'answered_at' => now(),
-        ]);
+        // UserAnswer::updateOrCreate([
+        //     'user_id' => Auth::id() ?? 1,
+        //     'question_id' => $question['question_number'],
+        //     'test_session_id' => $this->testSessionId
+        // ], [
+        //     'answer_value' => $this->selectedAnswer,
+        //     'response_time_seconds' => $responseTime,
+        //     'answered_at' => now(),
+        // ]);
         
         // Обновляем прогресс сразу
         $this->updateProgress();

@@ -139,7 +139,7 @@
                                 });
                                 
                                 // Находим 8 талантов с наименьшими очками из всех результатов
-                                $bottomTalentsByScore = collect($userResults)->sortBy('score')->take(8);
+                                $bottomTalentsByScore = collect($userResults)->sortByDesc('score')->take(8);
                                 $bottomTalentIds = $bottomTalentsByScore->pluck('id')->toArray();
                             @endphp
 
@@ -189,7 +189,7 @@
                         </thead>
                         <tbody class="divide-y divide-gray-100">
                             @foreach($topSpheres as $sphere)
-                                <tr class="group hover:bg-gray-50/50 transition-colors duration-200 cursor-pointer {{ !$sphere['is_top'] ? 'opacity-50' : '' }}" 
+                                <tr class="group hover:bg-gray-50/50 transition-colors duration-200 cursor-pointer {{ !$sphere['is_top'] ? 'opacity-50' : 'bg-blue-50 border border-gray-300' }}" 
                                     wire:click="toggleSphereExpanded({{ $sphere['id'] }})"
                                     title="{{ in_array($sphere['id'], $expandedSpheres) ? 'Скрыть описание' : 'Показать описание' }}">
                                     <td class="py-8 pr-8 align-top">

@@ -12,25 +12,36 @@ class ProfessionMap extends Component
     public $sortBy = 'sort_order';
     public $sortDirection = 'asc';
     public $showInactive = false;
-    public $expandedSpheres = []; // Массив ID раскрытых сфер
-    public $expandedProfessions = []; // Массив ID раскрытых профессий для описаний
+    public $showModal = false;
+    public $selectedSphere = null;
+    public $expandedProfessions = []; // Массив ID раскрытых профессий в модалке
 
     public function updatedSearch()
     {
         // This will trigger a re-render when search is updated
     }
 
-    public function toggleSphere($sphereId)
+    public function showSphereInfo($sphereId)
     {
-        if (in_array($sphereId, $this->expandedSpheres)) {
-            // Закрываем сферу
-            $this->expandedSpheres = array_filter($this->expandedSpheres, function($id) use ($sphereId) {
-                return $id !== $sphereId;
-            });
-        } else {
-            // Открываем сферу
-            $this->expandedSpheres[] = $sphereId;
+        $sphere = Sphere::with(['professions' => function($query) {
+            if (!$this->showInactive) {
+                $query->where('is_active', true);
+            }
+            $query->orderBy('name');
+        }])->find($sphereId);
+        
+        if ($sphere) {
+            $sphere->loadedProfessions = $sphere->professions;
+            $this->selectedSphere = $sphere;
+            $this->showModal = true;
         }
+    }
+
+    public function closeModal()
+    {
+        $this->showModal = false;
+        $this->selectedSphere = null;
+        $this->expandedProfessions = []; // Сбрасываем раскрытые профессии при закрытии модалки
     }
 
     public function toggleProfessionDescription($professionId)
@@ -125,28 +136,11 @@ class ProfessionMap extends Component
         // Получаем избранные сферы пользователя
         $userFavoriteSpheres = Auth::check() ? (Auth::user()->favorite_spheres ?? []) : [];
 
-        // Загружаем профессии только для раскрытых сфер
-        if (!empty($this->expandedSpheres)) {
-            $spheres = $spheres->map(function($sphere) use ($userFavoriteSpheres) {
-                if (in_array($sphere->id, $this->expandedSpheres)) {
-                    $professionsQuery = $sphere->professions();
-                    if (!$this->showInactive) {
-                        $professionsQuery->where('is_active', true);
-                    }
-                    $sphere->loadedProfessions = $professionsQuery->orderBy('name')->get();
-                } else {
-                    $sphere->loadedProfessions = collect();
-                }
-                $sphere->is_favorite = in_array($sphere->id, $userFavoriteSpheres);
-                return $sphere;
-            });
-        } else {
-            $spheres = $spheres->map(function($sphere) use ($userFavoriteSpheres) {
-                $sphere->loadedProfessions = collect();
-                $sphere->is_favorite = in_array($sphere->id, $userFavoriteSpheres);
-                return $sphere;
-            });
-        }
+        // Добавляем информацию об избранности
+        $spheres = $spheres->map(function($sphere) use ($userFavoriteSpheres) {
+            $sphere->is_favorite = in_array($sphere->id, $userFavoriteSpheres);
+            return $sphere;
+        });
             
         return view('livewire.pages.profession-map', [
             'spheres' => $spheres
