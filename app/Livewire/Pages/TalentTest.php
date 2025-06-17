@@ -139,6 +139,49 @@ class TalentTest extends Component
         }
     }
     
+    public function updateProgressLocal()
+    {
+        // Локальное обновление прогресса без обращения к БД
+        $answered = count(array_filter($this->answers, function($answer) {
+            return $answer !== null;
+        }));
+        $this->progress = ($answered / count($this->allQuestions)) * 100;
+    }
+    
+    public function saveProgressBatch()
+    {
+        // Сохраняем все ответы партиями для улучшения производительности
+        $answersToSave = [];
+        
+        foreach ($this->answers as $index => $value) {
+            if ($value !== null) {
+                $question = $this->allQuestions[$index];
+                $responseTime = $this->responseTimes[$index] ?? $this->timePerQuestion;
+                
+                $answersToSave[] = [
+                    'user_id' => Auth::id() ?? 1,
+                    'question_id' => $question['id'],
+                    'test_session_id' => $this->testSessionId,
+                    'answer_value' => $value,
+                    'response_time_seconds' => $responseTime,
+                    'answered_at' => now(),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            }
+        }
+        
+        if (!empty($answersToSave)) {
+            // Удаляем старые ответы для этой сессии
+            UserAnswer::where('test_session_id', $this->testSessionId)->delete();
+            // Вставляем все ответы одним запросом
+            UserAnswer::insert($answersToSave);
+        }
+        
+        // Обновляем прогресс в TestSession
+        $this->updateProgress();
+    }
+    
     public function set($property, $value)
     {
         if ($property === 'selectedAnswer') {
@@ -161,25 +204,8 @@ class TalentTest extends Component
             $this->responseTimes[$this->currentQuestionIndex] = $responseTime;
         }
         
-        // Save all answers to the new user_answers table
-        // Use updateOrCreate to prevent duplicates
-        foreach ($this->answers as $index => $value) {
-            if ($value !== null) {
-                $question = $this->allQuestions[$index];
-                $responseTime = $this->responseTimes[$index] ?? $this->timePerQuestion;
-
-                // Use updateOrCreate to prevent duplicate answers for the same question in the same session
-                // UserAnswer::updateOrCreate([
-                //     'user_id' => Auth::id() ?? 1,
-                //     'question_id' => $question['question_number'],
-                //     'test_session_id' => $this->testSessionId
-                // ], [
-                //     'answer_value' => $value,
-                //     'response_time_seconds' => $responseTime,
-                //     'answered_at' => now(),
-                // ]);
-            }
-        }
+        // Сохраняем все ответы одним пакетом
+        $this->saveProgressBatch();
 
         // Обновляем TestSession при завершении теста
         $testSession = TestSession::where('session_id', $this->testSessionId)->first();
@@ -227,23 +253,6 @@ class TalentTest extends Component
             $this->responseTimes[$this->currentQuestionIndex] = 1;
         }
         
-        // Сохраняем ответ немедленно, чтобы предотвратить потерю данных при быстром прохождении
-        $question = $this->allQuestions[$this->currentQuestionIndex];
-        $responseTime = $this->responseTimes[$this->currentQuestionIndex] ?? 1;
-        
-        // UserAnswer::updateOrCreate([
-        //     'user_id' => Auth::id() ?? 1,
-        //     'question_id' => $question['question_number'],
-        //     'test_session_id' => $this->testSessionId
-        // ], [
-        //     'answer_value' => $this->selectedAnswer,
-        //     'response_time_seconds' => $responseTime,
-        //     'answered_at' => now(),
-        // ]);
-        
-        // Обновляем прогресс сразу
-        $this->updateProgress();
-        
         // Переходим к следующему вопросу или завершаем тест
         if ($this->currentQuestionIndex < count($this->allQuestions) - 1) {
             // Переход к следующему вопросу
@@ -251,6 +260,14 @@ class TalentTest extends Component
             $this->selectedAnswer = $this->answers[$this->currentQuestionIndex] ?? null;
             $this->timeRemaining = $this->timePerQuestion;
             $this->questionStartTime = now();
+            
+            // Обновляем прогресс асинхронно (только локально, без БД)
+            $this->updateProgressLocal();
+            
+            // Автосохранение каждые 10 вопросов для предотвращения потери данных
+            if (($this->currentQuestionIndex + 1) % 10 === 0) {
+                $this->saveProgressBatch();
+            }
             
             $this->dispatch('question-changed');
         } else {
