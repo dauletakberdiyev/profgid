@@ -94,7 +94,8 @@
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0"
          x-transition:enter-end="opacity-100"
-         class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+         style="background-color: rgba(0, 0, 0, 0.5);"
+         class="fixed inset-0 flex items-center justify-center z-50">
         <div class="bg-white rounded-lg p-6 max-w-sm mx-4">
             <div class="text-center">
                 <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
@@ -135,10 +136,13 @@ function talentTest(questions, timePerQuestion, testSessionId) {
         init() {
             this.selectedAnswer = this.answers[this.currentQuestionIndex];
             this.questionStartTime = Date.now();
+            this.updateProgress();
             this.startTimer();
         },
 
         startTimer() {
+            // Останавливаем предыдущий таймер, если он есть
+            this.stopTimer();
             this.timer = setInterval(() => {
                 if (this.timeRemaining > 0) {
                     this.timeRemaining--;
@@ -179,10 +183,13 @@ function talentTest(questions, timePerQuestion, testSessionId) {
 
         nextQuestion() {
             if (this.currentQuestionIndex < this.allQuestions.length - 1) {
+                this.stopTimer();
                 this.currentQuestionIndex++;
                 this.selectedAnswer = this.answers[this.currentQuestionIndex] || null;
                 this.timeRemaining = this.timePerQuestion;
                 this.questionStartTime = Date.now();
+                this.updateProgress();
+                this.startTimer();
             } else {
                 this.submitTest();
             }
@@ -190,16 +197,22 @@ function talentTest(questions, timePerQuestion, testSessionId) {
 
         previousQuestion() {
             if (this.currentQuestionIndex > 0) {
+                this.stopTimer();
                 this.currentQuestionIndex--;
                 this.selectedAnswer = this.answers[this.currentQuestionIndex] || null;
                 this.timeRemaining = this.timePerQuestion;
                 this.questionStartTime = Date.now();
+                this.updateProgress();
+                this.startTimer();
             }
         },
 
         updateProgress() {
             const answered = this.answers.filter(answer => answer !== null).length;
-            this.progress = (answered / this.allQuestions.length) * 100;
+            const currentProgress = (this.currentQuestionIndex + 1) / this.allQuestions.length * 100;
+            const answeredProgress = answered / this.allQuestions.length * 100;
+            // Показываем максимальный прогресс между текущим положением и количеством отвеченных вопросов
+            this.progress = Math.max(currentProgress, answeredProgress);
         },
 
         async submitTest() {
