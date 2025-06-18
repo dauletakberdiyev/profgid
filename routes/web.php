@@ -71,6 +71,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/payment/{sessionId?}', PaymentPage::class)->name('payment');
     Route::get('/payment-status/{sessionId}/{plan}', PaymentStatus::class)->name('payment-status');
     
+    // Talent Test API routes
+    Route::post('/api/talent-test/submit', [\App\Http\Controllers\TalentTestController::class, 'submitTestResults'])->name('api.talent-test.submit');
+    
     // Profession management routes
     Route::post('/profession/add-to-favorites', [\App\Http\Controllers\ProfessionController::class, 'addToFavorites'])->name('profession.add-to-favorites');
     Route::post('/profession/remove-from-favorites', [\App\Http\Controllers\ProfessionController::class, 'removeFromFavorites'])->name('profession.remove-from-favorites');

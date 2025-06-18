@@ -213,11 +213,29 @@ function talentTest(questions, timePerQuestion, testSessionId) {
                     this.responseTimes[this.currentQuestionIndex] = responseTime;
                 }
 
-                // Отправляем результаты на сервер
-                await $wire.submitTestResults(
-                    JSON.stringify(this.answers),
-                    JSON.stringify(this.responseTimes)
-                );
+                // Отправляем результаты на сервер через AJAX
+                const response = await fetch('{{ route("api.talent-test.submit") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        testSessionId: this.testSessionId,
+                        answers: this.answers,
+                        responseTimes: this.responseTimes
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Перенаправляем на страницу оплаты
+                    window.location.href = result.redirect_url;
+                } else {
+                    throw new Error(result.message || 'Ошибка отправки результатов');
+                }
             } catch (error) {
                 console.error('Ошибка отправки результатов:', error);
                 alert('Произошла ошибка при отправке результатов. Попробуйте еще раз.');
