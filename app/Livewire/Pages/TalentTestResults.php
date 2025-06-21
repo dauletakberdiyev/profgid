@@ -21,45 +21,6 @@ class TalentTestResults extends Component
     public $totalTimeSpent = 0;
     public $testDate = null;
     public $answersCount = 0;
-    public $activeTab = 'talents'; // Добавляем управление табами
-    public $expandedSpheres = []; // Управление раскрытием сфер
-    public $expandedProfessions = []; // Управление раскрытием профессий
-    
-    public function setActiveTab($tab)
-    {
-        // Проверяем права доступа к вкладкам
-        if ($tab === 'spheres' && !$this->canViewSpheresTab) {
-            return; // Не переключаем вкладку если нет доступа
-        }
-        
-        if ($tab === 'professions' && !$this->canViewProfessionsTab) {
-            return; // Не переключаем вкладку если нет доступа
-        }
-        
-        $this->activeTab = $tab;
-    }
-    
-    public function toggleSphereExpanded($sphereId)
-    {
-        if (in_array($sphereId, $this->expandedSpheres)) {
-            $this->expandedSpheres = array_filter($this->expandedSpheres, function($id) use ($sphereId) {
-                return $id !== $sphereId;
-            });
-        } else {
-            $this->expandedSpheres[] = $sphereId;
-        }
-    }
-    
-    public function toggleProfessionExpanded($professionId)
-    {
-        if (in_array($professionId, $this->expandedProfessions)) {
-            $this->expandedProfessions = array_filter($this->expandedProfessions, function($id) use ($professionId) {
-                return $id !== $professionId;
-            });
-        } else {
-            $this->expandedProfessions[] = $professionId;
-        }
-    }
     
     public function mount($sessionId = null)
     {
@@ -106,9 +67,6 @@ class TalentTestResults extends Component
         $this->answersCount = $this->testSession->userAnswers->count();
         
         $this->calculateResults();
-        
-        // Проверяем и корректируем активную вкладку в зависимости от доступа
-        $this->validateActiveTab();
     }
     private function calculateResults()
     {
@@ -251,30 +209,75 @@ class TalentTestResults extends Component
     
     public function getTopSpheres()
     {
-        // Получаем топ 8 талантов с наименьшими очками (самые слабые)
-        $topTalentsByScore = collect($this->userResults)->sortBy('score')->take(8);
-        $topTalentIds = $topTalentsByScore->pluck('id')->toArray();
+        // Создаем массив с очками пользователя по талантам
+        $userTalentScores = [];
+        foreach ($this->userResults as $result) {
+            $userTalentScores[$result['id']] = $result['score'];
+        }
         
-        // Получаем все сферы
-        $allSpheres = \App\Models\Sphere::all();
+        // Находим максимальный возможный балл для нормализации
+        $maxUserScore = collect($this->userResults)->max('score');
+        $maxUserScore = max($maxUserScore, 1); // Избегаем деления на 0
+        
+        // Получаем все сферы с профессиями и талантами
+        $allSpheres = \App\Models\Sphere::with(['professions.talents'])->get();
         $spheresData = collect();
         
         foreach ($allSpheres as $sphere) {
-            // Проверяем, связана ли сфера с топ 8 талантами через профессии
-            $isTopSphere = false;
-            $relevanceScore = 999; // Большое число для не-топ сфер
+            $compatibilityPercentage = 0;
             
-            foreach ($topTalentIds as $talentId) {
-                $talentModel = \App\Models\Talent::find($talentId);
-                if ($talentModel && $talentModel->professions) {
-                    foreach ($talentModel->professions as $profession) {
-                        if ($profession->sphere && $profession->sphere->id === $sphere->id) {
-                            $isTopSphere = true;
-                            // Находим лучший (наименьший) ранг среди связанных талантов
-                            $talentRank = collect($this->userResults)->where('id', $talentId)->first()['rank'] ?? 999;
-                            $relevanceScore = min($relevanceScore, $talentRank);
-                        }
+            // Собираем все уникальные таланты сферы через профессии
+            $sphereTalents = collect();
+            foreach ($sphere->professions as $profession) {
+                foreach ($profession->talents as $talent) {
+                    // Избегаем дубликатов, но сохраняем самый высокий коэффициент
+                    $existingTalent = $sphereTalents->firstWhere('id', $talent->id);
+                    if (!$existingTalent || $talent->pivot->coefficient > $existingTalent->coefficient) {
+                        $sphereTalents = $sphereTalents->reject(function($t) use ($talent) {
+                            return $t->id === $talent->id;
+                        });
+                        $sphereTalents->push((object)[
+                            'id' => $talent->id,
+                            'name' => $talent->name,
+                            'coefficient' => $talent->pivot->coefficient
+                        ]);
                     }
+                }
+            }
+            
+            // Вычисляем процент совместимости на основе талантов сферы
+            if ($sphereTalents->count() > 0) {
+                $totalWeightedScore = 0;
+                $totalWeight = 0;
+                $matchingTalentsCount = 0;
+                
+                foreach ($sphereTalents as $talent) {
+                    $userScore = $userTalentScores[$talent->id] ?? 0;
+                    $coefficient = $talent->coefficient ?? 0.5;
+                    
+                    // Нормализуем очки пользователя относительно максимального балла
+                    $normalizedScore = $userScore / $maxUserScore;
+                    
+                    // Взвешиваем по коэффициенту важности таланта для сферы
+                    $weightedScore = $normalizedScore * $coefficient;
+                    
+                    $totalWeightedScore += $weightedScore;
+                    $totalWeight += $coefficient;
+                    
+                    // Считаем количество "совпадающих" талантов (где есть хоть какие-то очки)
+                    if ($userScore > 0) {
+                        $matchingTalentsCount++;
+                    }
+                }
+                
+                // Базовый процент совместимости
+                if ($totalWeight > 0) {
+                    $baseCompatibility = ($totalWeightedScore / $totalWeight) * 100;
+                    
+                    // Бонус за покрытие талантов (чем больше талантов сферы у пользователя, тем лучше)
+                    $coverageBonus = ($matchingTalentsCount / $sphereTalents->count()) * 10; // до 10% бонуса
+                    
+                    $compatibilityPercentage = min($baseCompatibility + $coverageBonus, 100); // Ограничиваем 100%
                 }
             }
             
@@ -282,46 +285,104 @@ class TalentTestResults extends Component
                 'id' => $sphere->id,
                 'name' => $sphere->name,
                 'description' => $sphere->description ?? '',
-                'is_top' => $isTopSphere,
-                'relevance_score' => $relevanceScore
+                'is_top' => false, // Будет установлено после сортировки
+                'relevance_score' => 999,
+                'compatibility_percentage' => round($compatibilityPercentage, 1)
             ]);
         }
         
-        // Сортируем: сначала топ сферы по релевантности, потом остальные
-        return $spheresData->sortBy(function($sphere) {
-            return $sphere['is_top'] ? $sphere['relevance_score'] : (1000 + $sphere['relevance_score']);
+        // Сортируем: сначала по проценту совместимости (убывание)
+        $sortedSpheres = $spheresData->sortByDesc('compatibility_percentage');
+        
+        // Помечаем первые 8 как топовые
+        $topSpheres = $sortedSpheres->map(function($sphere, $index) {
+            $sphere['is_top'] = $index < 8; // Только первые 8 сфер топовые
+            return $sphere;
         });
+        
+        return $topSpheres;
     }
+    
     
     public function getTopProfessions()
     {
-        // Получаем топ 8 талантов с наименьшими очками (самые слабые)
-        $topTalentsByScore = collect($this->userResults)->sortBy('score')->take(8);
-        $topTalentIds = $topTalentsByScore->pluck('id')->toArray();
-        
-        $professionsData = collect();
-        
-        foreach ($topTalentIds as $talentId) {
-            $talentModel = \App\Models\Talent::find($talentId);
-            if ($talentModel && $talentModel->professions) {
-                foreach ($talentModel->professions as $profession) {
-                    // Находим ранг таланта для сортировки
-                    $talentRank = collect($this->userResults)->where('id', $talentId)->first()['rank'] ?? 999;
-                    
-                    $professionsData->push([
-                        'id' => $profession->id,
-                        'name' => $profession->name,
-                        'description' => $profession->description ?? '',
-                        'sphere_name' => $profession->sphere ? $profession->sphere->name : '',
-                        'is_top' => true, // Все профессии топовые, так как показываем только топ
-                        'relevance_score' => $talentRank
-                    ]);
-                }
-            }
+        // Создаем массив с очками пользователя по талантам
+        $userTalentScores = [];
+        foreach ($this->userResults as $result) {
+            $userTalentScores[$result['id']] = $result['score'];
         }
         
-        // Убираем дубликаты и сортируем по релевантности
-        return $professionsData->unique('id')->sortBy('relevance_score');
+        // Находим максимальный возможный балл для нормализации
+        $maxUserScore = collect($this->userResults)->max('score');
+        $maxUserScore = max($maxUserScore, 1); // Избегаем деления на 0
+        
+        // Получаем все профессии с их талантами
+        $allProfessions = \App\Models\Profession::with(['talents', 'sphere'])->get();
+        $professionsData = collect();
+        
+        foreach ($allProfessions as $profession) {
+            $compatibilityPercentage = 0;
+            
+            if ($profession->talents && $profession->talents->count() > 0) {
+                $totalWeightedScore = 0;
+                $totalWeight = 0;
+                $matchingTalentsCount = 0;
+                
+                foreach ($profession->talents as $talent) {
+                    $userScore = $userTalentScores[$talent->id] ?? 0;
+                    $coefficient = $talent->pivot->coefficient ?? 1.0;
+                    
+                    // Нормализуем очки пользователя относительно максимального балла
+                    $normalizedScore = $userScore / $maxUserScore;
+                    
+                    // Взвешиваем по коэффициенту важности таланта для профессии
+                    $weightedScore = $normalizedScore * $coefficient;
+                    
+                    $totalWeightedScore += $weightedScore;
+                    $totalWeight += $coefficient;
+                    
+                    // Считаем количество "совпадающих" талантов (где есть хоть какие-то очки)
+                    if ($userScore > 0) {
+                        $matchingTalentsCount++;
+                    }
+                }
+                
+                // Базовый процент совместимости
+                if ($totalWeight > 0) {
+                    $baseCompatibility = ($totalWeightedScore / $totalWeight) * 100;
+                    
+                    // Бонус за покрытие талантов (чем больше талантов профессии у пользователя, тем лучше)
+                    $coverageBonus = ($matchingTalentsCount / $profession->talents->count()) * 10; // до 10% бонуса
+                    
+                    $compatibilityPercentage = min($baseCompatibility + $coverageBonus, 100); // Ограничиваем 100%
+                }
+            }
+            
+            $professionsData->push([
+                'id' => $profession->id,
+                'name' => $profession->name,
+                'description' => $profession->description ?? '',
+                'sphere_name' => $profession->sphere ? $profession->sphere->name : '',
+                'is_top' => false, // Будет установлено после сортировки
+                'relevance_score' => 999,
+                'compatibility_percentage' => round($compatibilityPercentage, 1)
+            ]);
+        }
+        
+        // Сортируем: сначала по проценту совместимости (убывание), затем по имени (по возрастанию)
+        $sortedProfessions = $professionsData
+            ->sortByDesc('compatibility_percentage')
+            ->sortBy('name')
+            ->sortByDesc('compatibility_percentage') // Повторная сортировка по проценту для финального порядка
+            ->values();
+        
+        // Помечаем первые 8 как топовые
+        $topProfessions = $sortedProfessions->map(function($profession, $index) {
+            $profession['is_top'] = $index < 8; // Только первые 8 профессий топовые
+            return $profession;
+        });
+        
+        return $topProfessions;
     }
     
     /**
@@ -361,21 +422,6 @@ class TalentTestResults extends Component
         return $this->testSession->selected_plan === 'talents_spheres_professions';
     }
     
-    /**
-     * Валидирует и корректирует активную вкладку в зависимости от доступа
-     */
-    private function validateActiveTab()
-    {
-        // Если активная вкладка "spheres", но нет доступа - переключаем на "talents"
-        if ($this->activeTab === 'spheres' && !$this->canViewSpheresTab) {
-            $this->activeTab = 'talents';
-        }
-        
-        // Если активная вкладка "professions", но нет доступа - переключаем на доступную
-        if ($this->activeTab === 'professions' && !$this->canViewProfessionsTab) {
-            $this->activeTab = $this->canViewSpheresTab ? 'spheres' : 'talents';
-        }
-    }
     
     public function render()
     {

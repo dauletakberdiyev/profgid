@@ -1,4 +1,37 @@
-<div class="min-h-screen bg-gray-50 py-4 md:py-8 px-4">
+<div class="min-h-screen bg-gray-50 py-4 md:py-8 px-4" x-data="{
+    activeTab: 'talents',
+    canViewSpheresTab: {{ $this->canViewSpheresTab ? 'true' : 'false' }},
+    canViewProfessionsTab: {{ $this->canViewProfessionsTab ? 'true' : 'false' }},
+    modalSphere: null,
+    modalProfession: null,
+    
+    setActiveTab(tab) {
+        // Проверяем права доступа к вкладкам
+        if (tab === 'spheres' && !this.canViewSpheresTab) {
+            return; // Не переключаем вкладку если нет доступа
+        }
+        if (tab === 'professions' && !this.canViewProfessionsTab) {
+            return; // Не переключаем вкладку если нет доступа
+        }
+        this.activeTab = tab;
+    },
+    
+    openSphereModal(sphere) {
+        this.modalSphere = sphere;
+    },
+    
+    closeSphereModal() {
+        this.modalSphere = null;
+    },
+    
+    openProfessionModal(profession) {
+        this.modalProfession = profession;
+    },
+    
+    closeProfessionModal() {
+        this.modalProfession = null;
+    }
+}">
     <div class="max-w-7xl mx-auto bg-white rounded-xl p-4 md:p-8 my-4 md:my-8">
         @if (count($userResults) > 0)
             <!-- Tabs Navigation -->
@@ -6,23 +39,26 @@
                 <div class="border-b border-gray-200">
                     <nav class="-mb-px flex space-x-8" aria-label="Tabs">
                         <!-- Вкладка "Таланты" - всегда доступна -->
-                        <button wire:click="setActiveTab('talents')" 
-                            class="py-3 px-1 border-b-2 font-medium text-sm transition-colors duration-200 {{ $activeTab === 'talents' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
+                        <button @click="setActiveTab('talents')" 
+                            :class="activeTab === 'talents' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                            class="py-3 px-1 border-b-2 font-medium text-sm transition-colors duration-200">
                             Топ Таланты
                         </button>
                         
                         <!-- Вкладка "Сферы" - доступна для средний и премиум тарифов -->
                         @if($this->canViewSpheresTab)
-                            <button wire:click="setActiveTab('spheres')" 
-                                class="py-3 px-1 border-b-2 font-medium text-sm transition-colors duration-200 {{ $activeTab === 'spheres' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
+                            <button @click="setActiveTab('spheres')" 
+                                :class="activeTab === 'spheres' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                                class="py-3 px-1 border-b-2 font-medium text-sm transition-colors duration-200">
                                 Топ Сферы
                             </button>
                         @endif
                         
                         <!-- Вкладка "Профессии" - доступна только для премиум тарифа -->
                         @if($this->canViewProfessionsTab)
-                            <button wire:click="setActiveTab('professions')" 
-                                class="py-3 px-1 border-b-2 font-medium text-sm transition-colors duration-200 {{ $activeTab === 'professions' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
+                            <button @click="setActiveTab('professions')" 
+                                :class="activeTab === 'professions' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                                class="py-3 px-1 border-b-2 font-medium text-sm transition-colors duration-200">
                                 Топ Профессии
                             </button>
                         @endif
@@ -54,7 +90,7 @@
             </div>
 
             <!-- Tab Content -->
-            @if($activeTab === 'talents')
+            <div x-show="activeTab === 'talents'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
                 <!-- Domain Bar Chart -->
                 <div class="mb-4 md:mb-6">
                     @php
@@ -169,201 +205,228 @@
                         </div>
                     @endforeach
                 </div>
-            @endif
+            </div>
 
-            @if($activeTab === 'spheres')
+            <div x-show="activeTab === 'spheres'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
                 <h2 class="text-lg md:text-xl font-bold mb-4">Все сферы деятельности</h2>
                 <p class="text-xs md:text-sm text-gray-600 mb-6 leading-relaxed">
-                    На основе ваших топ талантов мы выделили наиболее подходящие сферы деятельности. Яркие сферы соответствуют вашим сильным сторонам.
+                    На основе ваших топ талантов мы выделили наиболее подходящие сферы деятельности с процентом совместимости.
                 </p>
                 
-                <!-- Desktop Table View -->
-                <div class="hidden lg:block overflow-x-auto">
-                    <table class="w-full min-w-full">
-                        <thead>
-                            <tr class="border-b border-gray-200">
-                                <th class="text-left py-6 pr-8 text-sm font-medium text-gray-900 tracking-wider uppercase">
-                                    Сфера деятельности
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100">
-                            @foreach($topSpheres as $sphere)
-                                <tr class="group hover:bg-gray-50/50 transition-colors duration-200 cursor-pointer {{ !$sphere['is_top'] ? 'opacity-50' : 'bg-blue-50 border border-gray-300' }}" 
-                                    wire:click="toggleSphereExpanded({{ $sphere['id'] }})"
-                                    title="{{ in_array($sphere['id'], $expandedSpheres) ? 'Скрыть описание' : 'Показать описание' }}">
-                                    <td class="py-8 pr-8 align-top">
-                                        <div class="flex items-center justify-between">
-                                            <div>
-                                                <h3 class="text-lg font-semibold {{ $sphere['is_top'] ? 'text-gray-900' : 'text-gray-500' }} mb-1">
-                                                    {{ $sphere['name'] }}
-                                                    @if($sphere['is_top'])
-                                                        <span class="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">ТОП</span>
-                                                    @endif
-                                                </h3>
-                                                @if(in_array($sphere['id'], $expandedSpheres))
-                                                    <p class="text-sm {{ $sphere['is_top'] ? 'text-gray-700' : 'text-gray-500' }} leading-relaxed mt-2">
-                                                        {{ $sphere['description'] ?: 'Описание отсутствует' }}
-                                                    </p>
-                                                @endif
-                                            </div>
-                                            <div class="text-gray-400 group-hover:text-blue-600 transition-colors duration-200 p-1 ml-4">
-                                                <svg class="w-5 h-5 transform transition-transform duration-200 {{ in_array($sphere['id'], $expandedSpheres) ? 'rotate-180' : '' }}" 
-                                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" 
-                                                        d="M19 9l-7 7-7-7" />
-                                                </svg>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Mobile Card View -->
-                <div class="lg:hidden space-y-6">
-                    @foreach($topSpheres as $sphere)
-                        <div class="border border-gray-200 bg-white cursor-pointer hover:bg-gray-50 transition-colors duration-200 {{ !$sphere['is_top'] ? 'opacity-50' : '' }}"
-                             wire:click="toggleSphereExpanded({{ $sphere['id'] }})"
-                             title="{{ in_array($sphere['id'], $expandedSpheres) ? 'Скрыть описание' : 'Показать описание' }}">
-                            <table class="w-full">
-                                <tbody>
-                                    <tr class="border-b border-gray-100">
-                                        <td class="py-4 px-6 text-xs font-medium text-gray-500 uppercase tracking-wide w-1/3">
-                                            Сфера
-                                        </td>
-                                        <td class="py-4 px-6 text-right">
-                                            <div class="text-gray-400 hover:text-blue-600 transition-colors duration-200 p-1">
-                                                <svg class="w-4 h-4 transform transition-transform duration-200 {{ in_array($sphere['id'], $expandedSpheres) ? 'rotate-180' : '' }}" 
-                                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" 
-                                                        d="M19 9l-7 7-7-7" />
-                                                </svg>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr class="border-b border-gray-100">
-                                        <td colspan="2" class="py-4 px-6">
-                                            <h3 class="text-lg font-semibold {{ $sphere['is_top'] ? 'text-gray-900' : 'text-gray-500' }}">
-                                                {{ $sphere['name'] }}
-                                                @if($sphere['is_top'])
-                                                    <span class="ml-2 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">ТОП</span>
-                                                @endif
-                                            </h3>
-                                        </td>
-                                    </tr>
-                                    @if(in_array($sphere['id'], $expandedSpheres))
-                                        <tr>
-                                            <td colspan="2" class="py-4 px-6 text-sm {{ $sphere['is_top'] ? 'text-gray-700' : 'text-gray-500' }}">
-                                                {{ $sphere['description'] ?: 'Описание отсутствует' }}
-                                            </td>
-                                        </tr>
-                                    @endif
-                                </tbody>
-                            </table>
+                @php
+                    $topEightSpheres = collect($topSpheres)->filter(function($sphere) {
+                        return $sphere['is_top'];
+                    })->toArray();
+                    $remainingSpheres = collect($topSpheres)->filter(function($sphere) {
+                        return !$sphere['is_top'];
+                    })->toArray();
+                @endphp
+                
+                <!-- Топ 8 сфер -->
+                @if(count($topEightSpheres) > 0)
+                    <div class="mb-8">
+                        <div class="flex items-center mb-4">
+                            <svg class="w-5 h-5 text-yellow-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                            </svg>
+                            <h3 class="text-lg font-semibold text-gray-900">Топ рекомендации для вас</h3>
                         </div>
-                    @endforeach
+                        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4 space-y-2">
+                            @foreach($topEightSpheres as $sphere)
+                                <div class="bg-white border border-blue-100 hover:border-blue-300 transition-colors duration-200 px-6 py-4 rounded-lg flex items-center justify-between shadow-sm">
+                                    <div class="flex items-center space-x-4">
+                                        <h4 class="text-base font-medium text-gray-900">{{ $sphere['name'] }}</h4>
+                                        <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full font-medium">
+                                            {{ $sphere['compatibility_percentage'] }}%
+                                        </span>
+                                    </div>
+                                    
+                                    <button @click="openSphereModal({{ json_encode($sphere) }})" 
+                                            class="text-blue-400 hover:text-blue-600 transition-colors duration-200 p-1"
+                                            title="Показать описание">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+                
+                <!-- Остальные сферы -->
+                @if(count($remainingSpheres) > 0)
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4">Остальные сферы деятельности</h3>
+                        <div class="space-y-2">
+                            @foreach($remainingSpheres as $sphere)
+                                <div class="border border-gray-200 bg-white hover:bg-gray-50 transition-colors duration-200 px-6 py-3 flex items-center justify-between opacity-70">
+                                    <div class="flex items-center space-x-4">
+                                        <h4 class="text-base font-medium text-gray-600">{{ $sphere['name'] }}</h4>
+                                        <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+                                            {{ $sphere['compatibility_percentage'] }}%
+                                        </span>
+                                    </div>
+                                    
+                                    <button @click="openSphereModal({{ json_encode($sphere) }})" 
+                                            class="text-gray-400 hover:text-blue-600 transition-colors duration-200 p-1"
+                                            title="Показать описание">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+                
+                <!-- Modal for Sphere Description -->
+                <div x-show="modalSphere" 
+                     x-transition:enter="transition ease-out duration-300" 
+                     x-transition:enter-start="opacity-0" 
+                     x-transition:enter-end="opacity-100"
+                     x-transition:leave="transition ease-in duration-200" 
+                     x-transition:leave-start="opacity-100" 
+                     x-transition:leave-end="opacity-0"
+                     class="fixed inset-0 flex items-center justify-center z-50 p-4"
+                     style="background-color: rgba(0, 0, 0, 0.5);"
+                     @click="closeSphereModal()">
+                    <div @click.stop 
+                         x-transition:enter="transition ease-out duration-300" 
+                         x-transition:enter-start="opacity-0 transform scale-95" 
+                         x-transition:enter-end="opacity-100 transform scale-100"
+                         x-transition:leave="transition ease-in duration-200" 
+                         x-transition:leave-start="opacity-100 transform scale-100" 
+                         x-transition:leave-end="opacity-0 transform scale-95"
+                         class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+                        <div class="flex items-start justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-gray-900" x-text="modalSphere?.name"></h3>
+                            <button @click="closeSphereModal()" 
+                                    class="text-gray-400 hover:text-gray-600 transition-colors">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        <p class="text-sm text-gray-700 leading-relaxed" x-text="modalSphere?.description || 'Описание отсутствует'"></p>
+                    </div>
                 </div>
-            @endif
+            </div>
 
-            @if($activeTab === 'professions')
-                <h2 class="text-lg md:text-xl font-bold mb-4">Топ Профессии</h2>
+            <div x-show="activeTab === 'professions'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
+                <h2 class="text-lg md:text-xl font-bold mb-4">Все профессии</h2>
                 <p class="text-xs md:text-sm text-gray-600 mb-6 leading-relaxed">
                     На основе ваших топ талантов мы подобрали наиболее подходящие профессии.
                 </p>
                 
-                <!-- Desktop Table View -->
-                <div class="hidden lg:block overflow-x-auto">
-                    <table class="w-full min-w-full">
-                        <thead>
-                            <tr class="border-b border-gray-200">
-                                <th class="text-left py-6 pr-8 text-sm font-medium text-gray-900 tracking-wider uppercase">
-                                    Профессия
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100">
-                            @foreach($topProfessions as $profession)
-                                <tr class="group hover:bg-gray-50/50 transition-colors duration-200 cursor-pointer"
-                                    wire:click="toggleProfessionExpanded({{ $profession['id'] }})"
-                                    title="{{ in_array($profession['id'], $expandedProfessions) ? 'Скрыть описание' : 'Показать описание' }}">
-                                    <td class="py-8 pr-8 align-top">
-                                        <div class="flex items-center justify-between">
-                                            <div>
-                                                <h3 class="text-lg font-semibold text-gray-900 mb-1">
-                                                    {{ $profession['name'] }}
-                                                </h3>
-                                                @if(!empty($profession['sphere_name']))
-                                                    <div class="text-xs text-gray-600 mb-1">{{ $profession['sphere_name'] }}</div>
-                                                @endif
-                                                @if(in_array($profession['id'], $expandedProfessions))
-                                                    <p class="text-sm text-gray-700 leading-relaxed mt-2">
-                                                        {{ $profession['description'] ?: 'Описание отсутствует' }}
-                                                    </p>
-                                                @endif
-                                            </div>
-                                            <div class="text-gray-400 group-hover:text-blue-600 transition-colors duration-200 p-1 ml-4">
-                                                <svg class="w-5 h-5 transform transition-transform duration-200 {{ in_array($profession['id'], $expandedProfessions) ? 'rotate-180' : '' }}" 
-                                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" 
-                                                        d="M19 9l-7 7-7-7" />
-                                                </svg>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Mobile Card View -->
-                <div class="lg:hidden space-y-6">
-                    @foreach($topProfessions as $profession)
-                        <div class="border border-gray-200 bg-white cursor-pointer hover:bg-gray-50 transition-colors duration-200"
-                             wire:click="toggleProfessionExpanded({{ $profession['id'] }})"
-                             title="{{ in_array($profession['id'], $expandedProfessions) ? 'Скрыть описание' : 'Показать описание' }}">
-                            <table class="w-full">
-                                <tbody>
-                                    <tr class="border-b border-gray-100">
-                                        <td class="py-4 px-6 text-xs font-medium text-gray-500 uppercase tracking-wide w-1/3">
-                                            Профессия
-                                        </td>
-                                        <td class="py-4 px-6 text-right">
-                                            <div class="text-gray-400 hover:text-blue-600 transition-colors duration-200 p-1">
-                                                <svg class="w-4 h-4 transform transition-transform duration-200 {{ in_array($profession['id'], $expandedProfessions) ? 'rotate-180' : '' }}" 
-                                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" 
-                                                        d="M19 9l-7 7-7-7" />
-                                                </svg>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr class="border-b border-gray-100">
-                                        <td colspan="2" class="py-4 px-6">
-                                            <h3 class="text-lg font-semibold text-gray-900">
-                                                {{ $profession['name'] }}
-                                            </h3>
-                                            @if(!empty($profession['sphere_name']))
-                                                <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded mt-1 inline-block">{{ $profession['sphere_name'] }}</span>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                    @if(in_array($profession['id'], $expandedProfessions))
-                                        <tr>
-                                            <td colspan="2" class="py-4 px-6 text-sm text-gray-700">
-                                                {{ $profession['description'] ?: 'Описание отсутствует' }}
-                                            </td>
-                                        </tr>
-                                    @endif
-                                </tbody>
-                            </table>
+                @php
+                    $topEightProfessions = collect($topProfessions)->take(8)->toArray();
+                    $remainingProfessions = collect($topProfessions)->skip(8)->toArray();
+                @endphp
+                
+                <!-- Топ 8 профессий -->
+                @if(count($topEightProfessions) > 0)
+                    <div class="mb-8">
+                        <div class="flex items-center mb-4">
+                            <svg class="w-5 h-5 text-yellow-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                            </svg>
+                            <h3 class="text-lg font-semibold text-gray-900">Топ рекомендации для вас</h3>
                         </div>
-                    @endforeach
+                        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4 space-y-2">
+                            @foreach($topEightProfessions as $index => $profession)
+                                <div class="bg-white border border-blue-100 hover:border-blue-300 transition-colors duration-200 px-6 py-4 rounded-lg flex items-center justify-between shadow-sm">
+                                    <div class="flex items-center space-x-4">
+                                        <h4 class="text-base font-medium text-gray-900">{{ $profession['name'] }}</h4>
+                                        <span class="text-xs bg-blue-600 text-white px-3 py-1 rounded-full font-medium">
+                                            {{ $profession['compatibility_percentage'] }}%
+                                        </span>
+                                    </div>
+                                    
+                                    <button @click="openProfessionModal({{ json_encode($profession) }})" 
+                                            class="text-blue-400 hover:text-blue-600 transition-colors duration-200 p-1"
+                                            title="Показать описание">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+                <!-- Остальные профессии -->
+                @if(count($remainingProfessions) > 0)
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4">Остальные профессии</h3>
+                        <div class="space-y-2">
+                            @foreach($remainingProfessions as $profession)
+                                <div class="border border-gray-200 bg-white hover:bg-gray-50 transition-colors duration-200 px-6 py-3 flex items-center justify-between opacity-70">
+                                    <div class="flex items-center space-x-4">
+                                        <div>
+                                            <h4 class="text-base font-medium text-gray-600">{{ $profession['name'] }}</h4>
+                                            @if(!empty($profession['sphere_name']))
+                                                <div class="text-xs text-gray-500 mt-1">{{ $profession['sphere_name'] }}</div>
+                                            @endif
+                                        </div>
+                                        <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+                                            {{ $profession['compatibility_percentage'] }}%
+                                        </span>
+                                    </div>
+                                    
+                                    <button @click="openProfessionModal({{ json_encode($profession) }})" 
+                                            class="text-gray-400 hover:text-blue-600 transition-colors duration-200 p-1"
+                                            title="Показать описание">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+                
+                <!-- Modal for Profession Description -->
+                <div x-show="modalProfession" 
+                     x-transition:enter="transition ease-out duration-300" 
+                     x-transition:enter-start="opacity-0" 
+                     x-transition:enter-end="opacity-100"
+                     x-transition:leave="transition ease-in duration-200" 
+                     x-transition:leave-start="opacity-100" 
+                     x-transition:leave-end="opacity-0"
+                     class="fixed inset-0 flex items-center justify-center z-50 p-4"
+                     style="background-color: rgba(0, 0, 0, 0.5);"
+                     @click="closeProfessionModal()">
+                    <div @click.stop 
+                         x-transition:enter="transition ease-out duration-300" 
+                         x-transition:enter-start="opacity-0 transform scale-95" 
+                         x-transition:enter-end="opacity-100 transform scale-100"
+                         x-transition:leave="transition ease-in duration-200" 
+                         x-transition:leave-start="opacity-100 transform scale-100" 
+                         x-transition:leave-end="opacity-0 transform scale-95"
+                         class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+                        <div class="flex items-start justify-between mb-4">
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-900" x-text="modalProfession?.name"></h3>
+                                <div class="text-sm text-blue-600 mt-1" x-text="modalProfession?.sphere_name || ''"></div>
+                            </div>
+                            <button @click="closeProfessionModal()" 
+                                    class="text-gray-400 hover:text-gray-600 transition-colors">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        <p class="text-sm text-gray-700 leading-relaxed" x-text="modalProfession?.description || 'Описание отсутствует'"></p>
+                    </div>
                 </div>
-            @endif
+            </div>
 
 
         @else

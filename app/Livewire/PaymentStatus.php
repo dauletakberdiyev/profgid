@@ -3,19 +3,15 @@
 namespace App\Livewire;
 
 use Livewire\Component;
-use Livewire\WithFileUploads;
 use App\Models\TestSession;
-use Illuminate\Support\Facades\Storage;
 
 class PaymentStatus extends Component
 {
-    use WithFileUploads;
-    
     public $sessionId;
     public $plan;
     public $testSession;
-    public $receiptImage;
-    public $uploadedReceipt = false;
+    public $payerName;
+    public $paymentConfirmed = false;
     
     public $plans = [
         'talents' => [
@@ -49,38 +45,37 @@ class PaymentStatus extends Component
             return redirect()->route('payment');
         }
         
-        // Проверяем, загружен ли уже чек
-        $this->uploadedReceipt = !empty($this->testSession->receipt_image);
+        // Проверяем, подтверждена ли уже оплата
+        $this->paymentConfirmed = !empty($this->testSession->payer_name);
+        $this->payerName = $this->testSession->payer_name;
     }
 
     public function refreshPaymentStatus()
     {
         $this->testSession = $this->testSession->fresh();
-        $this->uploadedReceipt = !empty($this->testSession->receipt_image);
+        $this->paymentConfirmed = !empty($this->testSession->payer_name);
+        $this->payerName = $this->testSession->payer_name;
     }
 
     public function confirmPayment()
     {
         $this->validate([
-            'receiptImage' => 'required|image|max:5120' // 5MB max
+            'payerName' => 'required|string|min:2|max:255'
         ], [
-            'receiptImage.required' => 'Пожалуйста, прикрепите чек об оплате',
-            'receiptImage.image' => 'Файл должен быть изображением',
-            'receiptImage.max' => 'Размер файла не должен превышать 5MB'
+            'payerName.required' => 'Пожалуйста, укажите имя плательщика',
+            'payerName.min' => 'Имя должно содержать минимум 2 символа',
+            'payerName.max' => 'Имя не должно превышать 255 символов'
         ]);
-
-        // Сохраняем изображение
-        $imagePath = $this->receiptImage->store('receipts', 'public');
         
         // Обновляем сессию
         $this->testSession->update([
-            'receipt_image' => $imagePath,
+            'payer_name' => $this->payerName,
             'payment_status' => 'review'
         ]);
         
-        $this->uploadedReceipt = true;
+        $this->paymentConfirmed = true;
         
-        session()->flash('success', 'Чек загружен! Мы проверим оплату в течение 30 минут.');
+        session()->flash('success', 'Информация о плательщике сохранена! Мы проверим оплату в течение 30 минут.');
     }
 
     public function getStatusText()

@@ -70,43 +70,27 @@
                 </a>
             </div>
 
-            <!-- Upload Receipt -->
+            <!-- Payment Confirmation -->
             <div class="bg-white border border-gray-200 rounded-2xl p-6 md:p-8">
                 <h3 class="text-xl font-medium text-gray-900 mb-6">Подтверждение оплаты</h3>
                 
-                @if(!$uploadedReceipt && $testSession->payment_status !== 'completed')
+                @if(!$paymentConfirmed && $testSession->payment_status !== 'completed')
                     <form wire:submit.prevent="confirmPayment">
                         <div class="mb-6">
-                            <label class="block text-sm font-medium text-gray-700 mb-3">
-                                Прикрепите чек об оплате
+                            <label for="payer-name" class="block text-sm font-medium text-gray-700 mb-3">
+                                Имя плательщика *
                             </label>
-                            <div class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:border-gray-400 transition-colors">
-                                <input type="file" 
-                                       wire:model="receiptImage" 
-                                       accept="image/*"
-                                       class="hidden"
-                                       id="receipt-upload">
-                                <label for="receipt-upload" class="cursor-pointer">
-                                    <svg class="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                                    </svg>
-                                    <p class="text-gray-600">Нажмите, чтобы выбрать файл</p>
-                                    <p class="text-sm text-gray-500 mt-1">PNG, JPG до 5MB</p>
-                                </label>
-                            </div>
-                            @error('receiptImage') 
+                            <input type="text" 
+                                   id="payer-name"
+                                   wire:model="payerName" 
+                                   placeholder="Введите ваше имя"
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                   required>
+                            @error('payerName') 
                                 <p class="text-red-500 text-sm mt-2">{{ $message }}</p> 
                             @enderror
+                            <p class="text-sm text-gray-500 mt-2">Укажите имя, на которое была произведена оплата</p>
                         </div>
-                        
-                        @if($receiptImage)
-                            <div class="mb-6">
-                                <p class="text-sm text-gray-600 mb-2">Выбранный файл:</p>
-                                <div class="bg-gray-50 rounded-lg p-3">
-                                    <p class="text-sm font-medium">{{ $receiptImage->getClientOriginalName() }}</p>
-                                </div>
-                            </div>
-                        @endif
                         
                         <button type="submit" 
                                 class="w-full py-3 px-6 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-colors font-medium">
@@ -120,7 +104,8 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
                         </div>
-                        <h4 class="text-lg font-medium text-gray-900 mb-2">Чек загружен</h4>
+                        <h4 class="text-lg font-medium text-gray-900 mb-2">Информация получена</h4>
+                        <p class="text-gray-600 mb-2">Плательщик: <span class="font-medium">{{ $testSession->payer_name }}</span></p>
                         <p class="text-gray-600">Мы проверяем вашу оплату. Это займет до 30 минут.</p>
                     </div>
                 @elseif($testSession->payment_status === 'completed')

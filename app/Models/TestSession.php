@@ -15,6 +15,7 @@ class TestSession extends Model
         'payment_amount',
         'payment_transaction_id',
         'receipt_image',
+        'payer_name',
         'payment_confirmed_at',
         'selected_plan',
         'total_questions',

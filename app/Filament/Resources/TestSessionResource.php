@@ -105,18 +105,10 @@ class TestSessionResource extends Resource
                             ->step(0.01)
                             ->prefix('₸'),
                             
-                        Forms\Components\FileUpload::make('receipt_image')
-                            ->label('Чек об оплате')
-                            ->image()
-                            ->directory('receipts')
-                            ->visibility('public')
-                            ->imagePreviewHeight('250')
-                            ->panelAspectRatio('2:3')
-                            ->panelLayout('integrated')
-                            ->removeUploadedFileButtonPosition('right')
-                            ->uploadButtonPosition('left')
-                            ->uploadProgressIndicatorPosition('left')
-                            ->downloadable(),
+                        Forms\Components\TextInput::make('payer_name')
+                            ->label('Имя плательщика')
+                            ->maxLength(255)
+                            ->helperText('Имя человека, который произвел оплату'),
                             
                         Forms\Components\DateTimePicker::make('payment_confirmed_at')
                             ->label('Время подтверждения оплаты'),
@@ -199,11 +191,10 @@ class TestSessionResource extends Resource
                     })
                     ->sortable(),
                     
-                Tables\Columns\ImageColumn::make('receipt_image')
-                    ->label('Чек')
-                    ->width(60)
-                    ->height(80)
-                    ->defaultImageUrl(url('/images/no-receipt.svg'))
+                Tables\Columns\TextColumn::make('payer_name')
+                    ->label('Плательщик')
+                    ->searchable()
+                    ->placeholder('—')
                     ->toggleable(isToggledHiddenByDefault: false),
                     
                 Tables\Columns\TextColumn::make('answered_questions')
@@ -275,6 +266,10 @@ class TestSessionResource extends Resource
                 Tables\Filters\Filter::make('paid_sessions')
                     ->label('Подтвержденные оплаты')
                     ->query(fn (Builder $query): Builder => $query->where('payment_status', 'completed')),
+                    
+                Tables\Filters\Filter::make('has_payer_name')
+                    ->label('С именем плательщика')
+                    ->query(fn (Builder $query): Builder => $query->whereNotNull('payer_name')),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -301,7 +296,9 @@ class TestSessionResource extends Resource
                     ->requiresConfirmation()
                     ->modalHeading('Подтвердить оплату?')
                     ->modalDescription('Это действие подтвердит оплату и откроет доступ к результатам теста.')
-                    ->visible(fn (TestSession $record): bool => $record->payment_status === 'review'),
+                    ->visible(fn (TestSession $record): bool => 
+                        $record->payment_status === 'review' && !empty($record->payer_name)
+                    ),
                     
                 Tables\Actions\Action::make('rejectPayment')
                     ->label('Отклонить оплату')
@@ -315,7 +312,9 @@ class TestSessionResource extends Resource
                     ->requiresConfirmation()
                     ->modalHeading('Отклонить оплату?')
                     ->modalDescription('Это действие отклонит оплату и потребует повторной оплаты.')
-                    ->visible(fn (TestSession $record): bool => $record->payment_status === 'review'),
+                    ->visible(fn (TestSession $record): bool => 
+                        $record->payment_status === 'review' && !empty($record->payer_name)
+                    ),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
