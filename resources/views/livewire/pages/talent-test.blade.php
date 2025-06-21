@@ -121,6 +121,7 @@ function talentTest(questions, timePerQuestion, testSessionId) {
         timer: null,
         testSessionId: testSessionId,
         isSubmitting: false,
+        isTransitioning: false, // Добавляем флаг для предотвращения двойных переходов
         answerOptions: [
             'Совсем не согласен',
             'Скорее не согласен', 
@@ -147,7 +148,24 @@ function talentTest(questions, timePerQuestion, testSessionId) {
                 if (this.timeRemaining > 0) {
                     this.timeRemaining--;
                 } else {
-                    this.nextQuestion();
+                    // Переходим к следующему вопросу только если еще не ответили и не происходит переход
+                    if (this.answers[this.currentQuestionIndex] === null && !this.isTransitioning) {
+                        this.isTransitioning = true;
+                        this.stopTimer();
+                        
+                        // Автоматический переход по таймеру
+                        if (this.currentQuestionIndex < this.allQuestions.length - 1) {
+                            this.currentQuestionIndex++;
+                            this.selectedAnswer = this.answers[this.currentQuestionIndex] || null;
+                            this.timeRemaining = this.timePerQuestion;
+                            this.questionStartTime = Date.now();
+                            this.updateProgress();
+                            this.startTimer();
+                        } else {
+                            this.submitTest();
+                        }
+                        this.isTransitioning = false;
+                    }
                 }
             }, 1000);
         },
@@ -160,6 +178,13 @@ function talentTest(questions, timePerQuestion, testSessionId) {
         },
 
         selectAnswerAndNext(answerValue) {
+            // Предотвращаем двойной клик
+            if (this.isTransitioning) return;
+            
+            // Останавливаем таймер сразу, чтобы избежать двойного перехода
+            this.stopTimer();
+            this.isTransitioning = true;
+            
             // Записываем ответ и время
             this.selectedAnswer = answerValue;
             this.answers[this.currentQuestionIndex] = answerValue;
@@ -174,37 +199,46 @@ function talentTest(questions, timePerQuestion, testSessionId) {
             // Переходим к следующему вопросу или завершаем
             setTimeout(() => {
                 if (this.currentQuestionIndex < this.allQuestions.length - 1) {
-                    this.nextQuestion();
+                    // Переходим на следующий вопрос напрямую без дополнительных проверок
+                    this.currentQuestionIndex++;
+                    this.selectedAnswer = this.answers[this.currentQuestionIndex] || null;
+                    this.timeRemaining = this.timePerQuestion;
+                    this.questionStartTime = Date.now();
+                    this.updateProgress();
+                    this.startTimer();
                 } else {
                     this.submitTest();
                 }
+                this.isTransitioning = false;
             }, 150); // Небольшая задержка для UX
         },
 
         nextQuestion() {
-            if (this.currentQuestionIndex < this.allQuestions.length - 1) {
-                this.stopTimer();
-                this.currentQuestionIndex++;
-                this.selectedAnswer = this.answers[this.currentQuestionIndex] || null;
-                this.timeRemaining = this.timePerQuestion;
-                this.questionStartTime = Date.now();
-                this.updateProgress();
-                this.startTimer();
-            } else {
-                this.submitTest();
+            if (this.currentQuestionIndex >= this.allQuestions.length - 1) {
+                return;
             }
+            
+            this.stopTimer();
+            this.currentQuestionIndex++;
+            this.selectedAnswer = this.answers[this.currentQuestionIndex] || null;
+            this.timeRemaining = this.timePerQuestion;
+            this.questionStartTime = Date.now();
+            this.updateProgress();
+            this.startTimer();
         },
 
         previousQuestion() {
-            if (this.currentQuestionIndex > 0) {
-                this.stopTimer();
-                this.currentQuestionIndex--;
-                this.selectedAnswer = this.answers[this.currentQuestionIndex] || null;
-                this.timeRemaining = this.timePerQuestion;
-                this.questionStartTime = Date.now();
-                this.updateProgress();
-                this.startTimer();
+            if (this.currentQuestionIndex <= 0) {
+                return;
             }
+            
+            this.stopTimer();
+            this.currentQuestionIndex--;
+            this.selectedAnswer = this.answers[this.currentQuestionIndex] || null;
+            this.timeRemaining = this.timePerQuestion;
+            this.questionStartTime = Date.now();
+            this.updateProgress();
+            this.startTimer();
         },
 
         updateProgress() {
