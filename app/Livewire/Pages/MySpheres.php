@@ -31,7 +31,9 @@ class MySpheres extends Component
     {
         $user = Auth::user();
         $sphereIds = $user->favorite_spheres ?? [];
-        $this->favoriteSpheres = Sphere::with('talents')->whereIn('id', $sphereIds)->get();
+        $this->favoriteSpheres = Sphere::with(relations: ['talents', 'professions' => function($query) {
+            $query->where('is_active', true)->orderBy('name');
+        }])->whereIn('id', $sphereIds)->get();
     }
 
     public function removeSphere($sphereId)

@@ -9,12 +9,28 @@
         <!-- Pricing Cards -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-12 mb-12 md:mb-16">
             @foreach($plans as $key => $plan)
-                <div class="relative bg-white border border-gray-200 rounded-xl overflow-hidden transition-all duration-300 hover:border-gray-300 flex flex-col">
+                <div class="relative bg-white border {{ $loop->last ? 'border-yellow-300 scale-105' : 'border-gray-200' }} rounded-xl transition-all duration-300 hover:border-gray-300 flex flex-col {{ $loop->last ? 'lg:transform lg:scale-105' : '' }}">
+                    
+                    <!-- Crown for the last plan -->
+                    @if($loop->last)
+                        <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
+                            <div class="bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-full p-3">
+                                <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M5 16L3 6l5.5 4L12 4l3.5 6L21 6l-2 10H5z"/>
+                                </svg>
+                            </div>
+                        </div>
+                    @endif
                     
                     <div class="p-8 md:p-10 flex flex-col flex-grow">
                         <!-- Plan Header -->
                         <div class="text-center mb-8">
-                            <h3 class="text-xl md:text-2xl font-medium text-gray-900 mb-4">{{ $plan['name'] }}</h3>
+                            <h3 class="text-xl md:text-2xl font-medium text-gray-900 mb-4 {{ $loop->last ? 'mt-4' : '' }}">
+                                {{ $plan['name'] }}
+                                @if($loop->last)
+                                    <span class="block text-sm text-yellow-600 font-normal mt-1">Рекомендуемый</span>
+                                @endif
+                            </h3>
                             <div class="mb-6">
                                 <span class="text-4xl md:text-5xl font-light text-gray-900">{{ number_format($plan['price']) }}</span>
                                 <span class="text-gray-500 ml-2 text-lg">{{ $plan['currency'] }}</span>
@@ -35,10 +51,15 @@
                         <button 
                             wire:click="selectPlan('{{ $key }}')"
                             class="w-full py-4 px-6 rounded-lg font-medium transition-all duration-200 text-sm md:text-base border mt-auto
-                                {{ $plan['color'] === 'blue' ? 'bg-blue-500 text-white border-blue-500 hover:bg-blue-600' : '' }}
-                                {{ $plan['color'] === 'purple' ? 'bg-purple-500 text-white border-purple-500 hover:bg-purple-600' : '' }}
+                                {{ $loop->last ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 text-white border-yellow-500 hover:from-yellow-600 hover:to-yellow-700' : '' }}
+                                {{ $plan['color'] === 'blue' && !$loop->last ? 'bg-blue-500 text-white border-blue-500 hover:bg-blue-600' : '' }}
+                                {{ $plan['color'] === 'purple' && !$loop->last ? 'bg-purple-500 text-white border-purple-500 hover:bg-purple-600' : '' }}
                             ">
-                            Выбрать план
+                            @if($loop->last)
+                                Выбрать лучший план
+                            @else
+                                Выбрать план
+                            @endif
                         </button>
                     </div>
                 </div>
