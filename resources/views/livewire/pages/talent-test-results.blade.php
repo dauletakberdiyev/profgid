@@ -112,16 +112,20 @@
                         $totalScore = array_sum($domainScores);
                         $totalScore = $totalScore > 0 ? $totalScore : 1;
                         
+                        // Sort domains by score (descending)
+                        $sortedDomainScores = $domainScores;
+                        arsort($sortedDomainScores);
+                        
                         // Calculate percentages directly here
                         $domainPercentages = [];
-                        foreach ($domainScores as $domain => $score) {
+                        foreach ($sortedDomainScores as $domain => $score) {
                             $domainPercentages[$domain] = round(($score / $totalScore) * 100, 1);
                         }
                     @endphp
 
                     <!-- Single horizontal bar -->
                     <div class="flex gap-1 w-full h-6 md:h-8 overflow-hidden mb-3 md:mb-4">
-                        @foreach ($domainScores as $domain => $score)
+                        @foreach ($sortedDomainScores as $domain => $score)
                             @php
                                 $percentage = ($score / $totalScore) * 100;
                             @endphp
@@ -136,7 +140,7 @@
 
                     <!-- Domain labels with scores and percentages -->
                     <div class="flex w-full">
-                        @foreach ($domainScores as $domain => $score)
+                        @foreach ($sortedDomainScores as $domain => $score)
                             @php
                                 $percentage = ($score / $totalScore) * 100;
                             @endphp
@@ -174,9 +178,9 @@
                                     return $a['rank'] <=> $b['rank'];
                                 });
                                 
-                                // Находим 8 талантов с наименьшими очками из всех результатов
-                                $bottomTalentsByScore = collect($userResults)->sortByDesc('score')->take(8);
-                                $bottomTalentIds = $bottomTalentsByScore->pluck('id')->toArray();
+                                // Находим топ 10 талантов с наивысшими очками из всех результатов
+                                $topTalentsByScore = collect($userResults)->sortByDesc('score')->take(10);
+                                $topTalentIds = $topTalentsByScore->pluck('id')->toArray();
                             @endphp
 
                             @php
@@ -191,10 +195,10 @@
                             <div class="grid grid-cols-2 gap-1">
                                 @foreach ($domainTalents as $talent)
                                     @php
-                                        $bgColor = in_array($talent['id'], $bottomTalentIds) 
+                                        $bgColor = in_array($talent['id'], $topTalentIds) 
                                             ? ($domainBgColors[$domain] ?? 'bg-gray-400')
                                             : ($mutedBgColors[$domain] ?? 'bg-gray-200');
-                                        $textColor = in_array($talent['id'], $bottomTalentIds) ? 'text-white' : 'text-black';
+                                        $textColor = in_array($talent['id'], $topTalentIds) ? 'text-white' : 'text-black';
                                     @endphp
                                     <div class="{{ $bgColor }} {{ $textColor }} text-center aspect-square flex flex-col items-center justify-center">
                                         <div class="text-3xl md:text-xl">{{ $talent['rank'] }}</div>

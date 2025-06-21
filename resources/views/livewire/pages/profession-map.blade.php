@@ -33,86 +33,39 @@
             </div>
         @endif
 
-        <!-- Filters and Search -->
-        <div class="bg-gray-50 rounded-lg p-4 md:p-6 mb-6 md:mb-8">
-            <div class="space-y-4">
-                <!-- Search -->
-                <div class="w-full">
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                            </svg>
-                        </div>
-                        <input wire:model.live="search" 
-                               type="text" 
-                               class="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg bg-white placeholder-gray-400 focus:outline-none focus:border-blue-500" 
-                               placeholder="Поиск по сферам...">
-                    </div>
-                </div>
-
-                <!-- Filters Row -->
-                <div class="flex flex-col sm:flex-row gap-3 sm:gap-6">
-                    <!-- Show inactive toggle -->
-                    <label class="flex items-center">
-                        <input wire:model.live="showInactive" 
-                               type="checkbox" 
-                               class="rounded border-gray-300 text-blue-600 focus:ring-0">
-                        <span class="ml-2 text-sm text-gray-600">Показать неактивные</span>
-                    </label>
-
-                    <!-- Sort options -->
-                    <div class="flex items-center gap-2 flex-1">
-                        <span class="text-sm text-gray-600 hidden sm:inline">Сортировка:</span>
-                        <select wire:model.live="sortBy" 
-                                class="flex-1 sm:flex-initial text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white focus:outline-none focus:border-blue-500">
-                            <option value="sort_order">По порядку</option>
-                            <option value="name">По названию</option>
-                            <option value="professions_count">По количеству профессий</option>
-                        </select>
-                        
-                        <button wire:click="sortBy('{{ $sortBy }}')" 
-                                class="p-2 text-gray-400 hover:text-gray-600 transition-colors">
-                            @if($sortDirection === 'asc')
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12"/>
-                                </svg>
-                            @else
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 13l-5 5m0 0l-5-5m5 5V6"/>
-                                </svg>
-                            @endif
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <!-- Spheres Table -->
         <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
-            <div class="px-2 md:px-4 py-2 md:py-3 border-b border-gray-100">
-                <h2 class="text-sm md:text-lg font-medium text-gray-900">Сферы профессий</h2>
-                <p class="text-xs md:text-sm text-gray-500 mt-1">Нажмите на иконку для информации</p>
-            </div>
-            
             <div>
                 <table class="w-full">
                     <tbody class="divide-y divide-gray-100">
                         @foreach($spheres as $sphere)
                             <!-- Основная строка сферы -->
-                            <tr class="hover:bg-gray-50 transition-colors" >
+                            <tr class="hover:bg-gray-50 transition-colors">
                                 <td class="px-2 md:px-4 py-1 md:py-2">
                                     <div class="flex items-center justify-between">
-                                        <div class="flex items-center flex-1 min-w-0">
+                                        <div class="flex items-center flex-1 min-w-0 cursor-pointer" wire:click="toggleSphere({{ $sphere->id }})">
                                             <div class="flex-1 min-w-0">
                                                 <div class="text-xs md:text-sm font-medium text-gray-900 truncate">
                                                     {{ $sphere->localized_name }}
+                                                    @if($sphere->professions->count() > 0)
+                                                        <span class="text-xs text-gray-500 ml-1">({{ $sphere->professions->count() }})</span>
+                                                    @endif
                                                 </div>
                                             </div>
+                                            
+                                            <!-- Аккордеон стрелка -->
+                                            @if($sphere->professions->count() > 0)
+                                                <div class="text-gray-400 transition-transform duration-200 mr-2 {{ in_array($sphere->id, $expandedSpheres) ? 'rotate-90' : '' }}">
+                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7" />
+                                                    </svg>
+                                                </div>
+                                            @endif
                                         </div>
                                         
                                         <!-- Info Button -->
-                                        <button wire:click="showSphereInfo({{ $sphere->id }})"
+                                        <button wire:click.stop="showSphereInfo({{ $sphere->id }})"
                                                 class="p-1 text-gray-400 hover:text-blue-500 transition-colors flex-shrink-0 mr-1"
                                                 title="Показать информацию о сфере">
                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -122,17 +75,51 @@
                                         
                                         <!-- Like Button -->
                                         @auth
-                                            <button wire:click="likeSphere({{ $sphere->id }})"
+                                            <button wire:click.stop="likeSphere({{ $sphere->id }})"
                                                     class="p-1 {{ $sphere->is_favorite ? 'text-red-500 hover:text-red-600' : 'text-gray-400 hover:text-red-500' }} transition-colors flex-shrink-0"
                                                     title="{{ $sphere->is_favorite ? 'Убрать из избранного' : 'Добавить в избранное' }}">
-                                                <svg class="w-3 h-3" {{ $sphere->is_favorite ? 'fill="currentColor"' : 'fill="none"' }} stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-                                                </svg>
+                                                @if($sphere->is_favorite)
+                                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                                                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                                    </svg>
+                                                @else
+                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                                    </svg>
+                                                @endif
                                             </button>
                                         @endauth
                                     </div>
                                 </td>                            
                             </tr>
+                            
+                            <!-- Раскрывающийся список профессий -->
+                            @if(in_array($sphere->id, $expandedSpheres) && $sphere->professions->count() > 0)
+                                <tr>
+                                    <td class="px-2 md:px-4 py-0 border-t border-gray-100 bg-gray-50">
+                                        <div class="py-2">
+                                            <div class="grid grid-cols-1 gap-1">
+                                                @foreach($sphere->professions as $profession)
+                                                    <div class="bg-white border border-gray-200 rounded px-2 py-1 text-xs text-gray-700 hover:bg-gray-50 transition-colors">
+                                                        <div class="flex items-center justify-between">
+                                                            <span class="flex-1">{{ $profession->name }}</span>
+                                                            @if($profession->description)
+                                                                <button wire:click.stop="showProfessionInfo({{ $profession->id }})"
+                                                                        class="ml-2 p-1 text-gray-400 hover:text-blue-500 transition-colors flex-shrink-0"
+                                                                        title="Показать описание профессии">
+                                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                                    </svg>
+                                                                </button>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endif
                         @endforeach
                     </tbody>
                 </table>
@@ -153,7 +140,7 @@
 
         <!-- Modal for Sphere Info -->
         @if($showModal && $selectedSphere)
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" wire:click="closeModal">
+            <div class="fixed inset-0 bg-gray-500/75 flex items-center justify-center z-50" wire:click="closeModal">
                 <div class="bg-white rounded-lg max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden" wire:click.stop>
                     <!-- Modal Header -->
                     <div class="px-4 py-3 border-b border-gray-200">
@@ -173,59 +160,8 @@
                     <div class="px-4 py-3 overflow-y-auto max-h-[calc(90vh-120px)]">
                         @if($selectedSphere->localized_description)
                             <div class="mb-4">
-                                <h4 class="text-xs font-medium text-gray-900 mb-1">Описание сферы</h4>
-                                <p class="text-xs text-gray-700">{{ $selectedSphere->localized_description }}</p>
-                            </div>
-                        @endif
-                        
-                        @if($selectedSphere->loadedProfessions && $selectedSphere->loadedProfessions->count() > 0)
-                            <div>
-                                <h4 class="text-xs font-medium text-gray-900 mb-2">
-                                    Профессии в сфере ({{ $selectedSphere->loadedProfessions->count() }})
-                                </h4>
-                                
-                                <div class="space-y-1">
-                                    @foreach($selectedSphere->loadedProfessions as $profession)
-                                        <div class="bg-gray-50 rounded p-2">
-                                            <div class="flex items-center justify-between">
-                                                <div class="flex items-center flex-1 min-w-0 cursor-pointer" wire:click="toggleProfessionDescription({{ $profession->id }})">
-                                                    @if($profession->description)
-                                                        <div class="mr-2 text-gray-400 flex-shrink-0">
-                                                            @if(in_array($profession->id, $expandedProfessions))
-                                                                <svg class="w-3 h-3 transform rotate-90 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                                                                </svg>
-                                                            @else
-                                                                <svg class="w-3 h-3 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                                                                </svg>
-                                                            @endif
-                                                        </div>
-                                                    @else
-                                                        <div class="w-5 h-3 mr-2 flex-shrink-0"></div>
-                                                    @endif
-                                                    <h5 class="font-medium text-gray-900 text-xs truncate">{{ $profession->name }}</h5>
-                                                </div>
-                                                @auth
-                                                    <button onclick="event.stopPropagation(); addToFavorites({{ $profession->id }})"
-                                                            class="p-1 text-gray-400 hover:text-red-500 transition-colors flex-shrink-0"
-                                                            title="Добавить в избранное">
-                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-                                                        </svg>
-                                                    </button>
-                                                @endauth
-                                            </div>
-                                            
-                                            <!-- Развернутое описание профессии -->
-                                            @if(in_array($profession->id, $expandedProfessions) && $profession->description)
-                                                <div class="mt-2 pt-2 border-t border-gray-200">
-                                                    <p class="text-xs text-gray-600 leading-tight">{{ $profession->description }}</p>
-                                                </div>
-                                            @endif
-                                        </div>
-                                    @endforeach
-                                </div>
+                                <h4 class="text-sm font-medium text-gray-900 mb-2">Описание сферы</h4>
+                                <p class="text-sm text-gray-700 leading-relaxed">{{ $selectedSphere->localized_description }}</p>
                             </div>
                         @else
                             <div class="text-center py-6">
@@ -234,7 +170,47 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-2.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 009.586 13H7"/>
                                     </svg>
                                 </div>
-                                <p class="text-xs text-gray-500">В этой сфере пока нет доступных профессий</p>
+                                <p class="text-sm text-gray-500">Описание для этой сферы пока не добавлено</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        <!-- Modal for Profession Info -->
+        @if($showProfessionModal && $selectedProfession)
+            <div class="fixed inset-0 bg-gray-500/75 flex items-center justify-center z-50" wire:click="closeProfessionModal">
+                <div class="bg-white rounded-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-hidden" wire:click.stop>
+                    <!-- Modal Header -->
+                    <div class="px-4 py-3 border-b border-gray-200">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-base font-medium text-gray-900">
+                                {{ $selectedProfession->name }}
+                            </h3>
+                            <button wire:click="closeProfessionModal" class="text-gray-400 hover:text-gray-600">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Modal Body -->
+                    <div class="px-4 py-3 overflow-y-auto max-h-[calc(90vh-120px)]">
+                        @if($selectedProfession->description)
+                            <div class="mb-4">
+                                <h4 class="text-sm font-medium text-gray-900 mb-2">Описание профессии</h4>
+                                <p class="text-sm text-gray-700 leading-relaxed">{{ $selectedProfession->description }}</p>
+                            </div>
+                        @else
+                            <div class="text-center py-6">
+                                <div class="text-gray-400 mb-2">
+                                    <svg class="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-2.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 009.586 13H7"/>
+                                    </svg>
+                                </div>
+                                <p class="text-sm text-gray-500">Описание для этой профессии пока не добавлено</p>
                             </div>
                         @endif
                     </div>

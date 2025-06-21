@@ -15,6 +15,9 @@ class ProfessionMap extends Component
     public $showModal = false;
     public $selectedSphere = null;
     public $expandedProfessions = []; // Массив ID раскрытых профессий в модалке
+    public $expandedSpheres = []; // Массив ID раскрытых сфер в аккордеоне
+    public $showProfessionModal = false;
+    public $selectedProfession = null;
 
     public function updatedSearch()
     {
@@ -42,6 +45,35 @@ class ProfessionMap extends Component
         $this->showModal = false;
         $this->selectedSphere = null;
         $this->expandedProfessions = []; // Сбрасываем раскрытые профессии при закрытии модалки
+    }
+
+    public function showProfessionInfo($professionId)
+    {
+        $profession = \App\Models\Profession::find($professionId);
+        
+        if ($profession) {
+            $this->selectedProfession = $profession;
+            $this->showProfessionModal = true;
+        }
+    }
+
+    public function closeProfessionModal()
+    {
+        $this->showProfessionModal = false;
+        $this->selectedProfession = null;
+    }
+
+    public function toggleSphere($sphereId)
+    {
+        if (in_array($sphereId, $this->expandedSpheres)) {
+            // Закрываем аккордеон сферы
+            $this->expandedSpheres = array_filter($this->expandedSpheres, function($id) use ($sphereId) {
+                return $id !== $sphereId;
+            });
+        } else {
+            // Открываем аккордеон сферы
+            $this->expandedSpheres[] = $sphereId;
+        }
     }
 
     public function toggleProfessionDescription($professionId)
@@ -95,6 +127,12 @@ class ProfessionMap extends Component
     public function render()
     {
         $query = Sphere::query()
+            ->with(['professions' => function($q) {
+                if (!$this->showInactive) {
+                    $q->where('is_active', true);
+                }
+                $q->orderBy('name');
+            }])
             ->withCount(['professions' => function($q) {
                 if (!$this->showInactive) {
                     $q->where('is_active', true);
