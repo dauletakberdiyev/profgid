@@ -48,9 +48,6 @@
                                             <div class="flex-1 min-w-0">
                                                 <div class="text-xs md:text-sm font-medium text-gray-900 truncate">
                                                     {{ $sphere->localized_name }}
-                                                    @if($sphere->professions->count() > 0)
-                                                        <span class="text-xs text-gray-500 ml-1">({{ $sphere->professions->count() }})</span>
-                                                    @endif
                                                 </div>
                                             </div>
                                             

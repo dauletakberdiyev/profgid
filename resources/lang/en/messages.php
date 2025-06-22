@@ -19,7 +19,7 @@ return [
     'logout' => 'Logout',
     'profile' => 'Profile',
     'settings' => 'Settings',
-    'test_history' => 'Test History',
+    'test_history' => 'Мои отчеты',
     
     // Home page
     'how_it_works' => 'How it works?',
