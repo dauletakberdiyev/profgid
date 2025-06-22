@@ -153,10 +153,10 @@
                     </div>
                 </div>
 
-                <p class="text-xs md:text-sm text-gray-600 mb-6 md:mb-8 leading-relaxed">Этот график показывает относительное распределение ваших уникальных
-                    результатов по четырем доменам. Эти категории являются хорошей отправной точкой для изучения областей, в
-                    которых у вас есть наибольший потенциал для достижения совершенства и того, как вы можете наилучшим
-                    образом внести свой вклад в команду.</p>
+                <p class="text-xs md:text-sm text-gray-600 mb-6 md:mb-8 leading-relaxed">
+                    Вы умеете брать на себя инициативу, уверенно выражать свои мысли и вдохновлять других на действия. Ваши таланты из блока
+Влияние помогают мотивировать окружающих, убеждать их и добиваться значимых изменений
+                </p>
 
                 <h2 class="text-lg md:text-xl font-bold mb-3 md:mb-4">Ваши таланты по доменам</h2>
 
@@ -209,6 +209,113 @@
                         </div>
                     @endforeach
                 </div>
+
+
+                <div class="space-y-5">
+                    <h2 class="text-lg md:text-xl font-bold mb-3 md:mb-4">Цифры в профиле показывают, какие таланты у тебя выражены сильнее всего:</h2>
+
+                    <span class="block">
+                        Топ-8 талантов: Они выделены ярким цветом, чтобы показать их важность. Это твои главные сильные стороны, которые ты чаще
+    всего используешь
+                    </span>
+
+                    <span class="block">
+                        9–16: Эти таланты тоже заметны, но немного меньше.
+                    </span>
+                    
+                    <span class="block">
+                        17–24: Эти таланты менее выражены, но это не слабости, просто ты используешь их реже.
+                    </span>
+                </div>
+
+                <!-- Таланты блок -->
+                <div class="mt-20 space-y-6">
+                    <h2 class="text-lg md:text-xl font-bold text-center">Описание ваших талантов</h2>
+                    
+                    @php
+                        $topTenTalents = collect($userResults)->take(10)->toArray();
+                        $remainingTalents = collect($userResults)->skip(10)->toArray();
+                        
+                        // Вычисляем максимальный балл для расчета процентов
+                        $maxScore = collect($userResults)->max('score');
+                        $maxScore = $maxScore > 0 ? $maxScore : 1; // Избегаем деления на 0
+                    @endphp
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Левая колонка - Топ 10 талантов -->
+                        <div>
+                            <div class="space-y-2">
+                                @foreach($topTenTalents as $index => $talent)
+                                    @php
+                                        // Получаем цвет домена для таланта
+                                        $talentDomainColor = $domainColors[$talent['domain']] ?? '#6B7280';
+                                        // Вычисляем процент
+                                        $percentage = round(($talent['score'] / $maxScore) * 100, 1);
+                                    @endphp
+                                    
+                                    <div class="bg-white border-l-4 p-4 hover:shadow-sm transition-all"
+                                         style="border-left-color: {{ $talentDomainColor }}">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex-1">
+                                                <div class="flex items-center space-x-3">
+                                                    <span class="text-lg font-bold text-gray-900"
+                                                          style="color: {{ $talentDomainColor }}">{{ $talent['rank'] }}</span>
+                                                    <h4 class="text-sm font-medium text-gray-900">{{ $talent['name'] }}</h4>
+                                                </div>
+                                                <div class="text-xs text-gray-500 mt-1">{{ $domains[$talent['domain']] ?? '' }}</div>
+                                            </div>
+                                            <div class="flex items-center space-x-2">
+                                                <span class="text-xs px-2 py-1 font-medium"
+                                                      style="background-color: {{ $talentDomainColor }}20; color: {{ $talentDomainColor }}">
+                                                    {{ $percentage }}%
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                        
+                        <!-- Правая колонка - Остальные таланты -->
+                        <div>
+                            <div class="space-y-1">
+                                @foreach($remainingTalents as $talent)
+                                    @php
+                                        // Получаем цвет домена для таланта
+                                        $talentDomainColor = $domainColors[$talent['domain']] ?? '#6B7280';
+                                        // Вычисляем процент
+                                        $percentage = round(($talent['score'] / $maxScore) * 100, 1);
+                                    @endphp
+                                    
+                                    <div class="bg-gray-50 border-l-2 p-3 hover:bg-gray-100 transition-colors opacity-80"
+                                         style="border-left-color: {{ $talentDomainColor }}">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex-1">
+                                                <div class="flex items-center space-x-2">
+                                                    <span class="text-sm font-medium text-gray-600">{{ $talent['rank'] }}</span>
+                                                    <h4 class="text-sm text-gray-700">{{ $talent['name'] }}</h4>
+                                                </div>
+                                                <div class="text-xs text-gray-500 mt-0.5">{{ $domains[$talent['domain']] ?? '' }}</div>
+                                            </div>
+                                            <span class="text-xs px-2 py-0.5 bg-gray-200 text-gray-600">
+                                                {{ $percentage }}%
+                                            </span>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Важно блок -->
+                <div class="mt-8 text-left">
+                    <p class="text-sm text-gray-600">
+                        <span class="font-bold">*Важно</span><br>
+                        Ваши результаты уникальны и не подлежат сравнению с другими. Они отражают ваши сильные стороны и помогают раскрыть ваш путь к успеху.
+                    </p>
+                </div>
+
             </div>
 
             <div x-show="activeTab === 'spheres'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
