@@ -4,7 +4,8 @@
     canViewProfessionsTab: {{ $this->canViewProfessionsTab ? 'true' : 'false' }},
     modalSphere: null,
     modalProfession: null,
-    
+    expandedSpheres: [],
+
     setActiveTab(tab) {
         // Проверяем права доступа к вкладкам
         if (tab === 'spheres' && !this.canViewSpheresTab) {
@@ -15,19 +16,27 @@
         }
         this.activeTab = tab;
     },
-    
+
+    toggleSphere(sphereId) {
+        if (this.expandedSpheres.includes(sphereId)) {
+            this.expandedSpheres = this.expandedSpheres.filter(id => id !== sphereId);
+        } else {
+            this.expandedSpheres.push(sphereId);
+        }
+    },
+
     openSphereModal(sphere) {
         this.modalSphere = sphere;
     },
-    
+
     closeSphereModal() {
         this.modalSphere = null;
     },
-    
+
     openProfessionModal(profession) {
         this.modalProfession = profession;
     },
-    
+
     closeProfessionModal() {
         this.modalProfession = null;
     }
@@ -39,25 +48,28 @@
                 <div class="border-b border-gray-200">
                     <nav class="-mb-px flex space-x-8" aria-label="Tabs">
                         <!-- Вкладка "Таланты" - всегда доступна -->
-                        <button @click="setActiveTab('talents')" 
-                            :class="activeTab === 'talents' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                        <button @click="setActiveTab('talents')"
+                            :class="activeTab === 'talents' ? 'border-blue-600 text-blue-600' :
+                                'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
                             class="py-3 px-1 border-b-2 font-medium text-sm transition-colors duration-200">
                             Топ Таланты
                         </button>
-                        
+
                         <!-- Вкладка "Сферы" - доступна для средний и премиум тарифов -->
-                        @if($this->canViewSpheresTab)
-                            <button @click="setActiveTab('spheres')" 
-                                :class="activeTab === 'spheres' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                        @if ($this->canViewSpheresTab)
+                            <button @click="setActiveTab('spheres')"
+                                :class="activeTab === 'spheres' ? 'border-blue-600 text-blue-600' :
+                                    'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
                                 class="py-3 px-1 border-b-2 font-medium text-sm transition-colors duration-200">
                                 Топ Сферы
                             </button>
                         @endif
-                        
+
                         <!-- Вкладка "Профессии" - доступна только для премиум тарифа -->
-                        @if($this->canViewProfessionsTab)
-                            <button @click="setActiveTab('professions')" 
-                                :class="activeTab === 'professions' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                        @if ($this->canViewProfessionsTab)
+                            <button @click="setActiveTab('professions')"
+                                :class="activeTab === 'professions' ? 'border-blue-600 text-blue-600' :
+                                    'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
                                 class="py-3 px-1 border-b-2 font-medium text-sm transition-colors duration-200">
                                 Топ Профессии
                             </button>
@@ -65,7 +77,7 @@
                     </nav>
                 </div>
             </div>
-            
+
             <div class="flex flex-col md:flex-row md:justify-between md:items-start mb-4 md:mb-6">
                 <div class="mb-4 md:mb-0">
                     @php
@@ -77,20 +89,23 @@
                         Вы лидируете с <span class="font-extrabold">{{ $topDomainName }}</span> темами.
                     </h1>
                 </div>
-                
+
                 <!-- PDF Download Button -->
-                <button class="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors group self-start" 
-                        title="Скачать результаты в PDF">
-                    <svg class="w-5 h-5 md:w-6 md:h-6 text-gray-600 group-hover:text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                              d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                <button
+                    class="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors group self-start"
+                    title="Скачать результаты в PDF">
+                    <svg class="w-5 h-5 md:w-6 md:h-6 text-gray-600 group-hover:text-gray-800" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
                         </path>
                     </svg>
                 </button>
             </div>
 
             <!-- Tab Content -->
-            <div x-show="activeTab === 'talents'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
+            <div x-show="activeTab === 'talents'" x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
                 <!-- Domain Bar Chart -->
                 <div class="mb-4 md:mb-6">
                     @php
@@ -100,22 +115,22 @@
                             'strategic' => '#429162',
                             'influencing' => '#DA782D',
                         ];
-                        
+
                         $domainBgColors = [
                             'executing' => 'bg-[#702B7C]',
                             'relationship' => 'bg-[#316EC6]',
                             'strategic' => 'bg-[#429162]',
                             'influencing' => 'bg-[#DA782D]',
                         ];
-                        
+
                         // Calculate total score and percentages
                         $totalScore = array_sum($domainScores);
                         $totalScore = $totalScore > 0 ? $totalScore : 1;
-                        
+
                         // Sort domains by score (descending)
                         $sortedDomainScores = $domainScores;
                         arsort($sortedDomainScores);
-                        
+
                         // Calculate percentages directly here
                         $domainPercentages = [];
                         foreach ($sortedDomainScores as $domain => $score) {
@@ -129,10 +144,10 @@
                             @php
                                 $percentage = ($score / $totalScore) * 100;
                             @endphp
-                            @if($score > 0)
-                                <div class="{{ $domainBgColors[$domain] ?? 'bg-gray-400' }} flex items-center justify-center text-white font-bold text-xs md:text-sm" 
-                                     style="width: {{ $percentage }}%">
-                                    
+                            @if ($score > 0)
+                                <div class="{{ $domainBgColors[$domain] ?? 'bg-gray-400' }} flex items-center justify-center text-white font-bold text-xs md:text-sm"
+                                    style="width: {{ $percentage }}%">
+
                                 </div>
                             @endif
                         @endforeach
@@ -144,9 +159,10 @@
                             @php
                                 $percentage = ($score / $totalScore) * 100;
                             @endphp
-                            @if($score > 0)
+                            @if ($score > 0)
                                 <div class="text-left" style="width: {{ $percentage }}%">
-                                    <div class="text-xs md:text-sm font-medium text-gray-700">{{ $domains[$domain] }}</div>
+                                    <div class="text-xs md:text-sm font-medium text-gray-700">{{ $domains[$domain] }}
+                                    </div>
                                 </div>
                             @endif
                         @endforeach
@@ -154,22 +170,21 @@
                 </div>
 
                 <p class="text-xs md:text-sm text-gray-600 mb-6 md:mb-8 leading-relaxed">
-                    Вы умеете брать на себя инициативу, уверенно выражать свои мысли и вдохновлять других на действия. Ваши таланты из блока
-Влияние помогают мотивировать окружающих, убеждать их и добиваться значимых изменений
+                    Вы умеете брать на себя инициативу, уверенно выражать свои мысли и вдохновлять других на действия.
+                    Ваши таланты из блока
+                    Влияние помогают мотивировать окружающих, убеждать их и добиваться значимых изменений
                 </p>
 
                 <h2 class="text-lg md:text-xl font-bold mb-3 md:mb-4">Ваши таланты по доменам</h2>
 
-                <!-- Talent Grid by Domain -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-3 md:gap-1 mb-6 md:mb-8">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-1 mb-6 md:mb-8">
                     @foreach ($domains as $domain => $name)
                         <div class="mb-4 md:mb-0">
-                            <!-- Domain Header -->
-                            <div class="text-center font-bold uppercase text-xs md:text-sm mb-2 md:mb-3 pb-2 text-gray-800 p-2 border-b-8" 
-                                 style="border-color: {{ $domainColors[$domain] }}">
+                            <div class="text-center font-bold uppercase text-xs md:text-sm mb-2 md:mb-3 pb-1 md:pb-2 text-gray-800 p-1 md:p-2 border-b-4 md:border-b-8"
+                                style="border-color: {{ $domainColors[$domain] }}">
                                 {{ $name }}
                             </div>
-                            
+
                             @php
                                 $domainTalents = array_filter($userResults, function ($talent) use ($domain) {
                                     return $talent['domain'] === $domain;
@@ -177,8 +192,7 @@
                                 usort($domainTalents, function ($a, $b) {
                                     return $a['rank'] <=> $b['rank'];
                                 });
-                                
-                                // Находим топ 10 талантов с наивысшими очками из всех результатов
+
                                 $topTalentsByScore = collect($userResults)->sortByDesc('score')->take(10);
                                 $topTalentIds = $topTalentsByScore->pluck('id')->toArray();
                             @endphp
@@ -195,14 +209,18 @@
                             <div class="grid grid-cols-2 gap-1">
                                 @foreach ($domainTalents as $talent)
                                     @php
-                                        $bgColor = in_array($talent['id'], $topTalentIds) 
-                                            ? ($domainBgColors[$domain] ?? 'bg-gray-400')
-                                            : ($mutedBgColors[$domain] ?? 'bg-gray-200');
-                                        $textColor = in_array($talent['id'], $topTalentIds) ? 'text-white' : 'text-black';
+                                        $bgColor = in_array($talent['id'], $topTalentIds)
+                                            ? $domainBgColors[$domain] ?? 'bg-gray-400'
+                                            : $mutedBgColors[$domain] ?? 'bg-gray-200';
+                                        $textColor = in_array($talent['id'], $topTalentIds)
+                                            ? 'text-white'
+                                            : 'text-black';
                                     @endphp
-                                    <div class="{{ $bgColor }} {{ $textColor }} text-center aspect-square flex flex-col items-center justify-center">
-                                        <div class="text-3xl md:text-xl">{{ $talent['rank'] }}</div>
-                                        <div class="text-xs px-1 text-center leading-tight mt-3">{{ $talent['name'] }}</div>
+                                    <div
+                                        class="{{ $bgColor }} {{ $textColor }} text-center aspect-square flex flex-col items-center justify-center p-1">
+                                        <div class="text-lg md:text-xl font-bold">{{ $talent['rank'] }}</div>
+                                        <div class="text-xs md:text-xs px-1 text-center leading-tight mt-1">{{ $talent['name'] }}
+                                        </div>
                                     </div>
                                 @endforeach
                             </div>
@@ -212,17 +230,19 @@
 
 
                 <div class="space-y-5">
-                    <h2 class="text-lg md:text-xl font-bold mb-3 md:mb-4">Цифры в профиле показывают, какие таланты у тебя выражены сильнее всего:</h2>
+                    <h2 class="text-lg md:text-xl font-bold mb-3 md:mb-4">Цифры в профиле показывают, какие таланты у
+                        тебя выражены сильнее всего:</h2>
 
                     <span class="block">
-                        Топ-8 талантов: Они выделены ярким цветом, чтобы показать их важность. Это твои главные сильные стороны, которые ты чаще
-    всего используешь
+                        Топ-8 талантов: Они выделены ярким цветом, чтобы показать их важность. Это твои главные сильные
+                        стороны, которые ты чаще
+                        всего используешь
                     </span>
 
                     <span class="block">
                         9–16: Эти таланты тоже заметны, но немного меньше.
                     </span>
-                    
+
                     <span class="block">
                         17–24: Эти таланты менее выражены, но это не слабости, просто ты используешь их реже.
                     </span>
@@ -231,75 +251,73 @@
                 <!-- Таланты блок -->
                 <div class="mt-20 space-y-6">
                     <h2 class="text-lg md:text-xl font-bold text-center">Описание ваших талантов</h2>
-                    
+
                     @php
                         $topTenTalents = collect($userResults)->take(10)->toArray();
                         $remainingTalents = collect($userResults)->skip(10)->toArray();
-                        
+
                         // Вычисляем максимальный балл для расчета процентов
                         $maxScore = collect($userResults)->max('score');
                         $maxScore = $maxScore > 0 ? $maxScore : 1; // Избегаем деления на 0
                     @endphp
-                    
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:items-start">
                         <!-- Левая колонка - Топ 10 талантов -->
-                        <div>
-                            <div class="space-y-2">
-                                @foreach($topTenTalents as $index => $talent)
+                        <div class="h-full">
+                            <div class="space-y-1 h-full flex flex-col">
+                                @foreach ($topTenTalents as $index => $talent)
                                     @php
                                         // Получаем цвет домена для таланта
                                         $talentDomainColor = $domainColors[$talent['domain']] ?? '#6B7280';
                                         // Вычисляем процент
                                         $percentage = round(($talent['score'] / $maxScore) * 100, 1);
                                     @endphp
-                                    
-                                    <div class="bg-white border-l-4 p-4 hover:shadow-sm transition-all"
-                                         style="border-left-color: {{ $talentDomainColor }}">
+
+                                    <div class="bg-white border-l-2 p-3 hover:shadow-sm transition-all"
+                                        style="border-left-color: {{ $talentDomainColor }}">
                                         <div class="flex items-center justify-between">
                                             <div class="flex-1">
-                                                <div class="flex items-center space-x-3">
-                                                    <span class="text-lg font-bold text-gray-900"
-                                                          style="color: {{ $talentDomainColor }}">{{ $talent['rank'] }}</span>
-                                                    <h4 class="text-sm font-medium text-gray-900">{{ $talent['name'] }}</h4>
+                                                <div class="flex items-center space-x-2">
+                                                    <span class="text-sm font-medium text-gray-600"
+                                                        style="color: {{ $talentDomainColor }}">{{ $talent['rank'] }}</span>
+                                                    <h4 class="text-sm text-gray-700">{{ $talent['name'] }}
+                                                    </h4>
                                                 </div>
-                                                <div class="text-xs text-gray-500 mt-1">{{ $domains[$talent['domain']] ?? '' }}</div>
-                                            </div>
-                                            <div class="flex items-center space-x-2">
-                                                <span class="text-xs px-2 py-1 font-medium"
-                                                      style="background-color: {{ $talentDomainColor }}20; color: {{ $talentDomainColor }}">
-                                                    {{ $percentage }}%
-                                                </span>
+                                                <div class="text-xs text-gray-500 mt-0.5">
+                                                    {{ $domains[$talent['domain']] ?? '' }}</div>
                                             </div>
                                         </div>
                                     </div>
                                 @endforeach
                             </div>
                         </div>
-                        
+
                         <!-- Правая колонка - Остальные таланты -->
-                        <div>
-                            <div class="space-y-1">
-                                @foreach($remainingTalents as $talent)
+                        <div class="h-full">
+                            <div class="space-y-1 h-full flex flex-col">
+                                @foreach ($remainingTalents as $talent)
                                     @php
                                         // Получаем цвет домена для таланта
                                         $talentDomainColor = $domainColors[$talent['domain']] ?? '#6B7280';
                                         // Вычисляем процент
                                         $percentage = round(($talent['score'] / $maxScore) * 100, 1);
                                     @endphp
-                                    
+
                                     <div class="bg-gray-50 border-l-2 p-3 hover:bg-gray-100 transition-colors opacity-80"
-                                         style="border-left-color: {{ $talentDomainColor }}">
+                                        style="border-left-color: {{ $talentDomainColor }}">
                                         <div class="flex items-center justify-between">
                                             <div class="flex-1">
                                                 <div class="flex items-center space-x-2">
-                                                    <span class="text-sm font-medium text-gray-600">{{ $talent['rank'] }}</span>
+                                                    <span
+                                                        class="text-sm font-medium text-gray-600">{{ $talent['rank'] }}</span>
                                                     <h4 class="text-sm text-gray-700">{{ $talent['name'] }}</h4>
                                                 </div>
-                                                <div class="text-xs text-gray-500 mt-0.5">{{ $domains[$talent['domain']] ?? '' }}</div>
+                                                <div class="text-xs text-gray-500 mt-0.5">
+                                                    {{ $domains[$talent['domain']] ?? '' }}</div>
                                             </div>
-                                            <span class="text-xs px-2 py-0.5 bg-gray-200 text-gray-600">
+                                            {{-- <span class="text-xs px-2 py-0.5 bg-gray-200 text-gray-600">
                                                 {{ $percentage }}%
-                                            </span>
+                                            </span> --}}
                                         </div>
                                     </div>
                                 @endforeach
@@ -312,234 +330,611 @@
                 <div class="mt-8 text-left">
                     <p class="text-sm text-gray-600">
                         <span class="font-bold">*Важно</span><br>
-                        Ваши результаты уникальны и не подлежат сравнению с другими. Они отражают ваши сильные стороны и помогают раскрыть ваш путь к успеху.
+                        Ваши результаты уникальны и не подлежат сравнению с другими. Они отражают ваши сильные стороны и
+                        помогают раскрыть ваш путь к успеху.
                     </p>
                 </div>
 
+                <!-- Подробные описания талантов для полного тарифа -->
+                @if ($this->isFullPlan)
+                    <div class="mt-8 max-w-2xl mx-auto" x-data="{ expandedTalents: [] }">
+
+                        <div class="space-y-2">
+                            @foreach (array_slice($userResults, 0, 10) as $talent)
+                                @if (!empty($talent['description']))
+                                    @php
+                                        $talentDomainColor = $domainColors[$talent['domain']] ?? '#6B7280';
+                                        $percentage = round(($talent['score'] / $maxScore) * 100, 1);
+                                        $talentId = 'talent_' . $talent['id'];
+                                    @endphp
+
+                                    <div class="bg-white border border-gray-200 rounded-md p-3 transition-all">
+                                        <!-- Заголовок таланта -->
+                                        <div class="flex items-center justify-between mb-1 cursor-pointer md:cursor-default"
+                                            @click="window.innerWidth < 768 ? (expandedTalents.includes('{{ $talentId }}') ? expandedTalents.splice(expandedTalents.indexOf('{{ $talentId }}'), 1) : expandedTalents.push('{{ $talentId }}')) : null">
+                                            <div class="flex items-center flex-1">
+                                                <div class="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold mr-2"
+                                                    style="background-color: {{ $talentDomainColor }}">
+                                                    {{ $talent['rank'] }}
+                                                </div>
+                                                <div class="flex-1">
+                                                    <h3 class="text-sm font-bold text-gray-900">{{ $talent['name'] }}</h3>
+                                                    <span class="text-xs text-gray-500">{{ $domains[$talent['domain']] ?? '' }}</span>
+                                                </div>
+                                            </div>
+                                            <!-- Стрелка для мобильной версии -->
+                                            <div class="md:hidden text-gray-400 transition-transform duration-200"
+                                                :class="expandedTalents.includes('{{ $talentId }}') ? 'rotate-180' : ''">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                                </svg>
+                                            </div>
+                                        </div>
+
+                                        <!-- Контент - всегда видимый на десктопе, раскрывающийся на мобильном -->
+                                        <div class="md:block" 
+                                            x-show="window.innerWidth >= 768 || expandedTalents.includes('{{ $talentId }}')"
+                                            x-transition:enter="transition ease-out duration-200"
+                                            x-transition:enter-start="opacity-0 max-h-0"
+                                            x-transition:enter-end="opacity-100 max-h-96"
+                                            x-transition:leave="transition ease-in duration-150"
+                                            x-transition:leave-start="opacity-100 max-h-96"
+                                            x-transition:leave-end="opacity-0 max-h-0">
+                                            
+                                            <!-- Описание таланта -->
+                                            <div class="mb-2">
+                                                <h4 class="text-xs font-semibold text-gray-900 mb-1">Обзор</h4>
+                                                <p class="text-xs text-gray-700 leading-tight">
+                                                    {{ $talent['description'] }}</p>
+                                            </div>
+
+                                            <!-- Советы -->
+                                            <div class="pt-1 border-t border-gray-100">
+                                                <h4 class="text-xs font-semibold text-gray-900 mb-1">Советы</h4>
+                                                <div class="text-xs text-gray-700 leading-tight">
+                                                    {!! $this->getTalentAdvice($talent['name']) !!}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+
             </div>
 
-            <div x-show="activeTab === 'spheres'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
-                <h2 class="text-lg md:text-xl font-bold mb-4">Все сферы деятельности</h2>
+            <div x-show="activeTab === 'spheres'" x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
+                <h2 class="text-lg md:text-xl font-bold mb-4">Рекомендации по сферам деятельности</h2>
                 <p class="text-xs md:text-sm text-gray-600 mb-6 leading-relaxed">
-                    На основе ваших топ талантов мы выделили наиболее подходящие сферы деятельности с процентом совместимости.
+                    Сферы деятельности, которые лучше всего подходят вашим талантам и где вы сможете реализовать себя
+                    наиболее эффективно.
                 </p>
-                
+
                 @php
-                    $topEightSpheres = collect($topSpheres)->filter(function($sphere) {
-                        return $sphere['is_top'];
-                    })->toArray();
-                    $remainingSpheres = collect($topSpheres)->filter(function($sphere) {
-                        return !$sphere['is_top'];
-                    })->toArray();
+                    $topTenSpheres = collect($topSpheres)->take(10)->toArray();
+                    $remainingSpheres = collect($topSpheres)->skip(10)->toArray();
                 @endphp
-                
-                <!-- Топ 8 сфер -->
-                @if(count($topEightSpheres) > 0)
-                    <div class="mb-8">
-                        <div class="flex items-center mb-4">
-                            <svg class="w-5 h-5 text-yellow-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                            </svg>
-                            <h3 class="text-lg font-semibold text-gray-900">Топ рекомендации для вас</h3>
-                        </div>
-                        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4 space-y-2">
-                            @foreach($topEightSpheres as $sphere)
-                                <div class="bg-white border border-blue-100 hover:border-blue-300 transition-colors duration-200 px-6 py-4 rounded-lg flex items-center justify-between shadow-sm">
-                                    <div class="flex items-center space-x-4">
-                                        <h4 class="text-base font-medium text-gray-900">{{ $sphere['name'] }}</h4>
-                                        <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full font-medium">
-                                            {{ $sphere['compatibility_percentage'] }}%
-                                        </span>
-                                    </div>
-                                    
-                                    <button @click="openSphereModal({{ json_encode($sphere) }})" 
-                                            class="text-blue-400 hover:text-blue-600 transition-colors duration-200 p-1"
-                                            title="Показать описание">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                @endif
-                
-                <!-- Остальные сферы -->
-                @if(count($remainingSpheres) > 0)
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Левая колонка - Топ 10 сфер -->
                     <div>
-                        <h3 class="text-lg font-semibold text-gray-700 mb-4">Остальные сферы деятельности</h3>
-                        <div class="space-y-2">
-                            @foreach($remainingSpheres as $sphere)
-                                <div class="border border-gray-200 bg-white hover:bg-gray-50 transition-colors duration-200 px-6 py-3 flex items-center justify-between opacity-70">
-                                    <div class="flex items-center space-x-4">
-                                        <h4 class="text-base font-medium text-gray-600">{{ $sphere['name'] }}</h4>
-                                        <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
-                                            {{ $sphere['compatibility_percentage'] }}%
-                                        </span>
+                        <div class="space-y-1">
+                            @php
+                                // Используем синий цвет для всех сфер
+                                $topTenSpheresIndex = 0;
+                            @endphp
+                            @foreach ($topTenSpheres as $index => $sphere)
+                                @php
+                                    // Используем синий цвет для всех сфер
+                                    $sphereColor = '#316EC6';
+                                @endphp
+
+                                <div class="bg-blue-50 border-l-2 p-3 hover:bg-gray-100 transition-colors opacity-80 lg:h-11"
+                                    style="border-left-color: {{ $sphereColor }}">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex-1">
+                                            <div class="flex items-center space-x-3">
+                                                <span class="text-sm font-medium text-gray-600"
+                                                    style="color: {{ $sphereColor }}">{{ $topTenSpheresIndex = $topTenSpheresIndex + 1 }}</span>
+                                                <h4 class="text-sm text-gray-700">{{ $sphere['name'] }}</h4>
+                                            </div>
+                                        </div>
+
+
+                                        <div class="flex items-center space-x-2">
+                                            @if ($this->isFullPlan)
+                                                <!-- Progress Bar для полного тарифа -->
+                                                <div class="flex-1 min-w-[80px]">
+                                                    <div class="w-full bg-gray-200 rounded-full h-1">
+                                                        <div class="h-1 rounded-full transition-all duration-500"
+                                                            style="width: {{ $sphere['compatibility_percentage'] }}%; background-color: {{ $sphereColor }}">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <span class="text-xs px-2 py-0.5 bg-gray-200 text-gray-600">
+                                                    {{ $sphere['compatibility_percentage'] }}%
+                                                </span>
+                                            @endif
+                                            <button @click="openSphereModal({{ json_encode($sphere) }})"
+                                                class="text-gray-400 hover:text-blue-600 transition-colors duration-200 p-1"
+                                                title="Показать описание">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                            </button>
+                                        </div>
                                     </div>
-                                    
-                                    <button @click="openSphereModal({{ json_encode($sphere) }})" 
-                                            class="text-gray-400 hover:text-blue-600 transition-colors duration-200 p-1"
-                                            title="Показать описание">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                    </button>
                                 </div>
                             @endforeach
                         </div>
                     </div>
-                @endif
-                
+
+                    <div>
+                        <div class="space-y-1">
+                            @php
+                                $remainingSpheresIndex = 10;
+                            @endphp
+                            @foreach ($remainingSpheres as $index => $sphere)
+                                @php
+                                    $sphereColor = '#316EC6';
+                                @endphp
+
+                                <div class="bg-gray-50 border-l-2 p-3 hover:bg-gray-100 transition-colors opacity-80 lg:h-11"
+                                    style="border-left-color: {{ $sphereColor }}">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex-1">
+                                            <div class="flex items-center space-x-2">
+                                                <span
+                                                    class="text-sm font-medium text-gray-600">{{ $remainingSpheresIndex = $remainingSpheresIndex + 1 }}</span>
+                                                <h4 class="text-sm text-gray-700">{{ $sphere['name'] }}</h4>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center space-x-2">
+                                            @if ($this->isFullPlan)
+                                                <!-- Progress Bar для полного тарифа -->
+                                                <div class="flex-1 min-w-[80px]">
+                                                    <div class="w-full bg-gray-200 rounded-full h-1">
+                                                        <div class="h-1 rounded-full transition-all duration-500"
+                                                            style="width: {{ $sphere['compatibility_percentage'] }}%; background-color: {{ $sphereColor }}">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <span class="text-xs px-2 py-0.5 bg-gray-200 text-gray-600">
+                                                    {{ $sphere['compatibility_percentage'] }}%
+                                                </span>
+                                            @endif
+                                            <button @click="openSphereModal({{ json_encode($sphere) }})"
+                                                class="text-gray-400 hover:text-blue-600 transition-colors duration-200 p-1"
+                                                title="Показать описание">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Modal for Sphere Description -->
-                <div x-show="modalSphere" 
-                     x-transition:enter="transition ease-out duration-300" 
-                     x-transition:enter-start="opacity-0" 
-                     x-transition:enter-end="opacity-100"
-                     x-transition:leave="transition ease-in duration-200" 
-                     x-transition:leave-start="opacity-100" 
-                     x-transition:leave-end="opacity-0"
-                     class="fixed inset-0 flex items-center justify-center z-50 p-4"
-                     style="background-color: rgba(0, 0, 0, 0.5);"
-                     @click="closeSphereModal()">
-                    <div @click.stop 
-                         x-transition:enter="transition ease-out duration-300" 
-                         x-transition:enter-start="opacity-0 transform scale-95" 
-                         x-transition:enter-end="opacity-100 transform scale-100"
-                         x-transition:leave="transition ease-in duration-200" 
-                         x-transition:leave-start="opacity-100 transform scale-100" 
-                         x-transition:leave-end="opacity-0 transform scale-95"
-                         class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+                <div x-show="modalSphere" x-transition:enter="transition ease-out duration-300"
+                    x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                    x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100"
+                    x-transition:leave-end="opacity-0" class="fixed inset-0 flex items-center justify-center z-50 p-4"
+                    style="background-color: rgba(0, 0, 0, 0.5);" @click="closeSphereModal()">
+                    <div @click.stop x-transition:enter="transition ease-out duration-300"
+                        x-transition:enter-start="opacity-0 transform scale-95"
+                        x-transition:enter-end="opacity-100 transform scale-100"
+                        x-transition:leave="transition ease-in duration-200"
+                        x-transition:leave-start="opacity-100 transform scale-100"
+                        x-transition:leave-end="opacity-0 transform scale-95"
+                        class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
                         <div class="flex items-start justify-between mb-4">
                             <h3 class="text-lg font-semibold text-gray-900" x-text="modalSphere?.name"></h3>
-                            <button @click="closeSphereModal()" 
-                                    class="text-gray-400 hover:text-gray-600 transition-colors">
+                            <button @click="closeSphereModal()"
+                                class="text-gray-400 hover:text-gray-600 transition-colors">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M6 18L18 6M6 6l12 12" />
                                 </svg>
                             </button>
                         </div>
-                        <p class="text-sm text-gray-700 leading-relaxed" x-text="modalSphere?.description || 'Описание отсутствует'"></p>
+                        <p class="text-sm text-gray-700 leading-relaxed"
+                            x-text="modalSphere?.description || 'Описание отсутствует'"></p>
                     </div>
                 </div>
+
+                <!-- Modal for Profession Description -->
+                <div x-show="modalProfession" x-transition:enter="transition ease-out duration-300"
+                    x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                    x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100"
+                    x-transition:leave-end="opacity-0" class="fixed inset-0 flex items-center justify-center z-50 p-4"
+                    style="background-color: rgba(0, 0, 0, 0.5);" @click="closeProfessionModal()">
+                    <div @click.stop x-transition:enter="transition ease-out duration-300"
+                        x-transition:enter-start="opacity-0 transform scale-95"
+                        x-transition:enter-end="opacity-100 transform scale-100"
+                        x-transition:leave="transition ease-in duration-200"
+                        x-transition:leave-start="opacity-100 transform scale-100"
+                        x-transition:leave-end="opacity-0 transform scale-95"
+                        class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+                        <div class="flex items-start justify-between mb-4">
+                            <h3 class="text-lg font-semibold text-gray-900" x-text="modalProfession?.name"></h3>
+                            <button @click="closeProfessionModal()"
+                                class="text-gray-400 hover:text-gray-600 transition-colors">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        <p class="text-sm text-gray-700 leading-relaxed"
+                            x-text="modalProfession?.description || 'Описание отсутствует'"></p>
+                    </div>
+                </div>
+
+                @if ($this->isFullPlan)
+                    <!-- Профессии из ваших топ-10 сфер блок -->
+                    <div class="mt-16 space-y-4">
+                        <h2 class="text-lg font-bold text-center">Профессии из ваших топ-10 сфер</h2>
+                        <p class="text-xs text-gray-600 mb-4 text-center leading-relaxed">
+                            Этот раздел включает профессии, связанные с вашими топ-10 сферами деятельности.
+                        </p>
+
+                        @php
+                            // Получаем топ-10 сфер пользователя
+                            $topTenSpheresForTable = collect($topTenSpheres)->take(10);
+
+                            // Группируем профессии по всем топ-10 сферам (даже если у сферы нет профессий)
+                            $professionsGroupedBySphere = [];
+                            foreach ($topTenSpheresForTable as $sphere) {
+                                $sphereProfessions = collect($topProfessions)
+                                    ->filter(function ($profession) use ($sphere) {
+                                        return isset($profession['sphere_id']) &&
+                                            $profession['sphere_id'] == $sphere['id'];
+                                    })
+                                    ->values()
+                                    ->toArray();
+
+                                // Добавляем сферу даже если у неё нет профессий
+                                $professionsGroupedBySphere[] = [
+                                    'sphere' => $sphere,
+                                    'professions' => $sphereProfessions,
+                                ];
+                            }
+                        @endphp
+
+                        <!-- Accordion-style table similar to profession-map -->
+                        <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                            <div>
+                                <table class="w-full">
+                                    <tbody class="divide-y divide-gray-100">
+                                        @foreach ($professionsGroupedBySphere as $index => $sphereData)
+                                            <!-- Основная строка сферы -->
+                                            <tr class="hover:bg-gray-50 transition-colors">
+                                                <td class="px-2 md:px-4 py-1 md:py-2">
+                                                    <div class="flex items-center justify-between">
+                                                        <div class="flex items-center flex-1 min-w-0 cursor-pointer"
+                                                            @click="toggleSphere({{ $sphereData['sphere']['id'] }})">
+                                                            <div class="flex items-center space-x-3">
+                                                                <span class="text-sm font-medium text-blue-600"
+                                                                    style="color: #316EC6">{{ $index + 1 }}</span>
+                                                                <div class="flex-1 min-w-0">
+                                                                    <div
+                                                                        class="text-xs md:text-sm font-medium text-gray-900 truncate">
+                                                                        {{ $sphereData['sphere']['name'] }}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <!-- Аккордеон стрелка -->
+                                                            @if (count($sphereData['professions']) > 0)
+                                                                <div class="text-gray-400 transition-transform duration-200 mr-2"
+                                                                    :class="expandedSpheres.includes(
+                                                                            {{ $sphereData['sphere']['id'] }}) ?
+                                                                        'rotate-90' : ''">
+                                                                    <svg class="w-3 h-3" fill="none"
+                                                                        stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round"
+                                                                            stroke-linejoin="round" stroke-width="1.5"
+                                                                            d="M9 5l7 7-7 7" />
+                                                                    </svg>
+                                                                </div>
+                                                            @endif
+                                                        </div>
+                                                        <!-- Percentage Display -->
+                                                        <div class="flex items-center space-x-2">
+
+                                                            <!-- Progress Bar для полного тарифа -->
+                                                            <div class="flex-1 min-w-[80px]">
+                                                                <div class="w-full bg-gray-200 rounded-full h-1">
+                                                                    <div class="h-1 rounded-full transition-all duration-500"
+                                                                        style="width: {{ $sphereData['sphere']['compatibility_percentage'] }}%; background-color: #316EC6">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <span
+                                                                class="text-xs px-2 py-0.5 bg-blue-100 text-blue-600 rounded">
+                                                                {{ $sphereData['sphere']['compatibility_percentage'] }}%
+                                                            </span>
+
+                                                            <!-- Info Button -->
+                                                            <button
+                                                                @click.stop="openSphereModal({{ json_encode($sphereData['sphere']) }})"
+                                                                class="p-1 text-gray-400 hover:text-blue-500 transition-colors flex-shrink-0"
+                                                                title="Показать информацию о сфере">
+                                                                <svg class="w-3 h-3" fill="none"
+                                                                    stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round"
+                                                                        stroke-linejoin="round" stroke-width="2"
+                                                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                </svg>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+
+                                            <!-- Раскрывающийся список профессий -->
+                                            <tr x-show="expandedSpheres.includes({{ $sphereData['sphere']['id'] }})"
+                                                x-transition:enter="transition ease-out duration-200"
+                                                x-transition:enter-start="opacity-0 max-h-0"
+                                                x-transition:enter-end="opacity-100 max-h-96"
+                                                x-transition:leave="transition ease-in duration-150"
+                                                x-transition:leave-start="opacity-100 max-h-96"
+                                                x-transition:leave-end="opacity-0 max-h-0" style="display: none;">
+                                                <td class="px-2 md:px-4 py-0 border-t border-gray-100 bg-gray-50">
+                                                    @if (count($sphereData['professions']) > 0)
+                                                        <div class="py-2">
+                                                            <div class="grid grid-cols-1 gap-1">
+                                                                @foreach ($sphereData['professions'] as $profession)
+                                                                    <div
+                                                                        class="bg-white border border-gray-200 rounded px-2 py-1 text-xs text-gray-700 hover:bg-gray-50 transition-colors">
+                                                                        <div class="flex items-center justify-between">
+                                                                            <div class="flex items-center flex-1 space-x-2">
+                                                                                <span class="flex-1">{{ $profession['name'] }}</span>
+                                                                                @if($this->isFullPlan && isset($profession['compatibility_percentage']))
+                                                                                    <div class="flex items-center space-x-2">
+                                                                                        <!-- Mini progress bar -->
+                                                                                        <div class="w-12 bg-gray-200 rounded-full h-1">
+                                                                                            <div class="h-1 rounded-full transition-all duration-500 bg-blue-500"
+                                                                                                style="width: {{ $profession['compatibility_percentage'] }}%">
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <span class="text-xs text-gray-500 min-w-[30px]">
+                                                                                            {{ $profession['compatibility_percentage'] }}%
+                                                                                        </span>
+                                                                                    </div>
+                                                                                @endif
+                                                                            </div>
+                                                                            @if (isset($profession['description']) && $profession['description'])
+                                                                                <button
+                                                                                    @click.stop="openProfessionModal({{ json_encode($profession) }})"
+                                                                                    class="ml-2 p-1 text-gray-400 hover:text-blue-500 transition-colors flex-shrink-0"
+                                                                                    title="Показать описание профессии">
+                                                                                    <svg class="w-3 h-3"
+                                                                                        fill="none"
+                                                                                        stroke="currentColor"
+                                                                                        viewBox="0 0 24 24">
+                                                                                        <path stroke-linecap="round"
+                                                                                            stroke-linejoin="round"
+                                                                                            stroke-width="2"
+                                                                                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                                    </svg>
+                                                                                </button>
+                                                                            @endif
+                                                                        </div>
+                                                                    </div>
+                                                                @endforeach
+                                                            </div>
+                                                        </div>
+                                                    @else
+                                                        <div class="py-4 text-center">
+                                                            <p class="text-xs text-gray-500">Профессии для этой сферы
+                                                                пока
+                                                                не добавлены</p>
+                                                        </div>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+
+                                @if (empty($professionsGroupedBySphere))
+                                    <div class="text-center py-12 md:py-16 px-4">
+                                        <div class="text-gray-400 mb-3">
+                                            <svg class="w-8 h-8 md:w-12 md:h-12 mx-auto" fill="none"
+                                                stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-2.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 009.586 13H7" />
+                                            </svg>
+                                        </div>
+                                        <h3 class="text-base md:text-lg font-medium text-gray-900 mb-2">Нет доступных
+                                            сфер
+                                        </h3>
+                                        <p class="text-sm md:text-base text-gray-500">Сферы профессий пока не созданы.
+                                        </p>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+
+                @endif
+
             </div>
 
-            <div x-show="activeTab === 'professions'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
+            <div x-show="activeTab === 'professions'" x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
                 <h2 class="text-lg md:text-xl font-bold mb-4">Все профессии</h2>
                 <p class="text-xs md:text-sm text-gray-600 mb-6 leading-relaxed">
                     На основе ваших топ талантов мы подобрали наиболее подходящие профессии.
                 </p>
-                
+
                 @php
-                    $topEightProfessions = collect($topProfessions)->take(8)->toArray();
-                    $remainingProfessions = collect($topProfessions)->skip(8)->toArray();
+                    $topThirtyProfessions = collect($topProfessions)->take(30)->toArray();
+                    $nextTenProfessions = collect($topProfessions)->skip(30)->take(10)->toArray();
+
+                    // Фиолетовый цвет для профессий
+                    $professionColor = '#8B5CF6';
                 @endphp
-                
-                <!-- Топ 8 профессий -->
-                @if(count($topEightProfessions) > 0)
+
+                <!-- Топ 30 профессий на полную ширину -->
+                @if (count($topThirtyProfessions) > 0)
                     <div class="mb-8">
                         <div class="flex items-center mb-4">
                             <svg class="w-5 h-5 text-yellow-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                <path
+                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                             </svg>
-                            <h3 class="text-lg font-semibold text-gray-900">Топ рекомендации для вас</h3>
+                            <h3 class="text-lg font-semibold text-gray-900">Топ рекомендуемые профессии</h3>
                         </div>
-                        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4 space-y-2">
-                            @foreach($topEightProfessions as $index => $profession)
-                                <div class="bg-white border border-blue-100 hover:border-blue-300 transition-colors duration-200 px-6 py-4 rounded-lg flex items-center justify-between shadow-sm">
-                                    <div class="flex items-center space-x-4">
-                                        <h4 class="text-base font-medium text-gray-900">{{ $profession['name'] }}</h4>
-                                        <span class="text-xs bg-blue-600 text-white px-3 py-1 rounded-full font-medium">
-                                            {{ $profession['compatibility_percentage'] }}%
-                                        </span>
-                                    </div>
-                                    
-                                    <button @click="openProfessionModal({{ json_encode($profession) }})" 
-                                            class="text-blue-400 hover:text-blue-600 transition-colors duration-200 p-1"
-                                            title="Показать описание">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                @endif
-                <!-- Остальные профессии -->
-                @if(count($remainingProfessions) > 0)
-                    <div>
-                        <h3 class="text-lg font-semibold text-gray-700 mb-4">Остальные профессии</h3>
                         <div class="space-y-2">
-                            @foreach($remainingProfessions as $profession)
-                                <div class="border border-gray-200 bg-white hover:bg-gray-50 transition-colors duration-200 px-6 py-3 flex items-center justify-between opacity-70">
-                                    <div class="flex items-center space-x-4">
-                                        <div>
-                                            <h4 class="text-base font-medium text-gray-600">{{ $profession['name'] }}</h4>
-                                            @if(!empty($profession['sphere_name']))
-                                                <div class="text-xs text-gray-500 mt-1">{{ $profession['sphere_name'] }}</div>
-                                            @endif
+                            @foreach ($topThirtyProfessions as $index => $profession)
+                                <div class="bg-white px-4 py-1 transition-all border border-gray-200 rounded-lg">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex-1">
+                                            <div class="flex items-center space-x-3">
+                                                <span class="text-lg font-bold text-gray-900"
+                                                    style="color: {{ $professionColor }}">{{ $index + 1 }}</span>
+                                                <h4 class="text-sm font-medium text-gray-900">
+                                                    {{ $profession['name'] }}</h4>
+                                            </div>
                                         </div>
-                                        <span class="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
-                                            {{ $profession['compatibility_percentage'] }}%
-                                        </span>
+                                        <div class="flex items-center space-x-3">
+                                            <!-- Progress Bar -->
+                                            <div class="flex items-center space-x-2 min-w-[120px]">
+                                                <span
+                                                    class="text-xs text-gray-600 min-w-[30px]">{{ $profession['compatibility_percentage'] }}%</span>
+                                                <div class="flex-1 bg-gray-200 rounded-full h-2">
+                                                    <div class="h-2 rounded-full transition-all duration-500"
+                                                        style="width: {{ $profession['compatibility_percentage'] }}%; background-color: {{ $professionColor }}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <button @click="openProfessionModal({{ json_encode($profession) }})"
+                                                class="text-purple-400 hover:text-purple-600 transition-colors duration-200 p-1"
+                                                title="Показать описание">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                            </button>
+                                        </div>
                                     </div>
-                                    
-                                    <button @click="openProfessionModal({{ json_encode($profession) }})" 
-                                            class="text-gray-400 hover:text-blue-600 transition-colors duration-200 p-1"
-                                            title="Показать описание">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                    </button>
                                 </div>
                             @endforeach
                         </div>
                     </div>
                 @endif
-                
+
+                <!-- Следующие 10 профессий (31-40) - отдельный блок с предупреждением -->
+                @if (count($nextTenProfessions) > 0)
+                    <div class="mt-12">
+                        <div class="flex items-center mb-4">
+                            <svg class="w-5 h-5 text-orange-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            <h3 class="text-lg font-semibold text-black">Профессии, которые меньше всего соответствуют
+                                вашим талантам и могут не раскрыть ваш потенциал</h3>
+                        </div>
+                        <p class="text-sm text-black mb-4">
+                            Эти профессии показали низкую совместимость с вашими талантами. Работа в этих сферах может
+                            потребовать от вас больше усилий и не принести полного удовлетворения.
+                        </p>
+                        <div class="space-y-2">
+
+                            @php
+                                // Устанавливаем индекс для нумерации профессий
+                                $professionIndex = 0; // Начинаем с 31, так как первые 30 уже отображены
+                            @endphp
+
+                            @foreach ($nextTenProfessions as $index => $profession)
+                                <div class="bg-white border border-orange-200 p-3 rounded opacity-60">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex-1">
+                                            <div class="flex items-center space-x-2">
+                                                <span
+                                                    class="text-sm font-medium text-orange-600">{{ $professionIndex = $professionIndex + 1 }}</span>
+                                                <h4 class="text-sm text-gray-700">{{ $profession['name'] }}</h4>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center space-x-2">
+                                            <div class="flex-1 min-w-[60px]">
+                                                <div class="w-full bg-gray-200 rounded-full h-1">
+                                                    <div class="h-1 rounded-full transition-all duration-500 bg-orange-400"
+                                                        style="width: {{ $profession['compatibility_percentage'] }}%">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <span class="text-xs px-2 py-0.5 bg-orange-100 text-orange-600">
+                                                {{ $profession['compatibility_percentage'] }}%
+                                            </span>
+                                            <button @click="openProfessionModal({{ json_encode($profession) }})"
+                                                class="text-orange-400 hover:text-orange-600 transition-colors duration-200 p-1"
+                                                title="Показать описание">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+
                 <!-- Modal for Profession Description -->
-                <div x-show="modalProfession" 
-                     x-transition:enter="transition ease-out duration-300" 
-                     x-transition:enter-start="opacity-0" 
-                     x-transition:enter-end="opacity-100"
-                     x-transition:leave="transition ease-in duration-200" 
-                     x-transition:leave-start="opacity-100" 
-                     x-transition:leave-end="opacity-0"
-                     class="fixed inset-0 flex items-center justify-center z-50 p-4"
-                     style="background-color: rgba(0, 0, 0, 0.5);"
-                     @click="closeProfessionModal()">
-                    <div @click.stop 
-                         x-transition:enter="transition ease-out duration-300" 
-                         x-transition:enter-start="opacity-0 transform scale-95" 
-                         x-transition:enter-end="opacity-100 transform scale-100"
-                         x-transition:leave="transition ease-in duration-200" 
-                         x-transition:leave-start="opacity-100 transform scale-100" 
-                         x-transition:leave-end="opacity-0 transform scale-95"
-                         class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+                <div x-show="modalProfession" x-transition:enter="transition ease-out duration-300"
+                    x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                    x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100"
+                    x-transition:leave-end="opacity-0" class="fixed inset-0 flex items-center justify-center z-50 p-4"
+                    style="background-color: rgba(0, 0, 0, 0.5);" @click="closeProfessionModal()">
+                    <div @click.stop x-transition:enter="transition ease-out duration-300"
+                        x-transition:enter-start="opacity-0 transform scale-95"
+                        x-transition:enter-end="opacity-100 transform scale-100"
+                        x-transition:leave="transition ease-in duration-200"
+                        x-transition:leave-start="opacity-100 transform scale-100"
+                        x-transition:leave-end="opacity-0 transform scale-95"
+                        class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
                         <div class="flex items-start justify-between mb-4">
                             <div>
                                 <h3 class="text-lg font-semibold text-gray-900" x-text="modalProfession?.name"></h3>
-                                <div class="text-sm text-blue-600 mt-1" x-text="modalProfession?.sphere_name || ''"></div>
+                                <div class="text-sm text-blue-600 mt-1" x-text="modalProfession?.sphere_name || ''">
+                                </div>
                             </div>
-                            <button @click="closeProfessionModal()" 
-                                    class="text-gray-400 hover:text-gray-600 transition-colors">
+                            <button @click="closeProfessionModal()"
+                                class="text-gray-400 hover:text-gray-600 transition-colors">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M6 18L18 6M6 6l12 12" />
                                 </svg>
                             </button>
                         </div>
-                        <p class="text-sm text-gray-700 leading-relaxed" x-text="modalProfession?.description || 'Описание отсутствует'"></p>
+                        <p class="text-sm text-gray-700 leading-relaxed"
+                            x-text="modalProfession?.description || 'Описание отсутствует'"></p>
                     </div>
                 </div>
             </div>
-
-
         @else
             <div class="text-center py-12">
                 <h2 class="text-2xl font-bold mb-4">У вас пока нет результатов</h2>

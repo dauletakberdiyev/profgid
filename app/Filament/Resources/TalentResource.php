@@ -45,6 +45,11 @@ class TalentResource extends Resource
                     ->label('Описание')
                     ->maxLength(65535)
                     ->columnSpanFull(),
+                Forms\Components\Textarea::make('advice')
+                    ->label('Советы')
+                    ->helperText('5 советов для человека с этим талантом (можно использовать HTML)')
+                    ->maxLength(65535)
+                    ->columnSpanFull(),
             ]);
     }
 
@@ -60,6 +65,13 @@ class TalentResource extends Resource
                     ->label('Название')
                     ->searchable()
                     ->sortable(),
+                Tables\Columns\IconColumn::make('advice')
+                    ->label('Есть советы')
+                    ->boolean()
+                    ->trueIcon('heroicon-o-check-circle')
+                    ->falseIcon('heroicon-o-x-circle')
+                    ->trueColor('success')
+                    ->falseColor('danger'),
                 Tables\Columns\TextColumn::make('answers_count')
                     ->label('Кол-во вопросов')
                     ->counts('answers')

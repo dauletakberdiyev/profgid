@@ -77,4 +77,10 @@ Route::middleware(['auth'])->group(function () {
     // Profession management routes
     Route::post('/profession/add-to-favorites', [\App\Http\Controllers\ProfessionController::class, 'addToFavorites'])->name('profession.add-to-favorites');
     Route::post('/profession/remove-from-favorites', [\App\Http\Controllers\ProfessionController::class, 'removeFromFavorites'])->name('profession.remove-from-favorites');
+    
+    // // Test PDF route
+    // Route::get('/test-pdf', function () {
+    //     $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadHTML('<h1>Test PDF</h1><p>This is a test PDF.</p>');
+    //     return $pdf->download('test.pdf');
+    // })->name('test-pdf');
 });

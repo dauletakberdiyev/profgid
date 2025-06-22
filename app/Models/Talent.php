@@ -12,6 +12,7 @@ class Talent extends Model
     protected $fillable = [
         'name',
         'description',
+        'advice',
         'icon',
         'talent_domain_id'
     ];
