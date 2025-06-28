@@ -11,7 +11,7 @@
 
             <!-- Mobile menu button -->
             <div class="md:hidden">
-                <button type="button" 
+                <button type="button"
                     class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
                     @click="mobileMenuOpen = !mobileMenuOpen"
                     :aria-expanded="mobileMenuOpen">
@@ -31,6 +31,9 @@
             <nav class="hidden md:flex items-center space-x-6 lg:space-x-8">
                 <a href="{{ route('home') }}" class="text-sm font-medium text-gray-900 hover:text-blue-600 transition-colors">
                     {{ __('messages.nav_how_it_works') }}
+                </a>
+                <a href="{{ route('about') }}" class="text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors">
+                    О нас
                 </a>
                 <a href="{{ route('profession-map') }}"
                     class="text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors">
@@ -68,11 +71,11 @@
                         x-transition:leave-start="transform opacity-100 scale-100"
                         x-transition:leave-end="transform opacity-0 scale-95">
                         <div class="py-1">
-                            <a href="{{ route('locale.set', 'kk') }}" 
+                            <a href="{{ route('locale.set', 'kk') }}"
                                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 {{ app()->getLocale() == 'kk' ? 'bg-gray-100 font-medium' : '' }}">
                                 {{ __('messages.language_kk') }}
                             </a>
-                            <a href="{{ route('locale.set', 'ru') }}" 
+                            <a href="{{ route('locale.set', 'ru') }}"
                                 class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 {{ app()->getLocale() == 'ru' ? 'bg-gray-100 font-medium' : '' }}">
                                 {{ __('messages.language_ru') }}
                             </a>
@@ -105,8 +108,8 @@
         </div>
 
         <!-- Mobile menu -->
-        <div class="md:hidden" 
-             x-show="mobileMenuOpen" 
+        <div class="md:hidden"
+             x-show="mobileMenuOpen"
              x-transition:enter="transition ease-out duration-200"
              x-transition:enter-start="opacity-0 scale-95"
              x-transition:enter-end="opacity-100 scale-100"
@@ -115,19 +118,24 @@
              x-transition:leave-end="opacity-0 scale-95">
             <div class="pt-2 pb-3 space-y-1 border-t border-gray-200 mt-4">
                 <!-- Mobile navigation links -->
-                <a href="{{ route('home') }}" 
+                <a href="{{ route('home') }}"
                    class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors">
                     {{ __('messages.nav_how_it_works') }}
                 </a>
-                <a href="{{ route('profession-map') }}" 
+                <a href="{{ route('about') }}"
+                   class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors">
+                    О нас
+                </a>
+                <a href="{{ route('profession-map') }}"
                    class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors">
                     Карта профессий
                 </a>
-                <a href="{{ route('test-preparation') }}" 
+
+                <a href="{{ route('test-preparation') }}"
                    class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors">
                     {{ __('messages.nav_take_test') }}
                 </a>
-                
+
                 @auth
                     <!-- Mobile user menu -->
                     <div class="border-t border-gray-200 pt-4 pb-3">
@@ -145,17 +153,21 @@
                             </div>
                         </div>
                         <div class="mt-3 space-y-1">
-                            <a href="#" 
+                            <a href="#"
                                class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors">
                                 Профиль
                             </a>
-                            <a href="{{ route('profession-map') }}" 
+                            <a href="{{ route('profession-map') }}"
                                class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors">
                                 Карта профессий
                             </a>
+                            <a href="{{ route('test.history') }}"
+                                class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors">
+                                Мои отчеты
+                            </a>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
-                                <button type="submit" 
+                                <button type="submit"
                                         class="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors">
                                     Выйти
                                 </button>
@@ -166,11 +178,11 @@
                     <!-- Mobile auth buttons -->
                     <div class="border-t border-gray-200 pt-4 pb-3">
                         <div class="space-y-2 px-3">
-                            <a href="{{ route('login') }}" 
+                            <a href="{{ route('login') }}"
                                class="block w-full px-4 py-2 text-center text-blue-600 hover:text-blue-800 border border-blue-600 hover:border-blue-800 rounded-md font-medium transition-colors">
                                 {{ __('messages.login') }}
                             </a>
-                            <a href="{{ route('register') }}" 
+                            <a href="{{ route('register') }}"
                                class="block w-full px-4 py-2 text-center text-white bg-blue-600 hover:bg-blue-700 rounded-md font-medium transition-colors">
                                 {{ __('messages.register') }}
                             </a>

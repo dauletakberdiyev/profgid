@@ -1,6 +1,8 @@
 import './bootstrap';
 import Typed from 'typed.js';
-import '@animxyz/core';
+// import '@animxyz/core';
+
+
 
 document.addEventListener('livewire:navigated', () => {
     if (document.getElementById('typed-output')) {
@@ -18,7 +20,10 @@ document.addEventListener('livewire:navigated', () => {
         });
     }
 });
-import Alpine from 'alpinejs';
 
-window.Alpine = Alpine;
-Alpine.start();
+
+// import Alpine from 'alpinejs';
+
+// window.Alpine = Alpine;
+// Alpine.start();
+

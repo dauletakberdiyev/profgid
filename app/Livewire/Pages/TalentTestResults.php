@@ -9,6 +9,7 @@ use App\Models\UserAnswer;
 use App\Models\TestSession;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Request;
 
 class TalentTestResults extends Component
 {
@@ -129,6 +130,7 @@ class TalentTestResults extends Component
                 'id' => $talent->id,
                 'name' => $talent->name,
                 'description' => $talent->description ?? '',
+                'short_description' => $talent->short_description ?? '',
                 'advice' => $talent->advice ?? '',
                 'domain' => $domainName,
                 'score' => $score,
@@ -563,61 +565,8 @@ class TalentTestResults extends Component
     
     public function exportTalentDescriptionsPdf()
     {
-        try {
-            // Проверяем, что у пользователя есть полный тариф
-            if (!$this->isFullPlan) {
-                session()->flash('error', 'Экспорт PDF доступен только для пользователей с полным тарифом.');
-                return;
-            }
-
-            // Подготавливаем данные для PDF - только топ 10 талантов
-            $maxScore = max(array_column($this->userResults, 'score'));
-            
-            // Берем только первые 10 талантов с описаниями
-            $topTenTalents = array_slice(
-                array_filter($this->userResults, function($talent) {
-                    return !empty($talent['description']);
-                }), 
-                0, 
-                10
-            );
-            
-            // Собираем советы только для топ 10 талантов
-            $talentAdvice = [];
-            foreach ($topTenTalents as $talent) {
-                $talentAdvice[$talent['name']] = $this->getTalentAdvice($talent['name']);
-            }
-
-            // Определяем цвета доменов
-            $domainColors = [
-                'executing' => '#702B7C',
-                'relationship' => '#316EC6', 
-                'strategic' => '#429162',
-                'influencing' => '#DA782D',
-            ];
-
-            // Генерируем PDF
-            $pdf = Pdf::loadView('pdf.talent-descriptions', [
-                'userResults' => $topTenTalents,
-                'domains' => $this->domains,
-                'maxScore' => $maxScore,
-                'talentAdvice' => $talentAdvice,
-                'testDate' => $this->testDate,
-                'domainColors' => $domainColors
-            ]);
-
-            // Генерируем имя файла
-            $userName = Auth::user()->name ?? 'User';
-            $fileName = 'Топ_10_Талантов_' . str_replace(' ', '_', $userName) . '_' . now()->format('Y-m-d') . '.pdf';
-
-            // Скачиваем PDF
-            return $pdf->download($fileName);
-            
-        } catch (\Exception $e) {
-            \Log::error('PDF Export Error: ' . $e->getMessage());
-            session()->flash('error', 'Произошла ошибка при генерации PDF: ' . $e->getMessage());
-            return;
-        }
+        // Вместо прямого скачивания, просто флешим флаг для JS
+        session()->flash('download_pdf', true);
     }
     
     public function render()

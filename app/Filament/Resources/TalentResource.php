@@ -45,6 +45,11 @@ class TalentResource extends Resource
                     ->label('Описание')
                     ->maxLength(65535)
                     ->columnSpanFull(),
+                Forms\Components\Textarea::make('short_description')
+                    ->label('Краткое описание')
+                    ->helperText('Краткое описание таланта (показывается всем пользователям)')
+                    ->maxLength(500)
+                    ->columnSpanFull(),
                 Forms\Components\Textarea::make('advice')
                     ->label('Советы')
                     ->helperText('5 советов для человека с этим талантом (можно использовать HTML)')

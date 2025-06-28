@@ -33,16 +33,16 @@
                 <h3 class="text-sm font-semibold text-gray-900 tracking-wider uppercase mb-4">Навигация</h3>
                 <ul class="space-y-3">
                     <li>
-                        <a href="#" class="text-sm text-gray-500 hover:text-blue-600 transition-colors">Главная</a>
+                        <a href="{{ route('home') }}" class="text-sm text-gray-500 hover:text-blue-600 transition-colors">Главная</a>
                     </li>
                     <li>
-                        <a href="#" class="text-sm text-gray-500 hover:text-blue-600 transition-colors">Как это работает</a>
+                        <a href="{{ route('home') }}" class="text-sm text-gray-500 hover:text-blue-600 transition-colors">Как это работает</a>
                     </li>
                     <li>
-                        <a href="#" class="text-sm text-gray-500 hover:text-blue-600 transition-colors">О платформе</a>
+                        <a href="{{ route('about') }}" class="text-sm text-gray-500 hover:text-blue-600 transition-colors">О нас</a>
                     </li>
                     <li>
-                        <a href="#" class="text-sm text-gray-500 hover:text-blue-600 transition-colors">Пройти тест</a>
+                        <a href="{{ route('test-preparation') }}" class="text-sm text-gray-500 hover:text-blue-600 transition-colors">Пройти тест</a>
                     </li>
                 </ul>
             </div>
@@ -55,7 +55,7 @@
                         <a href="#" class="text-sm text-gray-500 hover:text-blue-600 transition-colors">Блог</a>
                     </li>
                     <li>
-                        <a href="#" class="text-sm text-gray-500 hover:text-blue-600 transition-colors">Профессии</a>
+                        <a href="{{ route('profession-map') }}" class="text-sm text-gray-500 hover:text-blue-600 transition-colors">Карта профессий</a>
                     </li>
                     <li>
                         <a href="#" class="text-sm text-gray-500 hover:text-blue-600 transition-colors">Университеты</a>
@@ -75,7 +75,7 @@
                             <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
                             <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
                         </svg>
-                        <a href="mailto:info@profgid.kz" class="text-sm text-gray-500 hover:text-blue-600 transition-colors">info@profgid.kz</a>
+                        <a href="mailto:zhangeldi.turarbek@gmail.com" class="text-sm text-gray-500 hover:text-blue-600 transition-colors">zhangeldi.turarbek@gmail.com</a>
                     </li>
                     <li class="flex items-start">
                         <svg class="h-5 w-5 text-gray-400 mr-2 mt-0.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -87,7 +87,7 @@
                         <svg class="h-5 w-5 text-gray-400 mr-2 mt-0.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                             <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
                         </svg>
-                        <a href="tel:+77771234567" class="text-sm text-gray-500 hover:text-blue-600 transition-colors">+7 777 123 45 67</a>
+                        <a href="tel:+77072170555" class="text-sm text-gray-500 hover:text-blue-600 transition-colors">+7 707 217 05 55</a>
                     </li>
                 </ul>
             </div>
@@ -97,8 +97,8 @@
             <div class="flex flex-col md:flex-row justify-between items-center">
                 <p class="text-xs text-gray-500">&copy; 2025 PROFGID. Все права защищены.</p>
                 <div class="flex space-x-6 mt-4 md:mt-0">
-                    <a href="#" class="text-xs text-gray-500 hover:text-blue-600 transition-colors">Условия использования</a>
-                    <a href="#" class="text-xs text-gray-500 hover:text-blue-600 transition-colors">Политика конфиденциальности</a>
+                    <a href="{{ route('terms-of-service') }}" class="text-xs text-gray-500 hover:text-blue-600 transition-colors">Договор оферты</a>
+                    <a href="{{ route('privacy-policy') }}" class="text-xs text-gray-500 hover:text-blue-600 transition-colors">Политика конфиденциальности</a>
                 </div>
             </div>
         </div>
