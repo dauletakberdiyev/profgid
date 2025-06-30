@@ -14,7 +14,7 @@
     <div x-show="open" @click.away="open = false"
         class="absolute right-0 mt-2 w-72 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
         role="menu" aria-orientation="vertical" aria-labelledby="user-menu">
-        
+
         <!-- Flash Message -->
         @if(session('message'))
             <div class="p-3 mb-2 bg-green-50 border-l-4 border-green-400">
@@ -25,18 +25,18 @@
 
         <!-- Regular Menu Items -->
         <div class="py-1">
-            <a href="{{ route('profile') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+            <a href="{{ route('profile') }}" class="block px-4 py-2 text-sm {{ request()->routeIs('profile') ? 'text-blue-600 bg-blue-50 font-medium' : 'text-gray-700' }} hover:bg-gray-100"
                 role="menuitem">{{ __('messages.profile') }}</a>
             <a href="{{ route('settings') }}"
-                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                class="block px-4 py-2 text-sm {{ request()->routeIs('settings') ? 'text-blue-600 bg-blue-50 font-medium' : 'text-gray-700' }} hover:bg-gray-100"
                 role="menuitem">{{ __('messages.settings') }}</a>
             <a href="{{ route('test.history') }}"
-                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                class="block px-4 py-2 text-sm {{ request()->routeIs('test.history') ? 'text-blue-600 bg-blue-50 font-medium' : 'text-gray-700' }} hover:bg-gray-100"
                 role="menuitem">{{ __('messages.test_history') }}</a>
-            
+
             <!-- My Professions Link -->
             <a href="{{ route('my-professions') }}"
-                class="block px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 font-medium"
+                class="block px-4 py-2 text-sm {{ request()->routeIs('my-professions') ? 'text-blue-600 bg-blue-50 font-semibold' : 'text-blue-600' }} hover:bg-blue-50 font-medium"
                 role="menuitem">
                 <div class="flex items-center">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -52,7 +52,7 @@
             </a>
 
             <a href="{{ route('my-spheres') }}"
-                class="block px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 font-medium"
+                class="block px-4 py-2 text-sm {{ request()->routeIs('my-spheres') ? 'text-blue-600 bg-blue-50 font-semibold' : 'text-blue-600' }} hover:bg-blue-50 font-medium"
                 role="menuitem">
                 <div class="flex items-center">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -66,7 +66,7 @@
                     @endif
                 </div>
             </a>
-            
+
             {{-- <!-- Profession Recommendations Link -->
             @if($favoriteProfessions->count() > 0)
                 <a href="{{ route('profession-recommendations') }}"
@@ -80,7 +80,7 @@
                     </div>
                 </a>
             @endif --}}
-            
+
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit"

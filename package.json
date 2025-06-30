@@ -20,6 +20,7 @@
         "@animxyz/core": "^0.6.6",
         "alpinejs": "^3.14.9",
         "easytimer.js": "^4.6.0",
+        "puppeteer": "^24.11.1",
         "typed.js": "^2.1.0"
     }
 }

@@ -9,32 +9,33 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class TestSession extends Model
 {
     protected $fillable = [
-        'session_id',
-        'user_id',
-        'payment_status',
-        'payment_amount',
-        'payment_transaction_id',
-        'receipt_image',
-        'payer_name',
-        'payment_confirmed_at',
-        'selected_plan',
-        'total_questions',
-        'answered_questions',
-        'completion_percentage',
-        'status',
-        'started_at',
-        'completed_at',
-        'total_time_spent',
-        'average_response_time'
+        "session_id",
+        "user_id",
+        "payment_status",
+        "payment_amount",
+        "payment_transaction_id",
+        "receipt_image",
+        "payer_name",
+        "promo_code",
+        "payment_confirmed_at",
+        "selected_plan",
+        "total_questions",
+        "answered_questions",
+        "completion_percentage",
+        "status",
+        "started_at",
+        "completed_at",
+        "total_time_spent",
+        "average_response_time",
     ];
 
     protected $casts = [
-        'payment_confirmed_at' => 'datetime',
-        'started_at' => 'datetime',
-        'completed_at' => 'datetime',
-        'payment_amount' => 'decimal:2',
-        'completion_percentage' => 'decimal:2',
-        'average_response_time' => 'decimal:2',
+        "payment_confirmed_at" => "datetime",
+        "started_at" => "datetime",
+        "completed_at" => "datetime",
+        "payment_amount" => "decimal:2",
+        "completion_percentage" => "decimal:2",
+        "average_response_time" => "decimal:2",
     ];
 
     /**
@@ -50,7 +51,11 @@ class TestSession extends Model
      */
     public function userAnswers(): HasMany
     {
-        return $this->hasMany(UserAnswer::class, 'test_session_id', 'session_id');
+        return $this->hasMany(
+            UserAnswer::class,
+            "test_session_id",
+            "session_id"
+        );
     }
 
     /**
@@ -60,18 +65,22 @@ class TestSession extends Model
     {
         $answeredCount = $this->userAnswers()->count();
         $this->update([
-            'answered_questions' => $answeredCount,
-            'completion_percentage' => $this->total_questions > 0 
-                ? round(($answeredCount / $this->total_questions) * 100, 2) 
-                : 0,
-            'status' => $answeredCount > 0 ? 'in_progress' : 'started'
+            "answered_questions" => $answeredCount,
+            "completion_percentage" =>
+                $this->total_questions > 0
+                    ? round(($answeredCount / $this->total_questions) * 100, 2)
+                    : 0,
+            "status" => $answeredCount > 0 ? "in_progress" : "started",
         ]);
 
         // Если все вопросы отвечены, помечаем как завершенную
-        if ($answeredCount >= $this->total_questions && $this->total_questions > 0) {
+        if (
+            $answeredCount >= $this->total_questions &&
+            $this->total_questions > 0
+        ) {
             $this->update([
-                'status' => 'completed',
-                'completed_at' => now()
+                "status" => "completed",
+                "completed_at" => now(),
             ]);
         }
     }
@@ -83,12 +92,12 @@ class TestSession extends Model
     {
         $answers = $this->userAnswers;
         if ($answers->count() > 0) {
-            $totalTime = $answers->sum('response_time_seconds');
-            $averageTime = $answers->avg('response_time_seconds');
+            $totalTime = $answers->sum("response_time_seconds");
+            $averageTime = $answers->avg("response_time_seconds");
 
             $this->update([
-                'total_time_spent' => $totalTime,
-                'average_response_time' => round($averageTime, 2)
+                "total_time_spent" => $totalTime,
+                "average_response_time" => round($averageTime, 2),
             ]);
         }
     }
@@ -98,7 +107,7 @@ class TestSession extends Model
      */
     public function isPaid(): bool
     {
-        return in_array($this->payment_status, ['completed', 'free']);
+        return in_array($this->payment_status, ["completed", "free"]);
     }
 
     /**
@@ -107,11 +116,11 @@ class TestSession extends Model
     public function getProgressStatusAttribute(): string
     {
         if ($this->completion_percentage == 0) {
-            return 'Не начат';
+            return "Не начат";
         } elseif ($this->completion_percentage < 100) {
-            return 'В процессе (' . $this->completion_percentage . '%)';
+            return "В процессе (" . $this->completion_percentage . "%)";
         } else {
-            return 'Завершен';
+            return "Завершен";
         }
     }
 
@@ -120,7 +129,7 @@ class TestSession extends Model
      */
     public function scopePaid($query)
     {
-        return $query->whereIn('payment_status', ['completed', 'free']);
+        return $query->whereIn("payment_status", ["completed", "free"]);
     }
 
     /**
@@ -128,6 +137,6 @@ class TestSession extends Model
      */
     public function scopeCompleted($query)
     {
-        return $query->where('status', 'completed');
+        return $query->where("status", "completed");
     }
 }

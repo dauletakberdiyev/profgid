@@ -46,14 +46,17 @@
     },
 
     async exportSection(sectionId, filename = 'talent-results') {
-        console.log('sdf')
-        domtoimage.toBlob(document.getElementById('talents-section')).then(function (blob) {
-            window.saveAs(blob, 'my-node.png');
-        });
+        this.isExporting = true;
 
+        // Проверяем готовность библиотек
+        if (!this.checkLibraryReadiness()) {
+            this.isExporting = false;
+            return;
+        }
 
-        {{-- this.isExporting = true;
-        
+        // Логируем диагностическую информацию
+        console.log('Export diagnostic info:', this.getDiagnosticInfo());
+
         try {
             const element = document.getElementById(sectionId);
             if (!element) {
@@ -61,77 +64,226 @@
                 return;
             }
 
-            // Временно показываем скрытый элемент для экспорта
-            const wasHidden = element.style.display === 'none' || !element.offsetParent;
-            if (wasHidden) {
-                element.style.display = 'block';
-                element.style.visibility = 'visible';
-                element.style.opacity = '1';
-            }
+            // Показываем уведомление о начале экспорта
+            this.showNotification('Подготовка к экспорту...', 'info');
 
-            // Ждем немного для рендеринга
-            await new Promise(resolve => setTimeout(resolve, 100));
+            // Ждем следующий кадр для плавности UI
+            await new Promise(resolve => requestAnimationFrame(resolve));
 
-            // Настройки для html2canvas
-            const options = {
-                scale: 2, // Увеличиваем качество изображения
-                useCORS: true, // Разрешаем загрузку внешних ресурсов
-                allowTaint: true,
-                backgroundColor: '#ffffff',
-                width: element.scrollWidth,
-                height: element.scrollHeight,
-                scrollX: 0,
-                scrollY: 0,
-                windowWidth: window.innerWidth,
-                windowHeight: window.innerHeight,
-                logging: false, // Отключаем логирование
-                removeContainer: true,
-                foreignObjectRendering: true
+            // Добавляем индикатор прогресса
+            let progressNotification = null;
+            const showProgress = (message) => {
+                if (progressNotification) {
+                    progressNotification.textContent = message;
+                } else {
+                    progressNotification = document.createElement('div');
+                    progressNotification.className = 'fixed top-16 right-4 z-50 px-4 py-2 rounded-lg shadow-lg bg-blue-500 text-white';
+                    progressNotification.textContent = message;
+                    document.body.appendChild(progressNotification);
+                }
             };
 
-            // Создаем canvas из элемента
-            const canvas = await html2canvas(element, options);
-            
-            // Возвращаем элемент в исходное состояние
-            if (wasHidden) {
-                element.style.display = '';
-                element.style.visibility = '';
-                element.style.opacity = '';
+            let dataUrl;
+
+            // Проверяем доступность библиотек
+            const hasDomToImage = typeof domtoimage !== 'undefined';
+            const hasHtml2Canvas = typeof html2canvas !== 'undefined';
+
+            if (!hasDomToImage && !hasHtml2Canvas) {
+                throw new Error('Библиотеки для экспорта не загружены');
             }
-            
+
+            // Сначала пробуем быстрый метод с dom-to-image
+            if (hasDomToImage) {
+                try {
+                    showProgress('Экспорт (быстрый метод)...');
+                    dataUrl = await Promise.race([
+                        domtoimage.toJpeg(element, {
+                            quality: 0.85,
+                            bgcolor: '#ffffff',
+                            style: {
+                                transform: 'none',
+                                transition: 'none',
+                                animation: 'none'
+                            }
+                        }),
+                        new Promise((_, reject) =>
+                            setTimeout(() => reject(new Error('dom-to-image timeout')), 8000)
+                        )
+                    ]);
+                } catch (domError) {
+                    console.warn('dom-to-image failed:', domError);
+                    if (!hasHtml2Canvas) {
+                        throw domError;
+                    }
+                    // Продолжаем к html2canvas
+                }
+            }
+
+            // Fallback к html2canvas если dom-to-image не сработал или недоступен
+            if (!dataUrl && hasHtml2Canvas) {
+                showProgress('Экспорт через HTML2Canvas...');
+
+                // Подготавливаем элемент для лучшего рендеринга
+                const originalStyle = {
+                    position: element.style.position,
+                    left: element.style.left,
+                    top: element.style.top
+                };
+
+                element.style.position = 'relative';
+                element.style.left = '0';
+                element.style.top = '0';
+
+                try {
+                    const canvas = await Promise.race([
+                        html2canvas(element, {
+                            scale: 1.2,
+                            useCORS: true,
+                            allowTaint: true,
+                            backgroundColor: '#ffffff',
+                            logging: false,
+                            letterRendering: true,
+                            removeContainer: true,
+                            imageTimeout: 5000,
+                            width: element.scrollWidth,
+                            height: element.scrollHeight,
+                            scrollX: 0,
+                            scrollY: 0,
+                            windowWidth: window.innerWidth,
+                            windowHeight: window.innerHeight,
+                            onclone: function(clonedDoc) {
+                                const clonedElement = clonedDoc.getElementById(sectionId);
+                                if (clonedElement) {
+                                    // Оптимизируем клонированный элемент
+                                    clonedElement.style.transform = 'none';
+                                    clonedElement.style.transition = 'none';
+                                    clonedElement.style.animation = 'none';
+                                    clonedElement.style.position = 'relative';
+
+                                    // Улучшаем видимость текста
+                                    const textElements = clonedElement.querySelectorAll('*');
+                                    textElements.forEach(el => {
+                                        if (el.style) {
+                                            el.style.textShadow = 'none';
+                                            el.style.webkitFontSmoothing = 'antialiased';
+                                        }
+                                    });
+                                }
+                            }
+                        }),
+                        new Promise((_, reject) =>
+                            setTimeout(() => reject(new Error('HTML2Canvas timeout')), 15000)
+                        )
+                    ]);
+
+                    // Восстанавливаем исходные стили
+                    Object.assign(element.style, originalStyle);
+
+                    dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+                } catch (canvasError) {
+                    // Восстанавливаем исходные стили в случае ошибки
+                    Object.assign(element.style, originalStyle);
+                    throw canvasError;
+                }
+            }
+
+            if (!dataUrl) {
+                throw new Error('Не удалось создать изображение');
+            }
+
+            showProgress('Подготовка к скачиванию...');
+
             // Создаем ссылку для скачивания
             const link = document.createElement('a');
-            link.download = `${filename}-${new Date().toISOString().split('T')[0]}.png`;
-            link.href = canvas.toDataURL('image/png', 0.95);
-            
+            link.download = `${filename}-${new Date().toISOString().split('T')[0]}.jpg`;
+            link.href = dataUrl;
+
             // Скачиваем файл
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            
-            // Показываем уведомление об успехе
+
             this.showNotification('Изображение успешно экспортировано!', 'success');
-            
+
         } catch (error) {
             console.error('Ошибка при экспорте:', error);
-            this.showNotification('Произошла ошибка при экспорте изображения', 'error');
+
+            let errorMessage = 'Произошла ошибка при экспорте изображения';
+
+            if (error.message.includes('timeout')) {
+                errorMessage = 'Экспорт занял слишком много времени. Попробуйте снова.';
+            } else if (error.message.includes('библиотеки')) {
+                errorMessage = 'Библиотеки для экспорта не загружены. Обновите страницу.';
+            } else if (error.message.includes('не найдена')) {
+                errorMessage = 'Секция для экспорта не найдена';
+            } else if (error.message.includes('создать изображение')) {
+                errorMessage = 'Не удалось создать изображение. Попробуйте другой браузер.';
+            }
+
+            this.showNotification(errorMessage, 'error');
         } finally {
+            // Очищаем индикатор прогресса
+            if (progressNotification) {
+                document.body.removeChild(progressNotification);
+                progressNotification = null;
+            }
             this.isExporting = false;
-        } --}}
+        }
+    },
+
+    // Проверка готовности библиотек
+    checkLibraryReadiness() {
+        const libraries = {
+            'dom-to-image': typeof domtoimage !== 'undefined',
+            'html2canvas': typeof html2canvas !== 'undefined',
+            'html2pdf': typeof html2pdf !== 'undefined'
+        };
+
+        console.log('Library readiness check:', libraries);
+
+        if (!libraries['dom-to-image'] && !libraries['html2canvas']) {
+            this.showNotification('Библиотеки экспорта не загружены', 'error');
+            return false;
+        }
+
+        return true;
+    },
+
+    // Диагностическая информация
+    getDiagnosticInfo() {
+        return {
+            userAgent: navigator.userAgent,
+            screenSize: `${screen.width}x${screen.height}`,
+            viewportSize: `${window.innerWidth}x${window.innerHeight}`,
+            devicePixelRatio: window.devicePixelRatio,
+            libraries: {
+                domtoimage: typeof domtoimage !== 'undefined',
+                html2canvas: typeof html2canvas !== 'undefined',
+                html2pdf: typeof html2pdf !== 'undefined'
+            },
+            performance: {
+                memory: navigator.memory ? {
+                    used: Math.round(navigator.memory.usedJSHeapSize / 1024 / 1024) + 'MB',
+                    total: Math.round(navigator.memory.totalJSHeapSize / 1024 / 1024) + 'MB',
+                    limit: Math.round(navigator.memory.jsHeapSizeLimit / 1024 / 1024) + 'MB'
+                } : 'Not available'
+            }
+        };
     },
 
     showNotification(message, type = 'info') {
         // Создаем уведомление
         const notification = document.createElement('div');
         notification.className = `fixed top-4 right-4 z-50 px-4 py-2 rounded-lg shadow-lg transition-all duration-300 ${
-            type === 'success' ? 'bg-green-500 text-white' : 
-            type === 'error' ? 'bg-red-500 text-white' : 
+            type === 'success' ? 'bg-green-500 text-white' :
+            type === 'error' ? 'bg-red-500 text-white' :
             'bg-blue-500 text-white'
         }`;
         notification.textContent = message;
-        
+
         document.body.appendChild(notification);
-        
+
         // Удаляем уведомление через 3 секунды
         setTimeout(() => {
             notification.style.opacity = '0';
@@ -193,14 +345,8 @@
                 <!-- Export and PDF Download Buttons -->
                 <div class="flex items-center space-x-2">
                     <!-- Image Export Button -->
-                    <button
-                        @click="exportSection(
-                            activeTab === 'talents' ? 'talents-section' : 
-                            activeTab === 'spheres' ? 'spheres-section' : 'professions-section',
-                            activeTab === 'talents' ? 'talents-results' : 
-                            activeTab === 'spheres' ? 'spheres-results' : 'professions-results'
-                        )"
-                        :disabled="isExporting"
+                    <!-- <button
+                        @click="exportSection()"
                         class="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 bg-green-100 hover:bg-green-200 disabled:bg-gray-100 disabled:cursor-not-allowed rounded-lg transition-colors group self-start"
                         title="Экспорт в изображение"
                     >
@@ -213,17 +359,17 @@
                         </svg>
                     </button>
 
-                    <button id="exportByImage">
+                    <a href="{{ route('talent.pdf.download', ['session_id' => "cac85329-bd7a-40a5-95f6-894fdd660bdc"]) }}">
                         Export pdf
-                    </button>
+                    </a> -->
 
                     <!-- PDF Download Button -->
                     <a
                         :href="
-                            activeTab === 'talents' 
-                                ? '{{ route('talent.pdf.download', ['session_id' => $testSessionId ?? request()->get('session_id'), 'tab' => 'talents']) }}' 
-                            : activeTab === 'spheres' 
-                                ? '{{ route('talent.pdf.download', ['session_id' => $testSessionId ?? request()->get('session_id'), 'tab' => 'spheres']) }}' 
+                            activeTab === 'talents'
+                                ? '{{ route('talent.pdf.download', ['session_id' => $testSessionId ?? request()->get('session_id'), 'tab' => 'talents']) }}'
+                            : activeTab === 'spheres'
+                                ? '{{ route('talent.pdf.download', ['session_id' => $testSessionId ?? request()->get('session_id'), 'tab' => 'spheres']) }}'
                             : '{{ route('talent.pdf.download', ['session_id' => $testSessionId ?? request()->get('session_id'), 'tab' => 'professions']) }}'
                         "
                         class="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors group self-start"
@@ -244,7 +390,7 @@
             <div id="talents-section" x-show="activeTab === 'talents'" x-transition:enter="transition ease-out duration-200"
                 x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
                 <!-- Domain Bar Chart -->
-                <div class="mb-4 md:mb-6">
+                <div class="mb-4 md:mb-6" id="talents-section-pdf">
                     @php
                         $domainColors = [
                             'executing' => '#702B7C',
@@ -437,7 +583,7 @@
                                         </div>
 
                                         <!-- Аккордеон для обзора и советов -->
-                                        <div class="overflow-hidden mt-2" 
+                                        <div class="overflow-hidden mt-2"
                                             x-show="expandedTalents.includes('{{ $talentId }}')"
                                             x-transition:enter="transition ease-out duration-200"
                                             x-transition:enter-start="opacity-0 max-h-0"
@@ -445,7 +591,7 @@
                                             x-transition:leave="transition ease-in duration-150"
                                             x-transition:leave-start="opacity-100 max-h-96"
                                             x-transition:leave-end="opacity-0 max-h-0">
-                                            
+
                                             <!-- Краткое описание - показывается в аккордеоне -->
                                             @if (!empty($talent['short_description']))
                                                 <div class="mb-3">
@@ -453,7 +599,7 @@
                                                     <p class="text-xs text-gray-700 leading-tight">{{ $talent['short_description'] }}</p>
                                                 </div>
                                             @endif
-                                            
+
                                             <!-- Обзор таланта (только для полного тарифа) -->
                                             @if (!empty($talent['description']) && $this->isFullPlan)
                                                 <div class="mb-3">
@@ -492,7 +638,7 @@
                                     <!-- Остальные таланты - с аккордеоном для краткого описания -->
                                     <div class="bg-gray-50 p-3 transition-all hover:bg-gray-100"
                                         style="border-left: 4px solid {{ $talentDomainColor }}">
-                                        
+
                                         <!-- Заголовок таланта с аккордеоном -->
                                         <div class="flex items-center justify-between cursor-pointer"
                                             @click="expandedTalents.includes('{{ $remainingTalentId }}') ? expandedTalents.splice(expandedTalents.indexOf('{{ $remainingTalentId }}'), 1) : expandedTalents.push('{{ $remainingTalentId }}')">
@@ -517,7 +663,7 @@
 
                                         <!-- Аккордеон для краткого описания -->
                                         @if (!empty($talent['short_description']))
-                                            <div class="overflow-hidden mt-2" 
+                                            <div class="overflow-hidden mt-2"
                                                 x-show="expandedTalents.includes('{{ $remainingTalentId }}')"
                                                 x-transition:enter="transition ease-out duration-200"
                                                 x-transition:enter-start="opacity-0 max-h-0"
@@ -525,7 +671,7 @@
                                                 x-transition:leave="transition ease-in duration-150"
                                                 x-transition:leave-start="opacity-100 max-h-96"
                                                 x-transition:leave-end="opacity-0 max-h-0">
-                                                
+
                                                 <!-- Краткое описание для остальных талантов -->
                                                 <div class="mb-3">
                                                     <h4 class="text-xs font-semibold text-gray-900 mb-1">Краткое описание</h4>
@@ -742,7 +888,7 @@
                         @php
                             // Получаем топ-10 сфер пользователя и сразу ограничиваем до 10 элементов
                             $topTenSpheresForTable = collect($topTenSpheres)->take(10);
-                            
+
                             // Создаем индексированный массив профессий для быстрого поиска
                             $professionsIndexedBySphereId = collect($topProfessions)
                                 ->filter(function ($profession) {
@@ -750,7 +896,7 @@
                                 })
                                 ->groupBy('sphere_id')
                                 ->toArray();
-                            
+
                             // Группируем профессии по сферам более эффективно
                             $professionsGroupedBySphere = $topTenSpheresForTable->map(function ($sphere) use ($professionsIndexedBySphereId) {
                                 return [
@@ -774,7 +920,7 @@
                                                 $sphereId = $sphere['id'];
                                                 $compatibilityPercentage = round($sphere['compatibility_percentage']);
                                             @endphp
-                                            
+
                                             <!-- Основная строка сферы -->
                                             <tr class="hover:bg-gray-50 transition-colors">
                                                 <td class="px-4 py-2">
@@ -804,7 +950,7 @@
                                                                 </div>
                                                             @endif
                                                         </div>
-                                                        
+
                                                         <!-- Percentage Display -->
                                                         <div class="flex items-center space-x-2">
                                                             <!-- Progress Bar -->
@@ -850,8 +996,8 @@
                                                             <div class="grid grid-cols-1 gap-1">
                                                                 @foreach ($professions as $profession)
                                                                     @php
-                                                                        $professionCompatibility = isset($profession['compatibility_percentage']) 
-                                                                            ? round($profession['compatibility_percentage']) 
+                                                                        $professionCompatibility = isset($profession['compatibility_percentage'])
+                                                                            ? round($profession['compatibility_percentage'])
                                                                             : 0;
                                                                         $hasDescription = isset($profession['description']) && $profession['description'];
                                                                     @endphp
@@ -903,7 +1049,7 @@
                                     </tbody>
                                 </table>
                             </div>
-                            
+
                             <!-- Mobile Card View -->
                             <div class="md:hidden space-y-1">
                                 @foreach ($professionsGroupedBySphere as $index => $sphereData)
@@ -923,13 +1069,13 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                                
+
                                                 <div class="flex items-center space-x-2 flex-shrink-0">
                                                     <!-- Percentage -->
                                                     <span class="text-xs px-2 py-1 bg-blue-100 text-blue-600 rounded">
                                                         {{ round($sphereData['sphere']['compatibility_percentage']) }}%
                                                     </span>
-                                                    
+
                                                     <!-- Info Button -->
                                                     <button
                                                         @click.stop="openSphereModal({{ json_encode($sphereData['sphere']) }})"
@@ -940,7 +1086,7 @@
                                                                 d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                         </svg>
                                                     </button>
-                                                    
+
                                                     <!-- Accordion Arrow -->
                                                     @if (count($sphereData['professions']) > 0)
                                                         <div class="text-gray-400 transition-transform duration-200"
@@ -954,7 +1100,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        
+
                                         <!-- Профессии для мобильной версии -->
                                         <div x-show="expandedSpheres.includes({{ $sphereData['sphere']['id'] }})"
                                             x-transition:enter="transition ease-out duration-200"
@@ -974,7 +1120,7 @@
                                                                     <h5 class="text-sm font-medium text-gray-900 mb-1">
                                                                         {{ $profession['name'] }}
                                                                     </h5>
-                                                                    
+
                                                                 </div>
                                                                 @if($this->isFullPlan && isset($profession['compatibility_percentage']))
                                                                         <div class="flex items-center space-x-2">
@@ -1022,7 +1168,7 @@
                                     </div>
                                 @endif
                             </div>
-                        
+
                     </div>
 
                 @endif

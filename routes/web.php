@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\TalentPdfController;
+use Spatie\Browsershot\Browsershot;
 
 /*
 |--------------------------------------------------------------------------
@@ -47,6 +48,12 @@ Route::get("/privacy-policy", PrivacyPolicy::class)->name("privacy-policy");
 Route::get("/terms-of-service", TermsOfService::class)->name(
     "terms-of-service"
 );
+
+Route::get("/export-livewire-page/{session_id}", function () {
+    $html = view("export.talents", [
+        "userResults" => $this->userResults,
+    ])->render();
+})->name("export-livewire");
 
 Route::get("/login", Login::class)->name("login");
 Route::get("/register", Register::class)->name("register");

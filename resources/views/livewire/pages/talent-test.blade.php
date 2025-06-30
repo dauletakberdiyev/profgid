@@ -1,7 +1,7 @@
-<div x-data="talentTest(@js($allQuestions), {{ $timePerQuestion }}, '{{ $testSessionId }}')" 
-     x-init="init()" 
+<div x-data="talentTest(@js($allQuestions), {{ $timePerQuestion }}, '{{ $testSessionId }}')"
+     x-init="init()"
      class="min-h-screen bg-gray-50 py-4 md:py-8 px-4">
-    
+
     <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-md overflow-hidden">
         <!-- Progress Bar -->
         <div class="bg-gray-100 p-3 md:p-4">
@@ -27,7 +27,7 @@
                 </div>
             </div>
             <div class="w-full bg-gray-200 rounded-full h-2.5">
-                <div class="bg-blue-600 h-2.5 rounded-full transition-all duration-300" 
+                <div class="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
                      :style="`width: ${progress}%`"></div>
             </div>
         </div>
@@ -36,7 +36,7 @@
         <div class="p-4 md:p-6">
             <template x-if="currentQuestion">
                 <div>
-                    <h2 class="text-lg md:text-xl font-semibold text-gray-800 mb-4 md:mb-6 leading-relaxed" 
+                    <h2 class="text-lg md:text-xl font-semibold text-gray-800 mb-4 md:mb-6 leading-relaxed"
                         x-text="currentQuestion.question"></h2>
 
                     <!-- Answer Options -->
@@ -46,7 +46,7 @@
                                    :class="selectedAnswer === index + 1 ? 'border-blue-500 bg-blue-50 scale-[1.02]' : 'border-gray-200'"
                                    @click="selectAnswerAndNext(index + 1)">
                                 <input type="radio" class="h-4 w-4 md:h-5 md:w-5 text-blue-600 focus:ring-blue-500 flex-shrink-0"
-                                       :value="index + 1" 
+                                       :value="index + 1"
                                        :checked="selectedAnswer === index + 1"
                                        name="question_answer">
                                 <span class="ml-3 text-sm md:text-base text-gray-700" x-text="option"></span>
@@ -56,7 +56,7 @@
 
                     <!-- Navigation Buttons -->
                     <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center pt-4 border-t space-y-3 sm:space-y-0">
-                        <button @click="previousQuestion()" 
+                        <button @click="previousQuestion()"
                                 :disabled="currentQuestionIndex === 0"
                                 class="w-full sm:w-auto px-4 md:px-6 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm md:text-base">
                             Назад
@@ -68,7 +68,7 @@
                                 Завершить тест
                             </button>
                         </template>
-                        
+
                         <template x-if="currentQuestionIndex < allQuestions.length - 1">
                             <div class="text-xs md:text-sm text-gray-500 flex items-center justify-center sm:justify-end">
                                 <svg class="w-3 h-3 md:w-4 md:h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -80,7 +80,7 @@
                     </div>
                 </div>
             </template>
-            
+
             <template x-if="!currentQuestion">
                 <div class="text-center py-12">
                     <p class="text-gray-600">Вопросы не найдены.</p>
@@ -90,7 +90,7 @@
     </div>
 
     <!-- Overlay для блокировки во время отправки -->
-    <div x-show="isSubmitting" 
+    <div x-show="isSubmitting"
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0"
          x-transition:enter-end="opacity-100"
@@ -123,11 +123,11 @@ function talentTest(questions, timePerQuestion, testSessionId) {
         isSubmitting: false,
         isTransitioning: false, // Добавляем флаг для предотвращения двойных переходов
         answerOptions: [
-            'Совсем не согласен',
-            'Скорее не согласен', 
-            'Затрудняюсь ответить',
-            'Скорее согласен',
-            'Полностью согласен'
+            'Нет',
+            'Скорее нет, чем да',
+            'не знаю',
+            'Скорее да, чем нет',
+            'да',
         ],
 
         get currentQuestion() {
@@ -152,7 +152,7 @@ function talentTest(questions, timePerQuestion, testSessionId) {
                     if (this.answers[this.currentQuestionIndex] === null && !this.isTransitioning) {
                         this.isTransitioning = true;
                         this.stopTimer();
-                        
+
                         // Автоматический переход по таймеру
                         if (this.currentQuestionIndex < this.allQuestions.length - 1) {
                             this.currentQuestionIndex++;
@@ -180,15 +180,15 @@ function talentTest(questions, timePerQuestion, testSessionId) {
         selectAnswerAndNext(answerValue) {
             // Предотвращаем двойной клик
             if (this.isTransitioning) return;
-            
+
             // Останавливаем таймер сразу, чтобы избежать двойного перехода
             this.stopTimer();
             this.isTransitioning = true;
-            
+
             // Записываем ответ и время
             this.selectedAnswer = answerValue;
             this.answers[this.currentQuestionIndex] = answerValue;
-            
+
             if (this.questionStartTime) {
                 const responseTime = Math.round((Date.now() - this.questionStartTime) / 1000);
                 this.responseTimes[this.currentQuestionIndex] = responseTime;
@@ -217,7 +217,7 @@ function talentTest(questions, timePerQuestion, testSessionId) {
             if (this.currentQuestionIndex >= this.allQuestions.length - 1) {
                 return;
             }
-            
+
             this.stopTimer();
             this.currentQuestionIndex++;
             this.selectedAnswer = this.answers[this.currentQuestionIndex] || null;
@@ -231,7 +231,7 @@ function talentTest(questions, timePerQuestion, testSessionId) {
             if (this.currentQuestionIndex <= 0) {
                 return;
             }
-            
+
             this.stopTimer();
             this.currentQuestionIndex--;
             this.selectedAnswer = this.answers[this.currentQuestionIndex] || null;

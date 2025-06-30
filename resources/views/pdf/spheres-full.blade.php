@@ -3,175 +3,416 @@
 <head>
     <meta charset="utf-8">
     <title>Полный отчет по сферам</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
-        body {
-            font-family: DejaVu Sans, sans-serif;
-            background: #f9fafb;
-            color: #22223b;
-            margin: 0;
-            padding: 0;
-        }
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            background: #fff;
-            border-radius: 1.25rem;
-            padding: 2.5rem 2rem 2.5rem 2rem;
-        }
-        .text-xl { font-size: 1.25rem; }
-        .text-2xl { font-size: 1.5rem; }
-        .text-lg { font-size: 1.125rem; }
-        .font-bold { font-weight: 700; }
-        .font-medium { font-weight: 500; }
-        .font-extrabold { font-weight: 800; }
-        .text-gray-900 { color: #111827; }
-        .text-gray-600 { color: #4b5563; }
-        .text-gray-800 { color: #1f2937; }
-        .text-gray-700 { color: #374151; }
-        .text-gray-500 { color: #6b7280; }
-        .text-white { color: #ffffff; }
-        .text-black { color: #000000; }
-        .mb-2 { margin-bottom: 0.5rem; }
-        .mb-3 { margin-bottom: 0.75rem; }
-        .mb-4 { margin-bottom: 1rem; }
-        .mb-6 { margin-bottom: 1.5rem; }
-        .mb-8 { margin-bottom: 2rem; }
-        .mt-1 { margin-top: 0.25rem; }
-        .mt-2 { margin-top: 0.5rem; }
-        .rounded-lg { border-radius: 0.75rem; }
-        .rounded-xl { border-radius: 1.25rem; }
-        .rounded-full { border-radius: 9999px; }
-        .p-1 { padding: 0.25rem; }
-        .p-2 { padding: 0.5rem; }
-        .p-3 { padding: 0.75rem; }
-        .p-4 { padding: 1rem; }
-        .px-1 { padding-left: 0.25rem; padding-right: 0.25rem; }
-        .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
-        .px-4 { padding-left: 1rem; padding-right: 1rem; }
-        .bg-white { background: #fff; }
-        .bg-gray-50 { background: #f9fafb; }
-        .bg-gray-100 { background: #f3f4f6; }
-        .bg-gray-200 { background: #e5e7eb; }
-        .bg-gray-400 { background: #9ca3af; }
-        .bg-blue-50 { background: #eff6ff; }
-        .bg-blue-100 { background: #dbeafe; }
-        .border-b-4 { border-bottom: 4px solid; }
-        .border-b-8 { border-bottom: 8px solid; }
-        .border-gray-200 { border-color: #e5e7eb; }
-        .border-gray-100 { border-color: #f3f4f6; }
-        .border-t { border-top: 1px solid; }
-        .border-l-4 { border-left: 4px solid; }
-        .uppercase { text-transform: uppercase; }
-        .text-center { text-align: center; }
-        .text-left { text-align: left; }
-        .w-full { width: 100%; }
-        .w-6 { width: 1.5rem; }
-        .h-6 { height: 1.5rem; }
-        .h-8 { height: 2rem; }
-        .flex { display: flex; }
-        .flex-col { flex-direction: column; }
-        .items-center { align-items: center; }
-        .justify-center { justify-content: center; }
-        .justify-between { justify-content: space-between; }
-        .gap-1 { gap: 0.25rem; }
-        .gap-3 { gap: 0.75rem; }
-        .gap-6 { gap: 1.5rem; }
-        .grid { display: grid; }
-        .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
-        .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-        .grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-        .space-y-1 > * + * { margin-top: 0.25rem; }
-        .space-y-5 > * + * { margin-top: 1.25rem; }
-        .space-y-6 > * + * { margin-top: 1.5rem; }
-        .mt-8 { margin-top: 2rem; }
-        .mt-20 { margin-top: 5rem; }
-        .mr-2 { margin-right: 0.5rem; }
-        .leading-relaxed { line-height: 1.625; }
-        .leading-tight { line-height: 1.25; }
-        .border { border: 1px solid #e5e7eb; }
-        .border-l-4 { border-left: 4px solid; }
-        .bg-yellow-50 { background: #fef3c7; }
-        .text-indigo-600 { color: #4f46e5; }
-        .text-green-600 { color: #16a34a; }
-        .text-blue-600 { color: #2563eb; }
-        .text-purple-700 { color: #6d28d9; }
-        .text-orange-600 { color: #ea580c; }
-        .text-xs { font-size: 0.75rem; }
-        .text-sm { font-size: 0.875rem; }
-        .text-base { font-size: 1rem; }
-        .border-b { border-bottom: 1px solid #e5e7eb; }
-        .border-b-4 { border-bottom: 4px solid; }
-        .border-b-8 { border-bottom: 8px solid; }
-        .pb-1 { padding-bottom: 0.25rem; }
-        .pb-2 { padding-bottom: 0.5rem; }
-        .pt-2 { padding-top: 0.5rem; }
-        .font-semibold { font-weight: 600; }
-        .font-normal { font-weight: 400; }
-        .aspect-square { aspect-ratio: 1 / 1; }
-        .overflow-hidden { overflow: hidden; }
-        .min-w-0 { min-width: 0; }
-        .flex-1 { flex: 1 1 0%; }
-        .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .block { display: block; }
+
     </style>
 </head>
 <body>
-<div class="container">
-    <h1 class="text-2xl font-bold text-gray-900 mb-4">Ваши сферы и профессии — подробный отчет</h1>
-    <p class="text-sm text-gray-600 mb-6">Дата теста: <b>{{ $testDate }}</b></p>
+<header class="bg-white fixed top-0 left-0 right-0">
+    <div class="flex w-full justify-between items-center pb-2">
 
-    <!-- Top Spheres -->
-    <div class="bg-white rounded-xl p-4 mb-6">
-        <h2 class="text-lg font-bold mb-4">Топ сферы</h2>
-        
-        <div class="space-y-6">
-            @foreach($topSpheres as $sphere)
-                <div class="border rounded-lg overflow-hidden {{ $sphere['is_top'] ? 'border-blue-600 border-2' : '' }}">
-                    <div class="flex items-center justify-between p-3 bg-gray-50 border-b">
-                        <h3 class="font-bold text-gray-900">{{ $sphere['name'] }}</h3>
-                        <div class="flex items-center">
-                            <div class="bg-blue-100 text-blue-600 font-bold rounded-full px-4 py-2">
-                                {{ $sphere['compatibility_percentage'] }}%
+        <h1>PROFGID</h1>
+
+        <h1><b>{{ auth()->user()->name }}</b> | 12324</h1>
+
+    </div>
+
+    <hr>
+</header>
+
+<div class="mt-20">
+<div id="spheres-section">
+    <h2 class="text-lg md:text-xl font-bold mb-3 md:mb-4">Рекомендации по сферам деятельности</h2>
+    <p class="text-xs md:text-sm text-gray-600 mb-6 leading-relaxed">
+        Сферы деятельности, которые лучше всего подходят вашим талантам и где вы сможете реализовать себя
+        наиболее эффективно.
+    </p>
+
+    @php
+        $isFullPlan = $isFullPlan ?? true; // Default to true for PDF view
+        $topTenSpheres = collect($topSpheres)->take(10)->toArray();
+        $remainingSpheres = collect($topSpheres)->skip(10)->toArray();
+    @endphp
+
+    <div class="grid grid-cols-2 gap-6 sphere-grid">
+        <!-- Левая колонка - Топ 10 сфер -->
+        <div class="sphere-column">
+            <div class="space-y-1">
+                @php
+                    // Используем синий цвет для всех сфер
+                    $topTenSpheresIndex = 0;
+                @endphp
+                @foreach ($topTenSpheres as $index => $sphere)
+                    @php
+                        // Используем синий цвет для всех сфер
+                        $sphereColor = '#316EC6';
+                    @endphp
+
+                    <div class="bg-blue-50 border-l-2 p-2 md:p-3 hover:bg-gray-100 transition-colors opacity-80 lg:h-11 sphere-item"
+                        style="border-left-color: {{ $sphereColor }}">
+                        <div class="flex items-center justify-between">
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-2 md:space-x-3">
+                                    <span class="text-xs md:text-sm font-medium text-gray-600"
+                                        style="color: {{ $sphereColor }}">{{ $topTenSpheresIndex = $topTenSpheresIndex + 1 }}</span>
+                                    <h4 class="text-xs font-medium text-gray-900 break-words leading-snug sphere-name">
+                                        {{ $sphere['name'] }}</h4>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center space-x-2">
+                                @if ($isFullPlan)
+                                    <!-- Progress Bar для полного тарифа - скрыт на мобильных -->
+                                    <div class="flex flex-1 min-w-[80px]">
+                                        <div class="w-full bg-gray-200 rounded-full h-1">
+                                            <div class="h-1 rounded-full transition-all duration-500"
+                                                style="width: {{ round($sphere['compatibility_percentage']) }}%; background-color: {{ $sphereColor }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs px-1 md:px-2 py-0.5 bg-gray-200 text-gray-600">
+                                        {{ round($sphere['compatibility_percentage']) }}%
+                                    </span>
+                                @endif
+                                <div class="text-gray-400 p-1">
+                                    <svg class="w-5 h-5 md:w-4 md:h-4" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="p-3">
-                        <p class="text-gray-600">{{ $sphere['description'] }}</p>
-                    </div>
-                </div>
-            @endforeach
+                @endforeach
+            </div>
         </div>
-    </div>
 
-    <!-- Top Professions -->
-    <div class="bg-white rounded-xl p-4 mb-6">
-        <h2 class="text-lg font-bold mb-4">Топ профессии</h2>
-        
-        <div class="space-y-6">
-            @foreach($topProfessions as $profession)
-                <div class="border rounded-lg overflow-hidden {{ $profession['is_top'] ? 'border-blue-600 border-2' : '' }}">
-                    <div class="flex items-center justify-between p-3 bg-gray-50 border-b">
-                        <div>
-                            <h3 class="font-bold text-gray-900">{{ $profession['name'] }}</h3>
-                            <p class="text-sm text-blue-600">{{ $profession['sphere_name'] }}</p>
-                        </div>
-                        <div class="flex items-center">
-                            <div class="bg-blue-100 text-blue-600 font-bold rounded-full px-4 py-2">
-                                {{ $profession['compatibility_percentage'] }}%
+        <div class="sphere-column">
+            <div class="space-y-1">
+                @php
+                    $remainingSpheresIndex = 10;
+                @endphp
+                @foreach ($remainingSpheres as $index => $sphere)
+                    @php
+                        $sphereColor = '#316EC6';
+                    @endphp
+
+                    <div class="bg-gray-50 border-l-2 p-2 md:p-3 hover:bg-gray-100 transition-colors opacity-80 lg:h-11 sphere-item"
+                        style="border-left-color: {{ $sphereColor }}">
+                        <div class="flex items-center justify-between">
+                            <div class="flex-1">
+                                <div class="flex items-center space-x-2 md:space-x-3">
+                                    <span class="text-xs md:text-sm font-medium text-gray-600"
+                                        style="color: {{ $sphereColor }}">{{ $remainingSpheresIndex = $remainingSpheresIndex + 1 }}</span>
+                                    <h4 class="text-xs font-medium text-gray-900 break-words leading-snug sphere-name">
+                                        {{ $sphere['name'] }}</h4>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                @if ($isFullPlan)
+                                    <!-- Progress Bar для полного тарифа -->
+                                    <div class="flex flex-1 min-w-[80px]">
+                                        <div class="w-full bg-gray-200 rounded-full h-1">
+                                            <div class="h-1 rounded-full transition-all duration-500"
+                                                style="width: {{ round($sphere['compatibility_percentage']) }}%; background-color: {{ $sphereColor }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs px-1 md:px-2 py-0.5 bg-gray-200 text-gray-600">
+                                        {{ round($sphere['compatibility_percentage']) }}%
+                                    </span>
+                                @endif
+                                <div class="text-gray-400 p-1">
+                                    <svg class="w-5 h-5 md:w-4 md:h-4" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="p-3">
-                        <p class="text-gray-600">{{ $profession['description'] }}</p>
-                    </div>
-                </div>
-            @endforeach
+                @endforeach
+            </div>
         </div>
     </div>
 
-    <div class="bg-yellow-50 border-l-4 border-orange-600 p-4 mt-8 text-sm">
-        <b>*Важно:</b> Ваши результаты уникальны и не подлежат сравнению с другими. Они отражают ваши сильные стороны и помогают раскрыть ваш путь к успеху.
-    </div>
+    <div style="page-break-before: always;"></div>
+
+    @if ($isFullPlan)
+        <!-- Профессии из ваших топ-10 сфер блок -->
+        <div class="mt-16 space-y-4 mt-20">
+            <h2 class="text-lg font-bold text-center section-header">Профессии из ваших топ-10 сфер</h2>
+            <p class="text-xs text-gray-600 mb-4 text-center leading-relaxed">
+                Этот раздел включает профессии, связанные с вашими топ-10 сферами деятельности.
+            </p>
+
+            @php
+                // Получаем топ-10 сфер пользователя и сразу ограничиваем до 10 элементов
+                $topTenSpheresForTable = collect($topTenSpheres)->take(10);
+
+                // Создаем индексированный массив профессий для быстрого поиска
+                $professionsIndexedBySphereId = collect($topProfessions)
+                    ->filter(function ($profession) {
+                        return isset($profession['sphere_id']);
+                    })
+                    ->groupBy('sphere_id')
+                    ->toArray();
+
+                // Группируем профессии по сферам более эффективно
+                $professionsGroupedBySphere = $topTenSpheresForTable->map(function ($sphere) use ($professionsIndexedBySphereId) {
+                    return [
+                        'sphere' => $sphere,
+                        'professions' => $professionsIndexedBySphereId[$sphere['id']] ?? [],
+                    ];
+                })->toArray();
+            @endphp
+
+            <!-- Responsive Accordion Layout -->
+            <div class="bg-white rounded-lg overflow-hidden table-section">
+                <!-- Desktop Table View -->
+                <div class="block">
+                    <table class="w-full">
+                        <tbody class="divide-y divide-gray-100">
+                            @foreach ($professionsGroupedBySphere as $index => $sphereData)
+                                @php
+                                    $sphere = $sphereData['sphere'];
+                                    $professions = $sphereData['professions'];
+                                    $hasProfessions = !empty($professions);
+                                    $sphereId = $sphere['id'];
+                                    $compatibilityPercentage = round($sphere['compatibility_percentage']);
+                                @endphp
+
+                                <!-- Основная строка сферы -->
+                                <tr class="hover:bg-gray-50 transition-colors sphere-row">
+                                    <td class="px-4 py-2">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center flex-1 min-w-0 cursor-pointer">
+                                                <div class="flex items-center space-x-3">
+                                                    <span class="text-sm font-medium text-blue-600"
+                                                        style="color: #316EC6">{{ $index + 1 }}</span>
+                                                    <div class="flex-1 min-w-0">
+                                                        <div class="text-sm font-medium text-gray-900">
+                                                            {{ $sphere['name'] }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Аккордеон стрелка -->
+                                                @if ($hasProfessions)
+                                                    <div class="text-gray-400 transition-transform duration-200 mr-2">
+                                                        <svg class="w-3 h-3" fill="none"
+                                                            stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round"
+                                                                stroke-linejoin="round" stroke-width="1.5"
+                                                                d="M9 5l7 7-7 7" />
+                                                        </svg>
+                                                    </div>
+                                                @endif
+                                            </div>
+
+                                            <!-- Percentage Display -->
+                                            <div class="flex items-center space-x-2">
+                                                <!-- Progress Bar -->
+                                                <div class="flex flex-1 min-w-[80px]">
+                                                    <div class="w-full bg-gray-200 rounded-full h-1">
+                                                        <div class="h-1 rounded-full transition-all duration-500"
+                                                            style="width: {{ $compatibilityPercentage }}%; background-color: #316EC6">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <span class="text-xs px-2 py-0.5 bg-blue-100 text-blue-600 rounded">
+                                                    {{ $compatibilityPercentage }}%
+                                                </span>
+
+                                                <!-- Info Button -->
+                                                <div class="p-1 text-gray-400 flex-shrink-0">
+                                                    <svg class="w-4 h-4" fill="none"
+                                                        stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round"
+                                                            stroke-linejoin="round" stroke-width="2"
+                                                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <!-- Раскрывающийся список профессий (Desktop) -->
+                                <tr class="sphere-row">
+                                    <td class="px-4 py-0 border-t border-gray-100 bg-gray-50">
+                                        @if ($hasProfessions)
+                                            <div class="py-2">
+                                                <div class="grid grid-cols-1 gap-1">
+                                                    @foreach ($professions as $profession)
+                                                        @php
+                                                            $professionCompatibility = isset($profession['compatibility_percentage'])
+                                                                ? round($profession['compatibility_percentage'])
+                                                                : 0;
+                                                            $hasDescription = isset($profession['description']) && $profession['description'];
+                                                        @endphp
+                                                        <div class="bg-white border border-gray-200 rounded px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                                            <div class="flex items-center justify-between">
+                                                                <div class="flex items-center flex-1 space-x-2">
+                                                                    <span class="flex-1">{{ $profession['name'] }}</span>
+                                                                    @if(isset($profession['compatibility_percentage']))
+                                                                        <div class="flex items-center space-x-2">
+                                                                            <!-- Mini progress bar -->
+                                                                            <div class="w-16 bg-gray-200 rounded-full h-1">
+                                                                                <div class="h-1 rounded-full transition-all duration-500 bg-blue-500"
+                                                                                    style="width: {{ $professionCompatibility }}%">
+                                                                                </div>
+                                                                            </div>
+                                                                            <span class="text-xs text-gray-500 min-w-[30px]">
+                                                                                {{ $professionCompatibility }}%
+                                                                            </span>
+                                                                        </div>
+                                                                    @endif
+                                                                </div>
+                                                                @if ($hasDescription)
+                                                                    <div class="ml-2 p-1 text-gray-400 flex-shrink-0">
+                                                                        <svg class="w-4 h-4" fill="none"
+                                                                            stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path stroke-linecap="round"
+                                                                                stroke-linejoin="round"
+                                                                                stroke-width="2"
+                                                                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                        </svg>
+                                                                    </div>
+                                                                @endif
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        @else
+                                            <div class="py-4 text-center">
+                                                <p class="text-xs text-gray-500">Профессии для этой сферы пока не добавлены</p>
+                                            </div>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Mobile Card View -->
+                <div class="hidden space-y-1">
+                    @foreach ($professionsGroupedBySphere as $index => $sphereData)
+                        <div class="bg-white border border-gray-200 rounded-lg overflow-hidden mobile-sphere-card">
+                            <!-- Заголовок сферы для мобильной версии -->
+                            <div class="p-4 cursor-pointer">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center flex-1 min-w-0">
+                                        <div class="flex items-center space-x-3">
+                                            <span class="text-sm font-medium text-blue-600"
+                                                style="color: #316EC6">{{ $index + 1 }}</span>
+                                            <div class="flex-1 min-w-0">
+                                                <div class="text-sm font-medium text-gray-900">
+                                                    {{ $sphereData['sphere']['name'] }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-center space-x-2 flex-shrink-0">
+                                        <!-- Percentage -->
+                                        <span class="text-xs px-2 py-1 bg-blue-100 text-blue-600 rounded">
+                                            {{ round($sphereData['sphere']['compatibility_percentage']) }}%
+                                        </span>
+
+                                        <!-- Info Button -->
+                                        <div class="p-1 text-gray-400">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        </div>
+
+                                        <!-- Accordion Arrow -->
+                                        @if (count($sphereData['professions']) > 0)
+                                            <div class="text-gray-400 transition-transform duration-200">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                                        d="M9 5l7 7-7 7" />
+                                                </svg>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Профессии для мобильной версии -->
+                            <div class="px-4 pb-4 bg-gray-50">
+                                @if (count($sphereData['professions']) > 0)
+                                    <div class="space-y-2">
+                                        @foreach ($sphereData['professions'] as $profession)
+                                            <div class="bg-white border border-gray-200 rounded-lg px-3 py-1 hover:bg-gray-50 transition-colors">
+                                                <div class="flex items-center justify-between">
+                                                    <div class="flex-1 min-w-0">
+                                                        <h5 class="text-sm font-medium text-gray-900 mb-1">
+                                                            {{ $profession['name'] }}
+                                                        </h5>
+                                                    </div>
+                                                    @if($isFullPlan && isset($profession['compatibility_percentage']))
+                                                        <div class="flex items-center space-x-2">
+                                                            <span class="text-xs text-gray-500">
+                                                                {{ round($profession['compatibility_percentage']) }}%
+                                                            </span>
+                                                        </div>
+                                                    @endif
+                                                    @if (isset($profession['description']) && $profession['description'])
+                                                        <div class="ml-2 p-1 text-gray-400 flex-shrink-0">
+                                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                            </svg>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @else
+                                    <div class="py-6 text-center">
+                                        <p class="text-sm text-gray-500">Профессии для этой сферы пока не добавлены</p>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+
+                @if (empty($professionsGroupedBySphere))
+                    <div class="text-center py-8 md:py-12 px-4">
+                        <div class="text-gray-400 mb-3">
+                            <svg class="w-12 h-12 md:w-16 md:h-16 mx-auto" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-2.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 009.586 13H7" />
+                            </svg>
+                        </div>
+                        <h3 class="text-lg md:text-xl font-medium text-gray-900 mb-2">Нет доступных сфер</h3>
+                        <p class="text-sm md:text-base text-gray-500">Сферы профессий пока не созданы.</p>
+                    </div>
+                @endif
+            </div>
+        </div>
+    @endif
 </div>
+</div>
+
+<footer class="bg-white mt-8 pt-4 border-t">
+    <div class="flex justify-between items-center px-4 py-2">
+        <p class="text-xs text-gray-600">© 2025 Profgid</p>
+        <p class="text-xs text-gray-600">Все права защищены</p>
+    </div>
+</footer>
 </body>
 </html>

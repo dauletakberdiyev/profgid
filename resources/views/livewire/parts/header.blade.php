@@ -29,18 +29,18 @@
 
             <!-- Desktop Navigation -->
             <nav class="hidden md:flex items-center space-x-6 lg:space-x-8">
-                <a href="{{ route('home') }}" class="text-sm font-medium text-gray-900 hover:text-blue-600 transition-colors">
+                <a href="{{ route('home') }}" class="text-sm font-medium {{ request()->routeIs('home') ? 'text-blue-600 font-semibold' : 'text-gray-500' }} hover:text-blue-600 transition-colors">
                     {{ __('messages.nav_how_it_works') }}
                 </a>
-                <a href="{{ route('about') }}" class="text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors">
+                <a href="{{ route('about') }}" class="text-sm font-medium {{ request()->routeIs('about') ? 'text-blue-600 font-semibold' : 'text-gray-500' }} hover:text-blue-600 transition-colors">
                     О нас
                 </a>
                 <a href="{{ route('profession-map') }}"
-                    class="text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors">
+                    class="text-sm font-medium {{ request()->routeIs('profession-map') ? 'text-blue-600 font-semibold' : 'text-gray-500' }} hover:text-blue-600 transition-colors">
                     Карта профессий
                 </a>
                 <a href="{{ route('test-preparation') }}"
-                    class="text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors">
+                    class="text-sm font-medium {{ request()->routeIs(['test-preparation', 'test', 'talent-test', 'test.results', 'talent-test-results']) ? 'text-blue-600 font-semibold' : 'text-gray-500' }} hover:text-blue-600 transition-colors">
                     {{ __('messages.nav_take_test') }}
                 </a>
             </nav>
@@ -119,20 +119,20 @@
             <div class="pt-2 pb-3 space-y-1 border-t border-gray-200 mt-4">
                 <!-- Mobile navigation links -->
                 <a href="{{ route('home') }}"
-                   class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors">
+                   class="block px-3 py-2 text-base font-medium {{ request()->routeIs('home') ? 'text-blue-600 bg-blue-50 font-semibold' : 'text-gray-700' }} hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors">
                     {{ __('messages.nav_how_it_works') }}
                 </a>
                 <a href="{{ route('about') }}"
-                   class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors">
+                   class="block px-3 py-2 text-base font-medium {{ request()->routeIs('about') ? 'text-blue-600 bg-blue-50 font-semibold' : 'text-gray-700' }} hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors">
                     О нас
                 </a>
                 <a href="{{ route('profession-map') }}"
-                   class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors">
+                   class="block px-3 py-2 text-base font-medium {{ request()->routeIs('profession-map') ? 'text-blue-600 bg-blue-50 font-semibold' : 'text-gray-700' }} hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors">
                     Карта профессий
                 </a>
 
                 <a href="{{ route('test-preparation') }}"
-                   class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors">
+                   class="block px-3 py-2 text-base font-medium {{ request()->routeIs(['test-preparation', 'test', 'talent-test', 'test.results', 'talent-test-results']) ? 'text-blue-600 bg-blue-50 font-semibold' : 'text-gray-700' }} hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors">
                     {{ __('messages.nav_take_test') }}
                 </a>
 
@@ -158,11 +158,11 @@
                                 Профиль
                             </a>
                             <a href="{{ route('profession-map') }}"
-                               class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors">
+                               class="block px-3 py-2 text-base font-medium {{ request()->routeIs('profession-map') ? 'text-blue-600 bg-blue-50 font-semibold' : 'text-gray-700' }} hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors">
                                 Карта профессий
                             </a>
                             <a href="{{ route('test.history') }}"
-                                class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors">
+                                class="block px-3 py-2 text-base font-medium {{ request()->routeIs('test.history') ? 'text-blue-600 bg-blue-50 font-semibold' : 'text-gray-700' }} hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors">
                                 Мои отчеты
                             </a>
                             <form method="POST" action="{{ route('logout') }}">
