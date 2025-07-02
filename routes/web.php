@@ -4,6 +4,7 @@ use App\Livewire\Pages\About;
 use App\Livewire\Pages\Home;
 use App\Livewire\Pages\PrivacyPolicy;
 use App\Livewire\Pages\TermsOfService;
+use App\Livewire\Pages\PaymentTerms;
 use App\Livewire\Pages\Login;
 use App\Livewire\Pages\ForgotPassword;
 use App\Livewire\Pages\ResetPassword;
@@ -48,6 +49,7 @@ Route::get("/privacy-policy", PrivacyPolicy::class)->name("privacy-policy");
 Route::get("/terms-of-service", TermsOfService::class)->name(
     "terms-of-service"
 );
+Route::get("/payment-terms", PaymentTerms::class)->name("payment-terms");
 
 Route::get("/export-livewire-page/{session_id}", function () {
     $html = view("export.talents", [

@@ -97,6 +97,7 @@
             <div class="flex flex-col md:flex-row justify-between items-center">
                 <p class="text-xs text-gray-500">&copy; 2025 PROFGID. Все права защищены.</p>
                 <div class="flex space-x-6 mt-4 md:mt-0">
+                <a href="{{ route('payment-terms') }}" class="text-xs text-gray-500 hover:text-blue-600 transition-colors">Условия оплаты и возврата</a>
                     <a href="{{ route('terms-of-service') }}" class="text-xs text-gray-500 hover:text-blue-600 transition-colors">Договор оферты</a>
                     <a href="{{ route('privacy-policy') }}" class="text-xs text-gray-500 hover:text-blue-600 transition-colors">Политика конфиденциальности</a>
                 </div>

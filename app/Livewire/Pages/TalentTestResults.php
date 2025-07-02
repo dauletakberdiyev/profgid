@@ -625,6 +625,34 @@ class TalentTestResults extends Component
         session()->flash('download_pdf', true);
     }
 
+    /**
+     * Показывает модальное окно для обновления тарифа
+     */
+    public function showUpgradeModal()
+    {
+        // Можно добавить логику для показа модального окна обновления тарифа
+        // Или перенаправить на страницу тарифов
+        session()->flash('show_upgrade_modal', true);
+        session()->flash('upgrade_message', 'Для скачивания этого раздела необходимо обновить тарифный план.');
+    }
+
+    /**
+     * Проверяет, может ли пользователь скачать PDF для конкретной вкладки
+     */
+    public function canDownloadTab($tab)
+    {
+        switch ($tab) {
+            case 'talents':
+                return true; // Таланты доступны всегда
+            case 'spheres':
+                return $this->canViewSpheresTab;
+            case 'professions':
+                return $this->canViewProfessionsTab;
+            default:
+                return false;
+        }
+    }
+
     public function render()
     {
         $spheres = $this->getTopSpheres();

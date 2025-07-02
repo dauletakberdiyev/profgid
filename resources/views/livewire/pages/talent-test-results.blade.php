@@ -298,39 +298,105 @@
             <!-- Tabs Navigation -->
             <div class="mb-6 md:mb-8">
                 <div class="border-b border-gray-200">
-                    <nav class="-mb-px flex space-x-8" aria-label="Tabs">
-                        <!-- Вкладка "Таланты" - всегда доступна -->
-                        <button @click="setActiveTab('talents')"
-                            :class="activeTab === 'talents' ? 'border-blue-600 text-blue-600' :
-                                'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-                            class="py-3 px-1 border-b-2 font-medium text-sm transition-colors duration-200">
-                            Топ Таланты
-                        </button>
-
-                        <!-- Вкладка "Сферы" - доступна для средний и премиум тарифов -->
-                        @if ($this->canViewSpheresTab)
-                            <button @click="setActiveTab('spheres')"
-                                :class="activeTab === 'spheres' ? 'border-blue-600 text-blue-600' :
+                    <div class="flex justify-between items-center">
+                        <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+                            <!-- Вкладка "Таланты" - всегда доступна -->
+                            <button @click="setActiveTab('talents')"
+                                :class="activeTab === 'talents' ? 'border-blue-600 text-blue-600' :
                                     'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
                                 class="py-3 px-1 border-b-2 font-medium text-sm transition-colors duration-200">
-                                Топ Сферы
+                                Топ Таланты
                             </button>
-                        @endif
 
-                        <!-- Вкладка "Профессии" - доступна только для премиум тарифа -->
-                        @if ($this->canViewProfessionsTab)
-                            <button @click="setActiveTab('professions')"
-                                :class="activeTab === 'professions' ? 'border-blue-600 text-blue-600' :
-                                    'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-                                class="py-3 px-1 border-b-2 font-medium text-sm transition-colors duration-200">
-                                Топ Профессии
-                            </button>
-                        @endif
-                    </nav>
+                            <!-- Вкладка "Сферы" - доступна для средний и премиум тарифов -->
+                            @if ($this->canViewSpheresTab)
+                                <button @click="setActiveTab('spheres')"
+                                    :class="activeTab === 'spheres' ? 'border-blue-600 text-blue-600' :
+                                        'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                                    class="py-3 px-1 border-b-2 font-medium text-sm transition-colors duration-200">
+                                    Топ Сферы
+                                </button>
+                            @endif
+
+                            <!-- Вкладка "Профессии" - доступна только для премиум тарифа -->
+                            @if ($this->canViewProfessionsTab)
+                                <button @click="setActiveTab('professions')"
+                                    :class="activeTab === 'professions' ? 'border-blue-600 text-blue-600' :
+                                        'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                                    class="py-3 px-1 border-b-2 font-medium text-sm transition-colors duration-200">
+                                    Топ Профессии
+                                </button>
+                            @endif
+                        </nav>
+                        
+                        <!-- Кнопка скачать рядом с табами -->
+                        <div class="flex flex-col items-center">
+                            @php
+                                $canDownloadTalents = true; // Таланты доступны всегда
+                                $canDownloadSpheres = $this->canViewSpheresTab;
+                                $canDownloadProfessions = $this->canViewProfessionsTab;
+                            @endphp
+                            
+                            <!-- Проверяем доступность скачивания для текущей вкладки -->
+                            <div x-data="{ 
+                                canDownload: function() {
+                                    if (this.activeTab === 'talents') return {{ $canDownloadTalents ? 'true' : 'false' }};
+                                    if (this.activeTab === 'spheres') return {{ $canDownloadSpheres ? 'true' : 'false' }};
+                                    if (this.activeTab === 'professions') return {{ $canDownloadProfessions ? 'true' : 'false' }};
+                                    return false;
+                                }
+                            }">
+                                <!-- Кнопка скачивания (активная) -->
+                                <a
+                                    x-show="canDownload()"
+                                    :href="
+                                        activeTab === 'talents'
+                                            ? '{{ route('talent.pdf.download', ['session_id' => $testSessionId ?? request()->get('session_id'), 'tab' => 'talents']) }}'
+                                        : activeTab === 'spheres'
+                                            ? '{{ route('talent.pdf.download', ['session_id' => $testSessionId ?? request()->get('session_id'), 'tab' => 'spheres']) }}'
+                                        : '{{ route('talent.pdf.download', ['session_id' => $testSessionId ?? request()->get('session_id'), 'tab' => 'professions']) }}'
+                                    "
+                                    class="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors group"
+                                    title="Скачать результаты в PDF"
+                                    target="_blank"
+                                >
+                                    <svg class="w-5 h-5 md:w-6 md:h-6 text-gray-600 group-hover:text-gray-800" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                        </path>
+                                    </svg>
+                                </a>
+                                
+                                <!-- Кнопка заблокированная (неактивная) -->
+                                <button
+                                    x-show="!canDownload()"
+                                    @click="$wire.showUpgradeModal()"
+                                    class="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 bg-gray-300 cursor-not-allowed rounded-lg opacity-50"
+                                    title="Обновите тариф для скачивания"
+                                    disabled
+                                >
+                                    <svg class="w-5 h-5 md:w-6 md:h-6 text-gray-500" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+                                        </path>
+                                    </svg>
+                                </button>
+                                
+                                <span class="text-xs text-gray-500 mt-1" x-text="canDownload() ? 'скачать отчет' : 'обновить тариф'"></span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="flex flex-col md:flex-row md:justify-between md:items-start mb-4 md:mb-6">
+            
+            <!-- Tab Content -->
+            <div id="talents-section" x-show="activeTab === 'talents'" x-transition:enter="transition ease-out duration-200"
+                x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
+                <!-- Domain Bar Chart -->
+                <div class="mb-4 md:mb-6" id="talents-section-pdf">
                 <div class="mb-4 md:mb-0">
                     @php
                         // Найдем домен с максимальным счетом
@@ -341,56 +407,7 @@
                         Вы лидируете с <span class="font-extrabold">{{ $topDomainName }}</span> темами.
                     </h1>
                 </div>
-
-                <!-- Export and PDF Download Buttons -->
-                <div class="flex items-center space-x-2">
-                    <!-- Image Export Button -->
-                    <!-- <button
-                        @click="exportSection()"
-                        class="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 bg-green-100 hover:bg-green-200 disabled:bg-gray-100 disabled:cursor-not-allowed rounded-lg transition-colors group self-start"
-                        title="Экспорт в изображение"
-                    >
-                        <svg x-show="!isExporting" class="w-5 h-5 md:w-6 md:h-6 text-green-600 group-hover:text-green-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                        </svg>
-                        <svg x-show="isExporting" class="w-5 h-5 md:w-6 md:h-6 text-gray-400 animate-spin" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                    </button>
-
-                    <a href="{{ route('talent.pdf.download', ['session_id' => "cac85329-bd7a-40a5-95f6-894fdd660bdc"]) }}">
-                        Export pdf
-                    </a> -->
-
-                    <!-- PDF Download Button -->
-                    <a
-                        :href="
-                            activeTab === 'talents'
-                                ? '{{ route('talent.pdf.download', ['session_id' => $testSessionId ?? request()->get('session_id'), 'tab' => 'talents']) }}'
-                            : activeTab === 'spheres'
-                                ? '{{ route('talent.pdf.download', ['session_id' => $testSessionId ?? request()->get('session_id'), 'tab' => 'spheres']) }}'
-                            : '{{ route('talent.pdf.download', ['session_id' => $testSessionId ?? request()->get('session_id'), 'tab' => 'professions']) }}'
-                        "
-                        class="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors group self-start"
-                        title="Скачать результаты в PDF"
-                        target="_blank"
-                    >
-                        <svg class="w-5 h-5 md:w-6 md:h-6 text-gray-600 group-hover:text-gray-800" fill="none"
-                            stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
-                            </path>
-                        </svg>
-                    </a>
-                </div>
-            </div>
-
-            <!-- Tab Content -->
-            <div id="talents-section" x-show="activeTab === 'talents'" x-transition:enter="transition ease-out duration-200"
-                x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
-                <!-- Domain Bar Chart -->
-                <div class="mb-4 md:mb-6" id="talents-section-pdf">
+                
                     @php
                         $domainColors = [
                             'executing' => '#702B7C',
@@ -1337,5 +1354,115 @@
                     тест</a>
             </div>
         @endif
+
+        <!-- Модальное окно для обновления тарифа -->
+        @if (session('show_upgrade_modal'))
+            <div class="fixed inset-0 flex items-center justify-center z-50 p-4" style="background-color: rgba(0, 0, 0, 0.5);">
+                <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-lg font-medium text-gray-900">Обновление тарифа</h3>
+                            </div>
+                        </div>
+                        <button onclick="this.parentElement.parentElement.parentElement.remove()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="mb-6">
+                        <p class="text-sm text-gray-700">{{ session('upgrade_message', 'Для доступа к этой функции необходимо обновить тарифный план.') }}</p>
+                    </div>
+                    <div class="flex justify-end space-x-3">
+                        <button onclick="this.parentElement.parentElement.parentElement.remove()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors">
+                            Закрыть
+                        </button>
+                        <a href="{{ route('pricing') }}" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors">
+                            Посмотреть тарифы
+                        </a>
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
 </div>
+
+<script>
+document.addEventListener('alpine:init', () => {
+    Alpine.data('talentTestResults', () => ({
+        activeTab: 'talents',
+        canViewSpheresTab: {{ $this->canViewSpheresTab ? 'true' : 'false' }},
+        canViewProfessionsTab: {{ $this->canViewProfessionsTab ? 'true' : 'false' }},
+        modalSphere: null,
+        modalProfession: null,
+        expandedSpheres: [],
+        expandedTalents: [],
+        isExporting: false,
+
+        init() {
+            console.log('Alpine.js initialized for talent test results');
+        },
+
+        setActiveTab(tab) {
+            if (tab === 'spheres' && !this.canViewSpheresTab) {
+                return;
+            }
+            if (tab === 'professions' && !this.canViewProfessionsTab) {
+                return;
+            }
+            this.activeTab = tab;
+        },
+
+        toggleSphere(sphereId) {
+            if (this.expandedSpheres.includes(sphereId)) {
+                this.expandedSpheres = this.expandedSpheres.filter(id => id !== sphereId);
+            } else {
+                this.expandedSpheres.push(sphereId);
+            }
+        },
+
+        openSphereModal(sphere) {
+            this.modalSphere = sphere;
+        },
+
+        closeSphereModal() {
+            this.modalSphere = null;
+        },
+
+        openProfessionModal(profession) {
+            this.modalProfession = profession;
+        },
+
+        closeProfessionModal() {
+            this.modalProfession = null;
+        },
+
+        showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 z-50 px-4 py-2 rounded-lg shadow-lg transition-all duration-300 ${
+                type === 'success' ? 'bg-green-500 text-white' :
+                type === 'error' ? 'bg-red-500 text-white' :
+                'bg-blue-500 text-white'
+            }`;
+            notification.textContent = message;
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => {
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+    }));
+});
+</script>

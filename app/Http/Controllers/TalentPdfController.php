@@ -137,7 +137,7 @@ class TalentPdfController extends Controller
             $pdf = Browsershot::html($html)
                 ->noSandbox()
                 ->showBackground()
-                ->format("A3")
+                ->format("A4")
                 ->scale(0.6)
                 ->waitUntilNetworkIdle()
                 ->margins(5, 5, 5, 5)
@@ -323,7 +323,7 @@ class TalentPdfController extends Controller
                 ->noSandbox()
                 ->showBackground()
                 ->scale(0.6)
-                ->format("A3")
+                ->format("A4")
                 ->waitUntilNetworkIdle()
                 ->headerHtml($header)
                 ->margins(5, 5, 5, 5)
@@ -411,7 +411,6 @@ class TalentPdfController extends Controller
             $html = view("pdf.professions-full", [
                 "topProfessions" => $topProfessions,
                 "testDate" => $testDate,
-                // ...
             ])->render();
 
             $header = view("pdf.header", [
@@ -422,7 +421,7 @@ class TalentPdfController extends Controller
             $pdf = Browsershot::html($html)
                 ->noSandbox()
                 ->showBackground()
-                ->format("A3")
+                ->format("A4")
                 ->scale(0.6)
                 ->waitUntilNetworkIdle()
                 ->headerHtml($header)

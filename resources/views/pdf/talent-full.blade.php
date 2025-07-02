@@ -191,27 +191,19 @@
                         @endphp
 
                         <!-- Все топ 10 талантов с аккордеоном -->
-                        <div class="border-gray-200 p-3 transition-all hover:bg-blue-100 bg-blue-50"
+                        <div class="border-gray-200 p-1.5 transition-all hover:bg-blue-100 bg-blue-50"
                             style="border-left: 4px solid {{ $talentDomainColor }}">
                             <!-- Заголовок таланта -->
                             <div class="flex items-center justify-between cursor-pointer"
                                 @click="expandedTalents.includes('{{ $talentId }}') ? expandedTalents.splice(expandedTalents.indexOf('{{ $talentId }}'), 1) : expandedTalents.push('{{ $talentId }}')">
                                 <div class="flex items-center flex-1 min-w-0">
-                                    <div class="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold mr-2"
+                                    <div class="w-5 h-5 rounded-full flex items-center justify-center text-white text-xs font-bold mr-2"
                                         style="background-color: {{ $talentDomainColor }}">
                                         {{ $talent['rank'] }}
                                     </div>
                                     <div class="flex-1 min-w-0">
-                                        <h3 class="text-sm font-bold text-gray-900 truncate">{{ $talent['name'] }}</h3>
-                                        <span class="text-xs text-gray-500 truncate block">{{ $domains[$talent['domain']] ?? '' }}</span>
+                                        <h3 class="text-xs font-bold text-gray-900 truncate">{{ $talent['name'] }}</h3>
                                     </div>
-                                </div>
-                                <!-- Стрелка аккордеона -->
-                                <div class="text-gray-400 transition-transform duration-200"
-                                    :class="expandedTalents.includes('{{ $talentId }}') ? 'rotate-180' : ''">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                    </svg>
                                 </div>
                             </div>
 
@@ -227,27 +219,13 @@
 
                                 <!-- Краткое описание - показывается в аккордеоне -->
                                 @if (!empty($talent['short_description']))
-                                    <div class="mb-3">
-                                        <h4 class="text-xs font-semibold text-gray-900 mb-1">Краткое описание</h4>
-                                        <p class="text-xs text-gray-700 leading-tight">{{ $talent['short_description'] }}</p>
+                                    <div class="mb-1">
+                                        <!-- <p class="text-xs text-gray-700 leading-tight">{{ $talent['short_description'] }}</p> -->
+                                        <p class="text-xs text-gray-700 leading-tight">
+                                        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Aliquam officia dicta eaque atque quam. Blanditiis voluptas molestiae dolores, nostrum voluptatibus sequi, quibusdam ipsa sapiente minima architecto soluta iste dicta ipsum?
+                                        </p>
                                     </div>
                                 @endif
-
-                                <!-- Обзор таланта (только для полного тарифа) -->
-                                @if (!empty($talent['description']))
-                                    <div class="mb-3">
-                                        <h4 class="text-xs font-semibold text-gray-900 mb-1">Обзор</h4>
-                                        <p class="text-xs text-gray-700 leading-tight">{{ $talent['description'] }}</p>
-                                    </div>
-                                @endif
-
-                                <!-- Советы (только для полного тарифа) -->
-                                <div class="pt-2 border-t border-gray-100">
-                                    <h4 class="text-xs font-semibold text-gray-900 mb-1">Советы</h4>
-                                    <div class="text-xs text-gray-700 leading-tight">
-
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     @endforeach
@@ -267,28 +245,20 @@
                         @endphp
 
                         <!-- Остальные таланты - с аккордеоном для краткого описания -->
-                        <div class="bg-gray-50 p-3 transition-all hover:bg-gray-100"
+                        <div class="bg-gray-50 p-1.5 transition-all hover:bg-gray-100"
                             style="border-left: 4px solid {{ $talentDomainColor }}">
 
                             <!-- Заголовок таланта с аккордеоном -->
                             <div class="flex items-center justify-between cursor-pointer"
                                 @click="expandedTalents.includes('{{ $remainingTalentId }}') ? expandedTalents.splice(expandedTalents.indexOf('{{ $remainingTalentId }}'), 1) : expandedTalents.push('{{ $remainingTalentId }}')">
                                 <div class="flex items-center flex-1 min-w-0">
-                                    <div class="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold mr-2"
+                                    <div class="w-5 h-5 rounded-full flex items-center justify-center text-white text-xs font-bold mr-2"
                                         style="background-color: {{ $talentDomainColor }}">
                                         {{ $talent['rank'] }}
                                     </div>
                                     <div class="flex-1 min-w-0">
-                                        <h3 class="text-sm font-bold text-gray-900 truncate">{{ $talent['name'] }}</h3>
-                                        <span class="text-xs text-gray-500 truncate block">{{ $domains[$talent['domain']] ?? '' }}</span>
+                                        <h3 class="text-xs font-bold text-gray-900 truncate">{{ $talent['name'] }}</h3>
                                     </div>
-                                </div>
-                                <!-- Стрелка аккордеона -->
-                                <div class="text-gray-400 transition-transform duration-200"
-                                    :class="expandedTalents.includes('{{ $remainingTalentId }}') ? 'rotate-180' : ''">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                    </svg>
                                 </div>
                             </div>
 
@@ -304,9 +274,11 @@
                                     x-transition:leave-end="opacity-0 max-h-0">
 
                                     <!-- Краткое описание для остальных талантов -->
-                                    <div class="mb-3">
-                                        <h4 class="text-xs font-semibold text-gray-900 mb-1">Краткое описание</h4>
-                                        <p class="text-xs text-gray-700 leading-tight">{{ $talent['short_description'] }}</p>
+                                    <div class="mb-1">
+                                        <!-- <p class="text-xs text-gray-700 leading-tight">{{ $talent['short_description'] }}</p> -->
+                                        <p class="text-xs text-gray-700 leading-tight">
+                                        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Animi excepturi nulla voluptas tempora tenetur, rem laborum quisquam quia doloremque eligendi sunt id repudiandae, consequatur quis delectus dolores molestiae repellat! Et.
+                                        </p>
                                     </div>
                                 </div>
                             @endif

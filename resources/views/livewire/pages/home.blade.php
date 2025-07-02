@@ -69,7 +69,7 @@
                             <h3 class="text-lg md:text-2xl font-semibold text-black">Получи результат</h3>
                             <p class="mt-2 text-sm md:text-base text-gray-400 leading-5">
                                 Мы анализируем твои ответы и составляем подробный отчет о твоих сильных сторонах,
-                                способностях и потенциальных сферах деятельности.</p>
+                                способностях и потенциальных сферах деятельности. <span class="text-blue-600 font-medium">Результаты доступны сразу после оплаты!</span></p>
                         </div>
                     </div>
 
@@ -91,6 +91,87 @@
                         </div>
                     </div>
 
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="py-12 md:py-24 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-8 md:mb-16">
+                <p class="text-xs md:text-sm font-medium text-gray-600 uppercase tracking-wide">ТАРИФЫ</p>
+                <h2 class="mt-2 text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900">
+                    Выберите подходящий план
+                </h2>
+                <p class="mt-3 md:mt-4 text-sm md:text-base text-gray-600 max-w-2xl mx-auto">
+                    Получите персональные рекомендации и откройте свой потенциал
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+                @foreach($plans as $planKey => $plan)
+                    <div class="relative bg-white rounded-2xl shadow-lg border border-gray-200 p-6 md:p-8 {{ $plan['popular'] ? 'ring-2 ring-blue-500 transform scale-105' : '' }} hover:shadow-xl transition-all duration-300">
+                        @if($plan['popular'])
+                            <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                                <span class="bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-medium">
+                                    Популярный
+                                </span>
+                            </div>
+                        @endif
+
+                        <div class="text-center">
+                            <h3 class="text-lg md:text-xl font-bold text-gray-900 mb-2">
+                                {{ $plan['name'] }}
+                            </h3>
+                            
+                            <div class="mb-6">
+                                <span class="text-3xl md:text-4xl font-bold text-gray-900">
+                                    {{ number_format($plan['price'], 0, ',', ' ') }}
+                                </span>
+                                <span class="text-lg text-gray-600 ml-1">{{ $plan['currency'] }}</span>
+                            </div>
+
+                            <ul class="space-y-3 mb-8 text-left">
+                                @foreach($plan['features'] as $feature)
+                                    <li class="flex items-start">
+                                        <svg class="w-5 h-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                        <span class="text-sm md:text-base text-gray-600">{{ $feature }}</span>
+                                    </li>
+                                @endforeach
+                            </ul>
+
+
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+
+            <div class="mt-8 md:mt-12 text-center">
+                <p class="text-sm text-gray-500 mb-4">
+                    Все планы включают безопасную оплату и техническую поддержку
+                </p>
+                <div class="flex justify-center items-center space-x-6 text-xs text-gray-400">
+                    <span class="flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                        </svg>
+                        Безопасная оплата
+                    </span>
+                    <span class="flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M12 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Поддержка 24/7
+                    </span>
+                    <span class="flex items-center">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Гарантия качества
+                    </span>
                 </div>
             </div>
         </div>
