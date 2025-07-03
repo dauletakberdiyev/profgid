@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Session;
 use App\Http\Controllers\TalentPdfController;
 use Spatie\Browsershot\Browsershot;
+use App\Livewire\PaymentStatusDemo;
 
 /*
 |--------------------------------------------------------------------------
@@ -73,6 +74,8 @@ Route::get("/auth/google/callback", [
     "handleGoogleCallback",
 ]);
 
+Route::get('forte/payment', PaymentStatusDemo::class)->name('payment-status-demo');
+
 Route::post("/logout", function () {
     // auth()->logout();
     request()->session()->invalidate();
@@ -104,7 +107,7 @@ Route::middleware(["auth"])->group(function () {
     Route::get("/test/history", TestHistory::class)->name("test.history");
     Route::get("/payment/{sessionId?}", PaymentPage::class)->name("payment");
     Route::get(
-        "/payment-status/{sessionId}/{plan}",
+        "/payment-status/{sessionId?}/{plan?}",
         PaymentStatus::class
     )->name("payment-status");
 
@@ -124,15 +127,10 @@ Route::middleware(["auth"])->group(function () {
         "removeFromFavorites",
     ])->name("profession.remove-from-favorites");
 
-    // PDF download route
+    // PDF download route - принимает тарифный план
     Route::get("/download-talent-pdf", [
         TalentPdfController::class,
         "download",
     ])->name("talent.pdf.download");
 
-    // // Test PDF route
-    // Route::get('/test-pdf', function () {
-    //     $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadHTML('<h1>Test PDF</h1><p>This is a test PDF.</p>');
-    //     return $pdf->download('test.pdf');
-    // })->name('test-pdf');
 });

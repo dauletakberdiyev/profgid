@@ -58,6 +58,13 @@ class PaymentPage extends Component
     {
         $this->sessionId = $sessionId ?? session('last_test_session_id');
         
+        // Если sessionId отсутствует, показываем примерную страницу
+        if (!$this->sessionId) {
+            // Устанавливаем флаг для отображения примерной страницы
+            $this->testSession = null;
+            return;
+        }
+        
         if ($this->sessionId) {
             $this->testSession = TestSession::where('session_id', $this->sessionId)->first();
         }
@@ -72,7 +79,13 @@ class PaymentPage extends Component
     {
         $plan = $this->plans[$planKey];
         
-        // Обновляем сессию с выбранным планом
+        // Если нет активной сессии теста, перенаправляем на тест
+        if (!$this->testSession) {
+            session()->flash('info', 'Для оплаты необходимо сначала пройти тест талантов');
+            return redirect()->route('talent-test');
+        }
+        
+        // Обновляем сессию с выбранным план��м
         $this->testSession->update([
             'selected_plan' => $planKey,
             'payment_status' => 'pending',

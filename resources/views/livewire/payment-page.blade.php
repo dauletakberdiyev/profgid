@@ -3,7 +3,19 @@
         <!-- Header -->
         <div class="text-center mb-12 md:mb-16">
             <h1 class="text-2xl md:text-3xl lg:text-4xl font-light text-gray-900 mb-4">Выберите тарифный план</h1>
-            <p class="text-lg md:text-xl text-gray-600 font-light">Получите полный доступ к результатам вашего теста талантов</p>
+с            @if($testSession)
+                <p class="text-lg md:text-xl text-gray-600 font-light">Получите полный доступ к результатам вашего теста талантов</p>
+            @else
+                <p class="text-lg md:text-xl text-gray-600 font-light">Ознакомьтесь с нашими тарифными планами</p>
+                <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg inline-block">
+                    <p class="text-sm text-blue-700">
+                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Для получения результатов необходимо сначала пройти тест талантов
+                    </p>
+                </div>
+            @endif
         </div>
 
         <!-- Pricing Cards -->
@@ -55,10 +67,18 @@
                                 {{ $plan['color'] === 'blue' && !$loop->last ? 'bg-blue-500 text-white border-blue-500 hover:bg-blue-600' : '' }}
                                 {{ $plan['color'] === 'purple' && !$loop->last ? 'bg-purple-500 text-white border-purple-500 hover:bg-purple-600' : '' }}
                             ">
-                            @if($loop->last)
-                                Выбрать лучший план
+                            @if($testSession)
+                                @if($loop->last)
+                                    Выбрать лучший план
+                                @else
+                                    Выбрать план
+                                @endif
                             @else
-                                Выбрать план
+                                @if($loop->last)
+                                    Пройти тест и выбрать план
+                                @else
+                                    Пройти ��ест для этого плана
+                                @endif
                             @endif
                         </button>
                     </div>

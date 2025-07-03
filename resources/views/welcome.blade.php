@@ -117,6 +117,66 @@
                             </a>
                         </li>
                     </ul>
+
+                    <!-- Pricing Section -->
+                    <div class="mt-8 lg:mt-12">
+                        <h2 class="mb-4 text-lg font-medium text-[#1b1b18] dark:text-[#EDEDEC]">Тарифные планы</h2>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <!-- Basic Plan -->
+                            <div class="p-4 bg-white dark:bg-[#161615] border border-[#e3e3e0] dark:border-[#3E3E3A] rounded-lg">
+                                <h3 class="text-sm font-medium text-[#1b1b18] dark:text-[#EDEDEC] mb-2">Таланты</h3>
+                                <div class="mb-3">
+                                    <span class="text-xl font-light text-[#1b1b18] dark:text-[#EDEDEC]">5 000</span>
+                                    <span class="text-sm text-[#706f6c] dark:text-[#A1A09A] ml-1">тг</span>
+                                </div>
+                                <ul class="text-xs text-[#706f6c] dark:text-[#A1A09A] mb-4 space-y-1">
+                                    <li>• Анализ талантов</li>
+                                    <li>• PDF отчет</li>
+                                    <li>• Рекомендации</li>
+                                </ul>
+                                <a href="{{ route('payment') }}" class="inline-block w-full text-center px-4 py-2 bg-[#1b1b18] dark:bg-[#eeeeec] text-white dark:text-[#1C1C1A] rounded-sm text-xs hover:bg-black dark:hover:bg-white transition-colors">
+                                    Оплатить
+                                </a>
+                            </div>
+
+                            <!-- Standard Plan -->
+                            <div class="p-4 bg-white dark:bg-[#161615] border border-[#e3e3e0] dark:border-[#3E3E3A] rounded-lg">
+                                <h3 class="text-sm font-medium text-[#1b1b18] dark:text-[#EDEDEC] mb-2">Таланты + Сферы</h3>
+                                <div class="mb-3">
+                                    <span class="text-xl font-light text-[#1b1b18] dark:text-[#EDEDEC]">15 000</span>
+                                    <span class="text-sm text-[#706f6c] dark:text-[#A1A09A] ml-1">тг</span>
+                                </div>
+                                <ul class="text-xs text-[#706f6c] dark:text-[#A1A09A] mb-4 space-y-1">
+                                    <li>• Все из базового</li>
+                                    <li>• Топ-8 сфер</li>
+                                    <li>• Карьерные пути</li>
+                                </ul>
+                                <a href="{{ route('payment') }}" class="inline-block w-full text-center px-4 py-2 bg-[#1b1b18] dark:bg-[#eeeeec] text-white dark:text-[#1C1C1A] rounded-sm text-xs hover:bg-black dark:hover:bg-white transition-colors">
+                                    Оплатить
+                                </a>
+                            </div>
+
+                            <!-- Premium Plan -->
+                            <div class="p-4 bg-white dark:bg-[#161615] border border-[#f53003] dark:border-[#FF4433] rounded-lg relative">
+                                <div class="absolute -top-2 left-1/2 transform -translate-x-1/2">
+                                    <span class="bg-[#f53003] dark:bg-[#FF4433] text-white px-2 py-1 rounded text-xs">Популярный</span>
+                                </div>
+                                <h3 class="text-sm font-medium text-[#1b1b18] dark:text-[#EDEDEC] mb-2 mt-2">Полный пакет</h3>
+                                <div class="mb-3">
+                                    <span class="text-xl font-light text-[#1b1b18] dark:text-[#EDEDEC]">35 000</span>
+                                    <span class="text-sm text-[#706f6c] dark:text-[#A1A09A] ml-1">тг</span>
+                                </div>
+                                <ul class="text-xs text-[#706f6c] dark:text-[#A1A09A] mb-4 space-y-1">
+                                    <li>• Все из предыдущих</li>
+                                    <li>• Топ-8 профессий</li>
+                                    <li>• Консультация</li>
+                                </ul>
+                                <a href="{{ route('payment') }}" class="inline-block w-full text-center px-4 py-2 bg-[#f53003] dark:bg-[#FF4433] text-white rounded-sm text-xs hover:bg-[#d42a02] dark:hover:bg-[#e63322] transition-colors">
+                                    Оплатить
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="bg-[#fff2f2] dark:bg-[#1D0002] relative lg:-ml-px -mb-px lg:mb-0 rounded-t-lg lg:rounded-t-none lg:rounded-r-lg aspect-[335/376] lg:aspect-auto w-full lg:w-[438px] shrink-0 overflow-hidden">
                     {{-- Laravel Logo --}}

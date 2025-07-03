@@ -1,5 +1,5 @@
 <div class="min-h-screen bg-gray-50 py-6 px-4">
-    <div class="max-w-4xl mx-auto">
+    <div class="max-w-7xl mx-auto">
         <!-- Header -->
         <div class="mb-8">
             <h1 class="text-2xl font-medium text-gray-900">
@@ -11,25 +11,40 @@
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <!-- Filters -->
                 <div class="flex flex-wrap gap-4">
-                    <select wire:model.live="statusFilter" 
-                            class="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white">
-                        <option value="all">Все тесты</option>
-                        <option value="completed">Завершенные</option>
-                        <option value="pending">В процессе</option>
-                        <option value="failed">Не завершенные</option>
-                    </select>
-                    <select wire:model.live="timeFilter" 
-                            class="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white">
-                        <option value="all">За все время</option>
-                        <option value="month">За месяц</option>
-                        <option value="week">За неделю</option>
-                    </select>
-                    <select wire:model.live="paymentFilter" 
-                            class="px-3 py-2 text-sm border border-gray-200 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white">
-                        <option value="all">Все тесты</option>
-                        <option value="paid">Оплаченные</option>
-                        <option value="unpaid">Неоплаченные</option>
-                    </select>
+                    <div class="relative">
+                        <select wire:model.live="statusFilter" 
+                                class="appearance-none w-full sm:w-auto bg-white border border-gray-200 text-gray-700 py-2 px-3 pr-8 rounded-lg leading-tight focus:outline-none focus:bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm">
+                            <option value="all">Все тесты</option>
+                            <option value="completed">Завершенные</option>
+                            <option value="pending">В процессе</option>
+                            <option value="failed">Не завершенные</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                            <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <select wire:model.live="timeFilter" 
+                                class="appearance-none w-full sm:w-auto bg-white border border-gray-200 text-gray-700 py-2 px-3 pr-8 rounded-lg leading-tight focus:outline-none focus:bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm">
+                            <option value="all">За все время</option>
+                            <option value="month">За месяц</option>
+                            <option value="week">За неделю</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                            <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <select wire:model.live="paymentFilter" 
+                                class="appearance-none w-full sm:w-auto bg-white border border-gray-200 text-gray-700 py-2 px-3 pr-8 rounded-lg leading-tight focus:outline-none focus:bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm">
+                            <option value="all">Все тесты</option>
+                            <option value="paid">Оплаченные</option>
+                            <option value="unpaid">Неоплаченные</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                            <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- Search -->

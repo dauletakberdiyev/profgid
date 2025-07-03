@@ -220,10 +220,7 @@
                                 <!-- Краткое описание - показывается в аккордеоне -->
                                 @if (!empty($talent['short_description']))
                                     <div class="mb-1">
-                                        <!-- <p class="text-xs text-gray-700 leading-tight">{{ $talent['short_description'] }}</p> -->
-                                        <p class="text-xs text-gray-700 leading-tight">
-                                        Lorem ipsum dolor sit amet consectetur, adipisicing elit. Aliquam officia dicta eaque atque quam. Blanditiis voluptas molestiae dolores, nostrum voluptatibus sequi, quibusdam ipsa sapiente minima architecto soluta iste dicta ipsum?
-                                        </p>
+                                        <p class="text-xs text-gray-700 leading-tight">{{ $talent['short_description'] }}</p>
                                     </div>
                                 @endif
                             </div>
@@ -275,10 +272,7 @@
 
                                     <!-- Краткое описание для остальных талантов -->
                                     <div class="mb-1">
-                                        <!-- <p class="text-xs text-gray-700 leading-tight">{{ $talent['short_description'] }}</p> -->
-                                        <p class="text-xs text-gray-700 leading-tight">
-                                        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Animi excepturi nulla voluptas tempora tenetur, rem laborum quisquam quia doloremque eligendi sunt id repudiandae, consequatur quis delectus dolores molestiae repellat! Et.
-                                        </p>
+                                        <p class="text-xs text-gray-700 leading-tight">{{ $talent['short_description'] }}</p> 
                                     </div>
                                 </div>
                             @endif
@@ -297,6 +291,128 @@
             помогают раскрыть ваш путь к успеху.
         </p>
     </div>
+
+    @if($plan === 'talents_spheres_professions')
+        <!-- Разрыв страницы перед новым разделом -->
+        <div style="page-break-before: always;"></div>
+
+        <!-- Топ 5 талантов раздел -->
+        <div class="mt-20 space-y-6">
+            @php
+                // Получаем топ 5 талантов с наивысшими баллами
+                $top5Talents = collect($userResults)->sortByDesc('score')->take(5)->values();
+                $maxScore = collect($userResults)->max('score');
+                $maxScore = $maxScore > 0 ? $maxScore : 1;
+            @endphp
+
+            <!-- Краткое описание -->
+            <div class="mb-6">
+                <p class="text-sm text-gray-600 leading-relaxed">
+                    Ниже представлены ваши пять самых сильных талантов, которые определяют ваш уникальный профиль и потенциал для достижения выдающихся результатов.
+                </p>
+            </div>
+
+            <!-- Обзорный текст -->
+            <div class="mb-8">
+                <p class="text-sm text-gray-700 leading-relaxed">
+                    Эти таланты представляют собой ваши основные сильные стороны и являются ключом к вашему профессиональному и личностному развитию. Сосредоточьтесь на их развитии и применении в повседневной деятельности.
+                </p>
+            </div>
+
+            <!-- Отдельная страница для каждого из топ 5 талантов -->
+            @foreach($top5Talents as $index => $talent)
+                @php
+                    $talentDomainColor = $domainColors[$talent['domain']] ?? '#6B7280';
+                    $percentage = round(($talent['score'] / $maxScore) * 100);
+                    $position = $index + 1;
+                @endphp
+
+                @if($index > 0)
+                    <!-- Разрыв страницы между талантами -->
+                    <div style="page-break-before: always;"></div>
+                @endif
+
+                <!-- Страница для конкретного таланта -->
+                <div class="mt-20 space-y-8">
+                    <!-- Заголовок с номером и названием таланта -->
+                    <div class="flex items-center space-x-4 mb-8">
+                        <!-- Квадрат с номером в цвете домена -->
+                        <div class="w-16 h-16 flex items-center justify-center text-white font-bold text-2xl" style="background-color: {{ $talentDomainColor }}">
+                            {{ $position }}
+                        </div>
+
+                        <!-- Название и балл таланта -->
+                        <div class="flex-1">
+                            <h1 class="text-2xl font-bold text-gray-900 mb-2">
+                                Обзор таланта {{ $talent['name'] }}
+                            </h1>
+                            <div class="flex items-center space-x-4">
+                                <div class="text-lg font-bold" style="color: {{ $talentDomainColor }}">
+                                    Балл: {{ $talent['score'] }} ({{ $percentage }}%)
+                                </div>
+                                <div class="text-sm text-gray-600 px-3 py-1 bg-gray-100 rounded">
+                                    Домен: {{ $domains[$talent['domain']] ?? $talent['domain'] }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Краткое описание -->
+                    @if(!empty($talent['short_description']))
+                        <div class="bg-blue-50 p-6 border-l-4" style="border-left-color: {{ $talentDomainColor }}">
+                            <h3 class="text-lg font-semibold mb-3 text-gray-900">Краткое описание</h3>
+                            <p class="text-sm text-gray-700 leading-relaxed">
+                                {{ $talent['short_description'] }}
+                            </p>
+                        </div>
+                    @endif
+
+                    <!-- Обзор таланта -->
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-900">Обзор</h3>
+                        <div class="space-y-3 text-sm text-gray-700 leading-relaxed">
+                            @if(!empty($talent['description']))
+                                <p>{{ $talent['description'] }}</p>
+                            @else
+                                <!-- Обобщенный текст для обзора -->
+                                <p>Талант "{{ $talent['name'] }}" представляет собой одну из ваших ключевых сильных сторон, которая проявляется в вашем естественном стремлении к определенным видам деятельности и способах взаимодействия с окружающим миром.</p>
+
+                                <p>Этот талант влияет на то, как вы подходите к решению задач, взаимодействуете с людьми и достигаете своих целей. Понимание и развитие этого таланта поможет вам максимально эффективно использовать свои природные способности.</p>
+
+                                <p>Люди с выраженным талантом "{{ $talent['name'] }}" часто демонстрируют высокие результаты в областях, где этот талант может быть полностью реализован. Важно создавать условия и выбирать деятельность, которая позволяет этому таланту проявиться наиболее полно.</p>
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- 5 советов для развития таланта -->
+                    <div class="bg-white border border-gray-200 p-6 rounded-lg">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-900">5 советов для развития таланта "{{ $talent['name'] }}"</h3>
+                        <div class="space-y-4">
+                            @php
+                                // Создаем персонализированные советы для каждого таланта
+                                $tips = [
+                                    "Определите конкретные области, где ваш талант \"" . $talent['name'] . "\" может принести максимальную пользу, и сосредоточьтесь на их развитии.",
+                                    "Ищите возможности для практического применения этого таланта в повседневной работе и личной жизни.",
+                                    "Изучайте успешных людей, которые эффективно используют схожие таланты, и адаптируйте их подходы под свои потребности.",
+                                    "Создавайте среду и условия, которые способствуют проявлению и развитию вашего таланта \"" . $talent['name'] . "\".",
+                                    "Регулярно оценивайте прогресс в развитии этого таланта и корректируйте свои подходы для достижения лучших результатов."
+                                ];
+                            @endphp
+
+                            @foreach($tips as $tipIndex => $tip)
+                                <div class="flex items-start space-x-3">
+                                    <div class="w-6 h-6 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5" style="background-color: {{ $talentDomainColor }}">
+                                        {{ $tipIndex + 1 }}
+                                    </div>
+                                    <p class="text-sm text-gray-700 leading-relaxed">{{ $tip }}</p>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    @endif
 
 </div>
 

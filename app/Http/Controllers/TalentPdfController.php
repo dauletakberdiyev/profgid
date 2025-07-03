@@ -17,7 +17,7 @@ class TalentPdfController extends Controller
     public function download(Request $request)
     {
         $sessionId = $request->get("session_id");
-        $tab = $request->get("tab", "talents");
+        $plan = $request->get("plan"); // Получаем тарифный план
         $testSession = TestSession::where("session_id", $sessionId)
             ->where("user_id", Auth::id())
             ->with([
@@ -113,8 +113,8 @@ class TalentPdfController extends Controller
         $userName = Auth::user()->name ?? "User";
         $fileName =
             "Отчет_" . $userName . "_" . now()->format("Y-m-d") . ".pdf";
-        // Данные для разных вкладок
-        if ($tab === "talents") {
+        // Генерация PDF в зависимости от тарифного плана
+        if ($plan === "talents") {
             $html = view("pdf.talent-full", [
                 "userResults" => $userResults,
                 "domains" => $domains,
@@ -122,6 +122,7 @@ class TalentPdfController extends Controller
                 "testDate" => $testDate,
                 "talentAdvice" => $talentAdvice,
                 "domainColors" => $domainColors,
+                "plan" => $plan,
             ])->render();
 
             $header = view("pdf.header", [
@@ -153,9 +154,18 @@ class TalentPdfController extends Controller
                         now()->format("Y-m-d") .
                         '.pdf"'
                 );
-        } elseif ($tab === "spheres") {
-            // Логика topSpheres и topProfessions как в компоненте
-            // --- topSpheres ---
+        } elseif ($plan === "talents_spheres") {
+            $talentsHtml = view("pdf.talent-full", [
+                "userResults" => $userResults,
+                "domains" => $domains,
+                "domainScores" => $domainScores,
+                "testDate" => $testDate,
+                "talentAdvice" => $talentAdvice,
+                "domainColors" => $domainColors,
+                "plan" => $plan,
+            ])->render();
+
+            // Затем логика для сфер
             $userTalentScores = [];
             foreach ($userResults as $result) {
                 $userTalentScores[$result["id"]] = $result["score"];
@@ -308,11 +318,15 @@ class TalentPdfController extends Controller
                 $profession["is_top"] = $index < 8;
                 return $profession;
             });
-            $html = view("pdf.spheres-full", [
+            // Генерируем HTML для сфер
+            $spheresHtml = view("pdf.spheres-full", [
                 "topSpheres" => $topSpheres,
                 "topProfessions" => $topProfessions,
                 "testDate" => $testDate,
             ])->render();
+
+            // Объединяем HTML талантов и сфер
+            $html = $talentsHtml . '<div style="page-break-before: always;"></div>' . $spheresHtml;
 
             $header = view("pdf.header", [
                 "userName" => $userName,
@@ -333,10 +347,84 @@ class TalentPdfController extends Controller
                 ->header("Content-Type", "application/pdf")
                 ->header(
                     "Content-Disposition",
-                    'attachment; filename="spheres.pdf"'
+                    'attachment; filename="отчет-' .
+                        $userName .
+                        "_" .
+                        now()->format("Y-m-d") .
+                        '.pdf"'
                 );
-        } elseif ($tab === "professions") {
-            // topProfessions как в компоненте
+        } elseif ($plan === "talents_spheres_professions") {
+            // Генерируем PDF с талантами + сферами + профессиями
+            // Сначала генерируем HTML для талантов
+            $talentsHtml = view("pdf.talent-full", [
+                "userResults" => $userResults,
+                "domains" => $domains,
+                "domainScores" => $domainScores,
+                "testDate" => $testDate,
+                "talentAdvice" => $talentAdvice,
+                "domainColors" => $domainColors,
+                "plan" => $plan,
+            ])->render();
+
+            // Логика для сфер (копируем из talents_spheres)
+            $userTalentScores = [];
+            foreach ($userResults as $result) {
+                $userTalentScores[$result["id"]] = $result["score"];
+            }
+            $maxUserScore = max(array_column($userResults, "score"));
+            $maxUserScore = max($maxUserScore, 1);
+            $allSpheres = \App\Models\Sphere::with([
+                "professions.talents",
+            ])->get();
+            $spheresData = collect();
+            foreach ($allSpheres as $sphere) {
+                $compatibilityPercentage = 0;
+                $sphereTalents = collect();
+                foreach ($sphere->professions as $profession) {
+                    foreach ($profession->talents as $talent) {
+                        $existingTalent = $sphereTalents->firstWhere(
+                            "id",
+                            $talent->id
+                        );
+                        if (
+                            !$existingTalent ||
+                            $talent->pivot->coefficient >
+                                $existingTalent->coefficient
+                        ) {
+                            $sphereTalents = $sphereTalents->reject(function (
+                                $t
+                            ) use ($talent) {
+                                return $t->id === $talent->id;
+                            });
+                            $sphereTalents->push(
+                                (object) [
+                                    "id" => $talent->id,
+                                    "name" => $talent->name,
+                                    "coefficient" => $talent->pivot->coefficient,
+                                ]
+                            );
+                        }
+                    }
+                }
+                foreach ($sphereTalents as $talent) {
+                    if (isset($userTalentScores[$talent->id])) {
+                        $compatibilityPercentage +=
+                            ($userTalentScores[$talent->id] / $maxUserScore) *
+                            $talent->coefficient;
+                    }
+                }
+                $spheresData->push([
+                    "id" => $sphere->id,
+                    "name" => $sphere->name,
+                    "compatibility_percentage" => $compatibilityPercentage,
+                ]);
+            }
+            $topSpheres = $spheresData
+                ->sortByDesc("compatibility_percentage")
+                ->values()
+                ->toArray();
+
+            // Логика для профессий
             $userTalentScores = [];
             foreach ($userResults as $result) {
                 $userTalentScores[$result["id"]] = $result["score"];
@@ -408,10 +496,25 @@ class TalentPdfController extends Controller
                 $profession["is_top"] = $index < 8;
                 return $profession;
             });
-            $html = view("pdf.professions-full", [
+            // Генерируем HTML для сфер
+            $spheresHtml = view("pdf.spheres-full", [
+                "topSpheres" => $topSpheres,
                 "topProfessions" => $topProfessions,
                 "testDate" => $testDate,
             ])->render();
+
+            // Генерируем HTML для профессий
+            $professionsHtml = view("pdf.professions-full", [
+                "topProfessions" => $topProfessions,
+                "testDate" => $testDate,
+            ])->render();
+
+            // Объединяем HTML всех трех разделов: Таланты + Сферы + Профессии
+            $html = $talentsHtml .
+                    '<div style="page-break-before: always;"></div>' .
+                    $spheresHtml .
+                    '<div style="page-break-before: always;"></div>' .
+                    $professionsHtml;
 
             $header = view("pdf.header", [
                 "userName" => $userName,
@@ -430,12 +533,16 @@ class TalentPdfController extends Controller
 
             return response($pdf)
                 ->header("Content-Type", "application/pdf")
-                ->header(
+                 ->header(
                     "Content-Disposition",
-                    'attachment; filename="professions.pdf"'
+                    'attachment; filename="отчет-' .
+                        $userName .
+                        "_" .
+                        now()->format("Y-m-d") .
+                        '.pdf"'
                 );
         } else {
-            abort(400, "Unknown tab");
+            abort(400, "Unknown plan or plan not provided");
         }
     }
 }

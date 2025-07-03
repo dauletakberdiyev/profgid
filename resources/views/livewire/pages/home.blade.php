@@ -111,7 +111,7 @@
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
                 @foreach($plans as $planKey => $plan)
-                    <div class="relative bg-white rounded-2xl shadow-lg border border-gray-200 p-6 md:p-8 {{ $plan['popular'] ? 'ring-2 ring-blue-500 transform scale-105' : '' }} hover:shadow-xl transition-all duration-300">
+                    <div class="relative bg-white rounded-2xl border border-gray-200 p-6 md:p-8 {{ $plan['popular'] ? 'ring-2 ring-blue-500 transform scale-105' : '' }} transition-all duration-300 flex flex-col h-full">
                         @if($plan['popular'])
                             <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
                                 <span class="bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-medium">
@@ -120,7 +120,7 @@
                             </div>
                         @endif
 
-                        <div class="text-center">
+                        <div class="text-center flex-grow flex flex-col">
                             <h3 class="text-lg md:text-xl font-bold text-gray-900 mb-2">
                                 {{ $plan['name'] }}
                             </h3>
@@ -132,7 +132,7 @@
                                 <span class="text-lg text-gray-600 ml-1">{{ $plan['currency'] }}</span>
                             </div>
 
-                            <ul class="space-y-3 mb-8 text-left">
+                            <ul class="space-y-3 mb-8 text-left flex-grow">
                                 @foreach($plan['features'] as $feature)
                                     <li class="flex items-start">
                                         <svg class="w-5 h-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -143,6 +143,22 @@
                                 @endforeach
                             </ul>
 
+                            <!-- Payment Button -->
+                            <div class="text-center mt-auto">
+                                <a href="{{ route('payment-status-demo') }}" 
+                                   class="w-full px-6 py-3 md:py-4 text-sm md:text-base font-medium text-white 
+                                          bg-blue-600 hover:bg-blue-700 
+                                          rounded-xl transition-all duration-300 transform hover:scale-105 
+                                          focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
+                                          inline-flex items-center justify-center">
+                                    <span class="flex items-center justify-center">
+                                        <svg class="w-4 h-4 md:w-5 md:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                                        </svg>
+                                        Оплатить
+                                    </span>
+                                </a>
+                            </div>
 
                         </div>
                     </div>

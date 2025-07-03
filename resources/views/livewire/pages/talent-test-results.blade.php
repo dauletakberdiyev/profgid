@@ -338,25 +338,24 @@
                             @endphp
                             
                             <!-- Проверяем доступность скачивания для текущей вкладки -->
-                            <div x-data="{ 
+                            <div x-data="{
                                 canDownload: function() {
-                                    if (this.activeTab === 'talents') return {{ $canDownloadTalents ? 'true' : 'false' }};
-                                    if (this.activeTab === 'spheres') return {{ $canDownloadSpheres ? 'true' : 'false' }};
-                                    if (this.activeTab === 'professions') return {{ $canDownloadProfessions ? 'true' : 'false' }};
-                                    return false;
+                                    // Проверяем тариф пользователя
+                                    const userPlan = '{{ $testSession->selected_plan ?? '' }}';
+                                    const isPaid = {{ $testSession && $testSession->isPaid() ? 'true' : 'false' }};
+
+                                    // Если не оплачено, скачивание недоступно
+                                    if (!isPaid) return false;
+
+                                    // Проверяем только тариф (без привязки к табам)
+                                    return ['talents', 'talents_spheres', 'talents_spheres_professions'].includes(userPlan);
                                 }
                             }">
                                 <!-- Кнопка скачивания (активная) -->
                                 <a
                                     x-show="canDownload()"
-                                    :href="
-                                        activeTab === 'talents'
-                                            ? '{{ route('talent.pdf.download', ['session_id' => $testSessionId ?? request()->get('session_id'), 'tab' => 'talents']) }}'
-                                        : activeTab === 'spheres'
-                                            ? '{{ route('talent.pdf.download', ['session_id' => $testSessionId ?? request()->get('session_id'), 'tab' => 'spheres']) }}'
-                                        : '{{ route('talent.pdf.download', ['session_id' => $testSessionId ?? request()->get('session_id'), 'tab' => 'professions']) }}'
-                                    "
-                                    class="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors group"
+                                    href="{{ route('talent.pdf.download', ['session_id' => $testSessionId ?? request()->get('session_id'), 'plan' => $testSession->selected_plan ?? '']) }}"
+                                    class="flex items-center gap-2 px-3 py-2 md:px-4 md:py-3 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors group"
                                     title="Скачать результаты в PDF"
                                     target="_blank"
                                 >
@@ -366,25 +365,35 @@
                                             d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
                                         </path>
                                     </svg>
+                                    <span class="text-sm md:text-base text-gray-600 group-hover:text-gray-800 font-medium">
+                                        Скачать отчет
+                                    </span>
                                 </a>
-                                
-                                <!-- Кнопка заблокированная (неактивная) -->
-                                <button
-                                    x-show="!canDownload()"
-                                    @click="$wire.showUpgradeModal()"
-                                    class="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 bg-gray-300 cursor-not-allowed rounded-lg opacity-50"
-                                    title="Обновите тариф для скачивания"
-                                    disabled
-                                >
-                                    <svg class="w-5 h-5 md:w-6 md:h-6 text-gray-500" fill="none"
-                                        stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
-                                        </path>
-                                    </svg>
-                                </button>
-                                
-                                <span class="text-xs text-gray-500 mt-1" x-text="canDownload() ? 'скачать отчет' : 'обновить тариф'"></span>
+
+                                <!-- Кнопка скачивания (неактивная) - показывается когда скачивание недоступно -->
+                                <div x-show="!canDownload()" class="relative">
+                                    <button
+                                        class="flex items-center gap-2 px-3 py-2 md:px-4 md:py-3 bg-gray-300 rounded-lg cursor-not-allowed opacity-60"
+                                        title="Обновите тариф для скачивания этого раздела"
+                                        disabled
+                                    >
+                                        <svg class="w-5 h-5 md:w-6 md:h-6 text-gray-500" fill="none"
+                                            stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+                                            </path>
+                                        </svg>
+                                        <span class="text-sm md:text-base text-gray-500 font-medium">
+                                            Скачать отчет
+                                        </span>
+                                    </button>
+
+                                    <!-- Подсказка о необходимости обновления тарифа -->
+                                    <div class="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10">
+                                        <span>Обновите тариф для скачивания отчета</span>
+                                        <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-b-gray-800"></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -129,7 +129,7 @@
 
     @if ($isFullPlan)
         <!-- Профессии из ваших топ-10 сфер блок -->
-        <div class="mt-16 space-y-4 mt-20">
+        <div class="space-y-4 mt-20">
             <h2 class="text-lg font-bold text-center section-header">Профессии из ваших топ-10 сфер</h2>
             <p class="text-xs text-gray-600 mb-4 text-center leading-relaxed">
                 Этот раздел включает профессии, связанные с вашими топ-10 сферами деятельности.
@@ -161,7 +161,7 @@
                 <div class="block">
                     <div class="w-full">
                         <div class="grid grid-cols-3 gap-5">
-                            @foreach (array_shift(array_slice($professionsGroupedBySphere, 0, 7)) as $index => $sphereData)
+                            @foreach (array_slice($professionsGroupedBySphere, 0, 6) as $index => $sphereData)
                                 @php
                                     $sphere = $sphereData['sphere'];
                                     $professions = $sphereData['professions'];
@@ -244,9 +244,96 @@
                                     </div>
                                 </div>
                             @endforeach
-
-                            <div style="page-break-before: always;"></div>
                         </div>
+
+                        <div style="page-break-before: always;"></div>
+
+                        <div class="grid grid-cols-3 gap-5 mt-20">
+                            @foreach (array_slice($professionsGroupedBySphere, 6, 12) as $index => $sphereData)
+                                @php
+                                    $sphere = $sphereData['sphere'];
+                                    $professions = $sphereData['professions'];
+                                    $hasProfessions = !empty($professions);
+                                    $sphereId = $sphere['id'];
+                                    $compatibilityPercentage = round($sphere['compatibility_percentage']);
+                                @endphp
+
+                                <div>
+                                    <!-- Основная строка сферы -->
+                                    <div>
+                                        <div class="py-2 px-2 bg-gray-50">
+                                            <div class="flex items-center justify-between">
+                                                <div class="flex items-center flex-1 min-w-0 cursor-pointer">
+                                                    <div class="flex items-center space-x-3">
+                                                        <span class="text-sm font-medium text-blue-600"
+                                                            style="color: #316EC6">{{ $loop->index + 1 }}</span>
+                                                        <div class="flex-1 min-w-0">
+                                                            <div class="text-sm font-medium text-gray-900">
+                                                                {{ $sphere['name'] }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Percentage Display -->
+                                                <div class="flex items-center space-x-2">
+                                                    <!-- Progress Bar -->
+                                                    <div class="flex flex-1 min-w-[80px]">
+                                                        <div class="w-full bg-gray-200 rounded-full h-1">
+                                                            <div class="h-1 rounded-full transition-all duration-500"
+                                                                style="width: {{ $compatibilityPercentage }}%; background-color: #316EC6">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <span class="text-xs px-2 py-0.5 bg-blue-100 text-blue-600 rounded">
+                                                        {{ $compatibilityPercentage }}%
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Раскрывающийся список профессий (Desktop) -->
+                                    <div>
+                                        <div class="px-2 py-0">
+                                            @if ($hasProfessions)
+                                                <div class="grid grid-cols-1 gap-1">
+                                                    @foreach ($professions as $profession)
+                                                        @php
+                                                            $professionCompatibility = isset($profession['compatibility_percentage'])
+                                                                ? round($profession['compatibility_percentage'])
+                                                                : 0;
+                                                            $hasDescription = isset($profession['description']) && $profession['description'];
+                                                        @endphp
+                                                        <div class="bg-white pb-1 text-sm text-gray-700 transition-colors border-b border-gray-200">
+                                                            <div class="flex items-center justify-between">
+                                                                <div class="flex items-center flex-1 space-x-2">
+                                                                    <span class="flex-1">{{ $profession['name'] }}</span>
+                                                                    @if(isset($profession['compatibility_percentage']))
+                                                                        <div class="flex items-center space-x-2">
+                                                                            <!-- Mini progress bar -->
+                                                                            <div class="w-16 bg-gray-200 rounded-full h-1">
+                                                                                <div class="h-1 rounded-full transition-all duration-500 bg-blue-500"
+                                                                                    style="width: {{ $professionCompatibility }}%">
+                                                                                </div>
+                                                                            </div>
+                                                                            <span class="text-xs text-gray-500 min-w-[30px]">
+                                                                                {{ $professionCompatibility }}%
+                                                                            </span>
+                                                                        </div>
+                                                                    @endif
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+
                     </div>
                 </div>
             </div>
