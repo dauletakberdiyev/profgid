@@ -38,14 +38,14 @@ class MyProfessions extends Component
     {
         $user = Auth::user();
         $favoriteProfessions = $user->favorite_professions ?? [];
-        
+
         $favoriteProfessions = array_filter($favoriteProfessions, function($id) use ($professionId) {
             return $id != $professionId;
         });
-        
+
         $user->update(['favorite_professions' => array_values($favoriteProfessions)]);
         $this->loadFavoriteProfessions();
-        
+
         session()->flash('message', 'Профессия удалена из избранного!');
     }
 

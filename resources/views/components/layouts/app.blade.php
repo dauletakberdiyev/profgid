@@ -12,7 +12,7 @@
 
     <link rel="stylesheet" href="{{ asset('assets/fonts/atyp/stylesheet.css') }}">
 
-    <link rel="stylesheet" href="{{ asset('build/assets/app-Ct8oqkp4.css') }}">
+    <link rel="stylesheet" href="{{ asset('build/assets/app-CpbGTD6R.css') }}">
 
     @livewireStyles
 
@@ -25,10 +25,10 @@
     {{ $slot }}
 
     <livewire:parts.footer />
-    
+
     @livewireScripts
 
-    <script src="{{ asset('build/assets/app-BlukfNVj.js') }}"></script>
+    <script src="{{ asset('build/assets/app-B6G8EThm.js') }}"></script>
 
 </body>
 
