@@ -123,11 +123,30 @@
         
         .advice-text ul {
             margin: 10px 0;
-            padding-left: 20px;
+            padding-left: 0;
+            list-style-type: none;
         }
         
         .advice-text li {
-            margin-bottom: 8px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px dotted #e5e7eb;
+        }
+        
+        .advice-text li:last-child {
+            border-bottom: none;
+        }
+        
+        .advice-text li strong {
+            display: block;
+            margin-bottom: 5px;
+            color: #4b5563;
+            font-size: 13px;
+        }
+        
+        .advice-text li p {
+            margin: 5px 0 0 0;
+            font-size: 12px;
         }
         
         .footer {
@@ -208,9 +227,23 @@
                 </div>
 
                 <div class="talent-advice">
-                    <div class="section-title">5 советов для человека с талантом {{ $talent['name'] }}</div>
+                    <div class="section-title">Советы для человека с талантом {{ $talent['name'] }}</div>
                     <div class="advice-text">
-                        {!! $talentAdvice[$talent['name']] ?? '' !!}
+                        @if(isset($talentAdvice[$talent['name']]) && is_array(json_decode($talentAdvice[$talent['name']], true)))
+                            @php
+                                $adviceItems = json_decode($talentAdvice[$talent['name']], true);
+                            @endphp
+                            <ul>
+                                @foreach($adviceItems as $item)
+                                    <li>
+                                        <strong>{{ $item['name'] }}</strong>
+                                        <p>{{ $item['description'] }}</p>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @else
+                            {!! $talentAdvice[$talent['name']] ?? '' !!}
+                        @endif
                     </div>
                 </div>
             </div>

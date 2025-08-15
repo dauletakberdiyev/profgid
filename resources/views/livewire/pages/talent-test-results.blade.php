@@ -423,6 +423,15 @@
                             'relationship' => '#316EC6',
                             'strategic' => '#429162',
                             'influencing' => '#DA782D',
+                            // Добавляем русские ключи для совместимости
+                            'ИСПОЛНЕНИЕ' => '#702B7C',
+                            'исполнение' => '#702B7C',
+                            'ОТНОШЕНИЯ' => '#316EC6',
+                            'отношения' => '#316EC6',
+                            'МЫШЛЕНИЕ' => '#429162',
+                            'мышление' => '#429162',
+                            'ВЛИЯНИЕ' => '#DA782D',
+                            'влияние' => '#DA782D',
                         ];
 
                         $domainBgColors = [
@@ -430,15 +439,55 @@
                             'relationship' => 'bg-[#316EC6]',
                             'strategic' => 'bg-[#429162]',
                             'influencing' => 'bg-[#DA782D]',
+                            // Добавляем русские ключи для совместимости
+                            'ИСПОЛНЕНИЕ' => 'bg-[#702B7C]',
+                            'исполнение' => 'bg-[#702B7C]',
+                            'ОТНОШЕНИЯ' => 'bg-[#316EC6]',
+                            'отношения' => 'bg-[#316EC6]',
+                            'МЫШЛЕНИЕ' => 'bg-[#429162]',
+                            'мышление' => 'bg-[#429162]',
+                            'ВЛИЯНИЕ' => 'bg-[#DA782D]',
+                            'влияние' => 'bg-[#DA782D]',
                         ];
+
+                        // Отладочная информация
+                        // dd('Debug info:', [
+                        //     'domainScores' => $domainScores,
+                        //     'domains' => $domains,
+                        //     'total' => array_sum($domainScores)
+                        // ]);
 
                         // Calculate total score and percentages
                         $totalScore = array_sum($domainScores);
                         $totalScore = $totalScore > 0 ? $totalScore : 1;
 
-                        // Sort domains by score (descending)
-                        $sortedDomainScores = $domainScores;
-                        arsort($sortedDomainScores);
+                        // Гарантируем, что все 4 домена присутствуют в стандартном порядке
+                        $allDomains = ['executing', 'influencing', 'relationship', 'strategic'];
+                        $completeDomainScores = [];
+                        foreach ($allDomains as $domain) {
+                            $completeDomainScores[$domain] = $domainScores[$domain] ?? 0;
+                        }
+
+                        // Гарантируем наличие всех доменов в массиве названий
+                        $defaultDomainNames = [
+                            'executing' => 'ИСПОЛНЕНИЕ',
+                            'influencing' => 'ВЛИЯНИЕ', 
+                            'relationship' => 'ОТНОШЕНИЯ',
+                            'strategic' => 'МЫШЛЕНИЕ'
+                        ];
+                        
+                        foreach ($defaultDomainNames as $key => $name) {
+                            if (!isset($domains[$key])) {
+                                $domains[$key] = $name;
+                            }
+                        }
+
+                        // Sort domains by score (descending) - только для определения топ домена
+                        $sortedForTop = $completeDomainScores;
+                        arsort($sortedForTop);
+                        
+                        // Для отображения используем стандартный порядок доменов (исполнение, влияние, отношения, мышление)
+                        $sortedDomainScores = $completeDomainScores;
 
                         // Calculate percentages directly here
                         $domainPercentages = [];
@@ -447,18 +496,33 @@
                         }
                     @endphp
 
+                    <!-- Temporary Debug Info (remove in production) -->
+                    {{-- 
+                    <div class="mb-4 p-3 bg-yellow-100 border border-yellow-400 rounded text-sm">
+                        <strong>Debug Info:</strong><br>
+                        Domain Scores: {{ json_encode($domainScores) }}<br>
+                        Complete Domain Scores: {{ json_encode($completeDomainScores) }}<br>
+                        Domains: {{ json_encode($domains) }}<br>
+                        Total Score: {{ $totalScore }}
+                    </div>
+                    --}}
+
                     <!-- Single horizontal bar -->
-                    <div class="flex gap-1 w-full h-6 md:h-8 overflow-hidden mb-3 md:mb-4">
+                    <div class="flex w-full h-6 md:h-8 overflow-hidden mb-3 md:mb-4 bg-gray-200 rounded">
                         @foreach ($sortedDomainScores as $domain => $score)
                             @php
-                                $percentage = ($score / $totalScore) * 100;
+                                $percentage = $totalScore > 0 ? ($score / $totalScore) * 100 : 25; // Равномерное распределение если нет данных
+                                // Если все домены имеют одинаковые оценки или нет данных, делаем равномерное распределение
+                                if ($totalScore == 0 || count(array_unique($completeDomainScores)) == 1) {
+                                    $percentage = 25; // 100% / 4 домена = 25% каждый
+                                }
+                                // Гарантируем минимальную видимость для каждого домена
+                                $adjustedPercentage = max($percentage, 10);
                             @endphp
-                            @if ($score > 0)
-                                <div class="{{ $domainBgColors[$domain] ?? 'bg-gray-400' }} flex items-center justify-center text-white font-bold text-xs md:text-sm"
-                                    style="width: {{ $percentage }}%">
-
-                                </div>
-                            @endif
+                            <div class="{{ $domainBgColors[$domain] ?? 'bg-gray-400' }} flex items-center justify-center text-white font-bold text-xs md:text-sm flex-shrink-0"
+                                style="width: {{ $adjustedPercentage }}%; min-width: 10%;">
+                                
+                            </div>
                         @endforeach
                     </div>
 
@@ -466,14 +530,18 @@
                     <div class="flex w-full">
                         @foreach ($sortedDomainScores as $domain => $score)
                             @php
-                                $percentage = ($score / $totalScore) * 100;
+                                $percentage = $totalScore > 0 ? ($score / $totalScore) * 100 : 25;
+                                if ($totalScore == 0 || count(array_unique($completeDomainScores)) == 1) {
+                                    $percentage = 25;
+                                }
+                                $adjustedPercentage = max($percentage, 10);
                             @endphp
-                            @if ($score > 0)
-                                <div class="text-left" style="width: {{ $percentage }}%">
-                                    <div class="text-xs md:text-sm font-medium text-gray-700">{{ $domains[$domain] }}
-                                    </div>
+                            <div class="text-left flex-shrink-0" style="width: {{ $adjustedPercentage }}%; min-width: 10%;">
+                                <div class="text-xs md:text-sm font-medium text-gray-700 truncate">
+                                    {{ $domains[$domain] ?? $domain }}
                                 </div>
-                            @endif
+                                
+                            </div>
                         @endforeach
                     </div>
                 </div>
@@ -638,8 +706,13 @@
                                             @if ($this->isFullPlan)
                                                 <div class="pt-2 border-t border-gray-100">
                                                     <h4 class="text-xs font-semibold text-gray-900 mb-1">Советы</h4>
-                                                    <div class="text-xs text-gray-700 leading-tight">
-                                                        {!! $this->getTalentAdvice($talent['name']) !!}
+                                                    <div class="text-xs text-gray-700 leading-tight space-y-2">
+                                                        @foreach ($this->getTalentAdvice($talent['name']) as $advice)
+                                                            <div>
+                                                                <strong>{{ $advice['name'] }}</strong><br>
+                                                                {{ $advice['description'] }}
+                                                            </div>
+                                                        @endforeach
                                                     </div>
                                                 </div>
                                             @endif

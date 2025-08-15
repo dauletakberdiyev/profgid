@@ -39,6 +39,10 @@
                     class="text-sm font-medium {{ request()->routeIs('profession-map') ? 'text-blue-600 font-semibold' : 'text-gray-500' }} hover:text-blue-600 transition-colors">
                     Карта профессий
                 </a>
+                <a href="{{ route('grant-analysis') }}"
+                    class="text-sm font-medium {{ request()->routeIs('grant-analysis') ? 'text-blue-600 font-semibold' : 'text-gray-500' }} hover:text-blue-600 transition-colors">
+                    Грант анализ
+                </a>
                 <a href="{{ route('test-preparation') }}"
                     class="text-sm font-medium {{ request()->routeIs(['test-preparation', 'test', 'talent-test', 'test.results', 'talent-test-results']) ? 'text-blue-600 font-semibold' : 'text-gray-500' }} hover:text-blue-600 transition-colors">
                     {{ __('messages.nav_take_test') }}
@@ -129,6 +133,11 @@
                 <a href="{{ route('profession-map') }}"
                    class="block px-3 py-2 text-base font-medium {{ request()->routeIs('profession-map') ? 'text-blue-600 bg-blue-50 font-semibold' : 'text-gray-700' }} hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors">
                     Карта профессий
+                </a>
+
+                <a href="{{ route('grant-analysis') }}"
+                   class="block px-3 py-2 text-base font-medium {{ request()->routeIs('grant-analysis') ? 'text-blue-600 bg-blue-50 font-semibold' : 'text-gray-700' }} hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors">
+                    Грант анализ
                 </a>
 
                 <a href="{{ route('test-preparation') }}"

@@ -20,6 +20,8 @@ use App\Livewire\Pages\ProfessionMap;
 use App\Livewire\Pages\TestHistory;
 use App\Livewire\PaymentPage;
 use App\Livewire\PaymentStatus;
+use App\Livewire\GrantAnalysis;
+use App\Http\Controllers\ImportController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Session;
@@ -46,6 +48,7 @@ Route::get("/locale/{locale}", [
 
 Route::get("/", Home::class)->name("home");
 Route::get("/about", About::class)->name("about");
+Route::get("/grant-analysis", GrantAnalysis::class)->name("grant-analysis");
 Route::get("/privacy-policy", PrivacyPolicy::class)->name("privacy-policy");
 Route::get("/terms-of-service", TermsOfService::class)->name(
     "terms-of-service"
@@ -133,4 +136,13 @@ Route::middleware(["auth"])->group(function () {
         "download",
     ])->name("talent.pdf.download");
 
+});
+
+// Admin Import Routes (protected by auth middleware)
+Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/import', [ImportController::class, 'index'])->name('import.index');
+    Route::post('/import/test-connection', [ImportController::class, 'testConnection'])->name('import.test-connection');
+    Route::get('/import/sheets', [ImportController::class, 'getSheets'])->name('import.sheets');
+    Route::post('/import/preview', [ImportController::class, 'previewData'])->name('import.preview');
+    Route::post('/import/import-data', [ImportController::class, 'startImport'])->name('import.import-data');
 });

@@ -18,6 +18,10 @@ class Talent extends Model
         'talent_domain_id'
     ];
 
+    protected $casts = [
+        'advice' => 'json',
+    ];
+
     protected $table = 'talents';
 
 
@@ -34,14 +38,15 @@ class Talent extends Model
     public function professions(): BelongsToMany
     {
         return $this->belongsToMany(Profession::class)
-                    ->withPivot('coefficient')
-                    ->withTimestamps();
+            ->withPivot('coefficient')
+            ->withTimestamps();
     }
 
     public function spheres(): BelongsToMany
     {
         return $this->belongsToMany(Sphere::class)
-                    ->withPivot('coefficient')
-                    ->withTimestamps();
+            ->withPivot('coefficient')
+            ->withTimestamps();
     }
+
 }

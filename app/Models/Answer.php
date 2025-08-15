@@ -10,8 +10,6 @@ class Answer extends Model
     protected $fillable = [
         'question',
         'talent_id',
-        'value',
-        'order',
     ];
 
     public function talent(): BelongsTo

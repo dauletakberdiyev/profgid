@@ -6,6 +6,8 @@
                 <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                     @if($testSession->payment_status === 'pending')
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                    @elseif($testSession->payment_status === 'processing')
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
                     @elseif($testSession->payment_status === 'review')
                         <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
                     @elseif($testSession->payment_status === 'completed')
@@ -46,46 +48,124 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
             <!-- Payment Options -->
-            <div class="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100">
+            <div class="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100" x-data="{ 
+                kaspiOpen: false, 
+                cardOpen: false,
+                openKaspi() {
+                    this.kaspiOpen = !this.kaspiOpen;
+                    if (this.kaspiOpen) this.cardOpen = false;
+                },
+                openCard() {
+                    this.cardOpen = !this.cardOpen;
+                    if (this.cardOpen) this.kaspiOpen = false;
+                }
+            }">
                 <h3 class="text-xl font-medium text-gray-900 mb-6">Способы оплаты</h3>
 
-                <!-- QR Code -->
-                <div class="text-center mb-6">
-                    <h4 class="text-lg font-medium text-gray-900 mb-4">QR-код для оплаты</h4>
-                    <div class="flex justify-center mb-4">
-                        <img src="{{ asset('assets/images/kaspi-qr.png') }}"
-                             alt="Kaspi QR Code"
-                             class="w-48 h-48 rounded-xl border">
+                <!-- Kaspi QR Accordion -->
+                <div class="mb-4">
+                    <button @click="openKaspi()"
+                            class="w-full flex items-center justify-between px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all duration-200 text-gray-700">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 mr-3 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h2M4 4h5.5M12 8V4"></path>
+                            </svg>
+                            <span class="font-medium">Оплата через Kaspi QR</span>
+                        </div>
+                        <svg class="w-4 h-4 text-gray-400 transition-transform duration-200" :class="{ 'rotate-180': kaspiOpen }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    
+                    <div x-show="kaspiOpen" 
+                         x-transition:enter="transition ease-out duration-300"
+                         x-transition:enter-start="opacity-0 transform scale-95"
+                         x-transition:enter-end="opacity-100 transform scale-100"
+                         x-transition:leave="transition ease-in duration-200"
+                         x-transition:leave-start="opacity-100 transform scale-100"
+                         x-transition:leave-end="opacity-0 transform scale-95"
+                         class="mt-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <!-- QR Code -->
+                        <div class="text-center mb-4">
+                            <h4 class="text-base font-medium text-gray-900 mb-3">QR-код для оплаты</h4>
+                            <div class="flex justify-center mb-3">
+                                <img src="{{ asset('assets/images/kaspi-qr.png') }}"
+                                     alt="Kaspi QR Code"
+                                     class="w-40 h-40 rounded-lg border">
+                            </div>
+                            <p class="text-sm text-gray-600 mb-4">Сканируйте QR-код в приложении Kaspi</p>
+                        </div>
+
+                        <!-- Divider -->
+                        <div class="relative mb-4">
+                            <div class="absolute inset-0 flex items-center">
+                                <div class="w-full border-t border-gray-300"></div>
+                            </div>
+                            <div class="relative flex justify-center text-xs">
+                                <span class="px-2 bg-gray-50 text-gray-500">или</span>
+                            </div>
+                        </div>
+
+                        <!-- Payment Link -->
+                        <a href="https://pay.kaspi.kz/pay/d9gpkmul"
+                           target="_blank"
+                           class="w-full inline-flex items-center justify-center px-4 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium text-sm">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                            </svg>
+                            Перейти к оплате
+                        </a>
                     </div>
-                    <p class="text-sm text-gray-600">Сканируйте QR-код в приложении Kaspi</p>
                 </div>
 
-                <!-- Divider -->
-                <div class="relative mb-6">
-                    <div class="absolute inset-0 flex items-center">
-                        <div class="w-full border-t border-gray-200"></div>
-                    </div>
-                    <div class="relative flex justify-center text-sm">
-                        <span class="px-4 bg-white text-gray-500">или</span>
+                <!-- Card Payment Accordion -->
+                <div class="mb-4">
+                    <button @click="openCard()"
+                            class="w-full flex items-center justify-between px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all duration-200 text-gray-700">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 mr-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                            </svg>
+                            <span class="font-medium">Оплата банковской картой</span>
+                        </div>
+                        <svg class="w-4 h-4 text-gray-400 transition-transform duration-200" :class="{ 'rotate-180': cardOpen }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+
+                    <div x-show="cardOpen" 
+                         x-transition:enter="transition ease-out duration-300"
+                         x-transition:enter-start="opacity-0 transform scale-95"
+                         x-transition:enter-end="opacity-100 transform scale-100"
+                         x-transition:leave="transition ease-in duration-200"
+                         x-transition:leave-start="opacity-100 transform scale-100"
+                         x-transition:leave-end="opacity-0 transform scale-95"
+                         class="mt-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        
+                        <div class="text-center">
+                            <p class="text-sm text-gray-600 mb-4">Нажмите кнопку для перехода на страницу оплаты</p>
+                            <button wire:click="processCardPayment"
+                                    class="w-full py-2.5 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium text-sm">
+                                <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                                </svg>
+                                Оплатить {{ number_format($plans[$plan]['price']) }} {{ $plans[$plan]['currency'] }}
+                            </button>
+                        </div>
+
+                        <div class="mt-3 flex items-center justify-center space-x-3">
+                            <img src="{{ asset('assets/images/visa.png') }}" alt="Visa" class="h-5 opacity-60">
+                            <img src="{{ asset('assets/images/mastercard.png') }}" alt="Mastercard" class="h-5 opacity-60">
+                        </div>
                     </div>
                 </div>
-
-                <!-- Payment Link -->
-                <a href="https://pay.kaspi.kz/pay/d9gpkmul"
-                   target="_blank"
-                   class="w-full inline-flex items-center justify-center px-6 py-4 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl hover:from-red-600 hover:to-red-700 transition-all duration-200 text-lg font-medium">
-                    <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                    </svg>
-                    Перейти к оплате в Kaspi
-                </a>
             </div>
 
             <!-- Payment Confirmation -->
             <div class="bg-white border border-gray-100 rounded-2xl p-6 md:p-8 shadow-sm">
                 <h3 class="text-xl font-medium text-gray-900 mb-6">Получите доступ используя код активации</h3>
 
-                @if(!$paymentConfirmed && $testSession->payment_status !== 'completed')
+                @if(!$paymentConfirmed && !in_array($testSession->payment_status, ['completed', 'processing']))
                     <form wire:submit.prevent="confirmPayment">
                         <!-- PIN Input Fields -->
                         <div class="mb-6" x-data="{
@@ -201,6 +281,21 @@
                         </div>
                     </form>
 
+                @elseif($testSession->payment_status === 'processing')
+                    <div class="text-center py-8">
+                        <div class="w-16 h-16 bg-blue-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                            <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                            </svg>
+                        </div>
+                        <h4 class="text-lg font-medium text-gray-900 mb-2">Обработка оплаты</h4>
+                        <p class="text-gray-600 mb-4">Ваша оплата обрабатывается. Пожалуйста, подождите...</p>
+                        <button wire:click="checkPaymentStatusWithForteBank" 
+                                class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm">
+                            Проверить статус
+                        </button>
+                    </div>
+
                 @elseif($testSession->payment_status === 'review')
                     <div class="text-center py-8">
                         <div class="w-16 h-16 bg-blue-100 rounded-full mx-auto mb-4 flex items-center justify-center">
@@ -225,6 +320,25 @@
                            class="inline-flex items-center px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
                             Посмотреть результаты
                         </a>
+                    </div>
+
+                @elseif($testSession->payment_status === 'failed')
+                    <div class="text-center py-8">
+                        <div class="w-16 h-16 bg-red-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                            <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </div>
+                        <h4 class="text-lg font-medium text-gray-900 mb-2">Оплата не прошла</h4>
+                        <p class="text-gray-600 mb-4">Попробуйте оплатить снова или свяжитесь с нами</p>
+                        <button wire:click="processCardPayment" 
+                                class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm mr-2">
+                            Попробовать снова
+                        </button>
+                        <button wire:click="getPromoCode" 
+                                class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm">
+                            Связаться с нами
+                        </button>
                     </div>
                 @endif
             </div>

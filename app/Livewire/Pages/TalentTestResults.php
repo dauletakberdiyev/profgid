@@ -8,6 +8,7 @@ use App\Models\Talent;
 use App\Models\UserAnswer;
 use App\Models\TestSession;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 
@@ -91,13 +92,13 @@ class TalentTestResults extends Component
 
         // Define the domains with exact names from database
         $this->domains = [
-            "executing" => "EXECUTING",
-            "influencing" => "INFLUENCING",
-            "relationship" => "RELATIONSHIP BUILDING",
-            "strategic" => "STRATEGIC THINKING",
+            "executing" => "ИСПОЛНЕНИЕ",
+            "influencing" => "ВЛИЯНИЕ",
+            "relationship" => "ОТНОШЕНИЯ",
+            "strategic" => "МЫШЛЕНИЕ",
         ];
 
-        // Initialize domain scores
+        // Initialize domain scores - используем стандартные ключи
         foreach ($this->domains as $key => $domain) {
             $this->domainScores[$key] = 0;
         }
@@ -120,13 +121,11 @@ class TalentTestResults extends Component
 
         // Calculate scores for each talent by grouping answers to each talent
         foreach ($questionScores as $questionId => $score) {
-            $questionIndex = $questionId - 1; // Convert to 0-based index (1-87 -> 0-86)
-            if ($questionIndex >= 0 && $questionIndex < count($answers)) {
-                $answer = $answers[$questionIndex];
-                if ($answer->talent) {
-                    // Add the score to the corresponding talent
-                    $talentScores[$answer->talent->id] += $score;
-                }
+            // Находим ответ (вопрос) по его ID
+            $answer = $answers->firstWhere('id', $questionId);
+            if ($answer && $answer->talent) {
+                // Add the score to the corresponding talent
+                $talentScores[$answer->talent->id] += $score;
             }
         }
 
@@ -134,6 +133,9 @@ class TalentTestResults extends Component
         foreach ($talents as $talent) {
             $score = $talentScores[$talent->id] ?? 0;
             $domainName = $talent->domain ? $talent->domain->name : "executing";
+            
+            // Преобразуем название домена из БД в стандартный ключ
+            $domainKey = $this->mapDomainNameToKey($domainName);
 
             $this->userResults[] = [
                 "id" => $talent->id,
@@ -141,14 +143,14 @@ class TalentTestResults extends Component
                 "description" => $talent->description ?? "",
                 "short_description" => $talent->short_description ?? "",
                 "advice" => $talent->advice ?? "",
-                "domain" => $domainName,
+                "domain" => $domainKey, // Используем стандартный ключ
                 "score" => $score,
                 "rank" => 0, // Will be set later
             ];
 
-            // Add talent score to corresponding domain
-            if (isset($this->domainScores[$domainName])) {
-                $this->domainScores[$domainName] += $score;
+            // Add talent score to corresponding domain using mapped key
+            if (isset($this->domainScores[$domainKey])) {
+                $this->domainScores[$domainKey] += $score;
             }
         }
 
@@ -651,6 +653,51 @@ class TalentTestResults extends Component
             default:
                 return false;
         }
+    }
+
+    /**
+     * Сопоставляет название домена из БД со стандартным ключом
+     */
+    private function mapDomainNameToKey($domainName)
+    {
+        // Сопоставление различных вариантов названий доменов
+        $mapping = [
+            'executing' => 'executing',
+            'EXECUTING' => 'executing',
+            'Executing' => 'executing',
+            'ИСПОЛНЕНИЕ' => 'executing',
+            'исполнение' => 'executing',
+            'Исполнение' => 'executing',
+            
+            'influencing' => 'influencing',
+            'INFLUENCING' => 'influencing', 
+            'Influencing' => 'influencing',
+            'ВЛИЯНИЕ' => 'influencing',
+            'влияние' => 'influencing',
+            'Влияние' => 'influencing',
+            
+            'relationship' => 'relationship',
+            'RELATIONSHIP' => 'relationship',
+            'Relationship' => 'relationship',
+            'RELATIONSHIP BUILDING' => 'relationship',
+            'relationship building' => 'relationship',
+            'Relationship Building' => 'relationship',
+            'ОТНОШЕНИЯ' => 'relationship',
+            'отношения' => 'relationship',
+            'Отношения' => 'relationship',
+            
+            'strategic' => 'strategic',
+            'STRATEGIC' => 'strategic',
+            'Strategic' => 'strategic',
+            'STRATEGIC THINKING' => 'strategic',
+            'strategic thinking' => 'strategic',
+            'Strategic Thinking' => 'strategic',
+            'МЫШЛЕНИЕ' => 'strategic',
+            'мышление' => 'strategic',
+            'Мышление' => 'strategic',
+        ];
+        
+        return $mapping[$domainName] ?? 'executing'; // По умолчанию executing
     }
 
     public function render()
