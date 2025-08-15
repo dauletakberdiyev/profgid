@@ -50,10 +50,21 @@ class TalentResource extends Resource
                     ->helperText('Краткое описание таланта (показывается всем пользователям)')
                     ->maxLength(500)
                     ->columnSpanFull(),
-                Forms\Components\Textarea::make('advice')
+                Forms\Components\Repeater::make('advice')
                     ->label('Советы')
-                    ->helperText('5 советов для человека с этим талантом (можно использовать HTML)')
-                    ->maxLength(65535)
+                    ->helperText('Советы для человека с этим талантом')
+                    ->schema([
+                        Forms\Components\TextInput::make('name')
+                            ->label('Название совета')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\Textarea::make('description')
+                            ->label('Описание совета')
+                            ->required()
+                            ->maxLength(65535),
+                    ])
+                    ->defaultItems(0)
+                    ->maxItems(5)
                     ->columnSpanFull(),
             ]);
     }
@@ -63,20 +74,18 @@ class TalentResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('domain.name')
-                ->label('Домен')
+                    ->label('Домен')
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('name')
                     ->label('Название')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\IconColumn::make('advice')
-                    ->label('Есть советы')
-                    ->boolean()
-                    ->trueIcon('heroicon-o-check-circle')
-                    ->falseIcon('heroicon-o-x-circle')
-                    ->trueColor('success')
-                    ->falseColor('danger'),
+                Tables\Columns\TextColumn::make('advice')
+                    ->label('Кол-во советов')
+                    ->formatStateUsing(fn($state) => is_array($state) ? count($state) : 0)
+                    ->badge()
+                    ->color(fn($state) => is_array($state) && count($state) > 0 ? 'success' : 'danger'),
                 Tables\Columns\TextColumn::make('answers_count')
                     ->label('Кол-во вопросов')
                     ->counts('answers')

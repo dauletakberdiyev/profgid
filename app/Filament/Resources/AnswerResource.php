@@ -40,16 +40,6 @@ class AnswerResource extends Resource
                     ->required()
                     ->maxLength(255)
                     ->columnSpanFull(),
-                Forms\Components\TextInput::make('value')
-                    ->label('Значение')
-                    ->numeric()
-                    ->default(0)
-                    ->required(),
-                Forms\Components\TextInput::make('order')
-                    ->label('Порядок')
-                    ->numeric()
-                    ->default(0)
-                    ->required(),
             ]);
     }
 
@@ -65,14 +55,6 @@ class AnswerResource extends Resource
                     ->label('Вопрос')
                     ->searchable()
                     ->limit(50),
-                Tables\Columns\TextColumn::make('value')
-                    ->label('Значение')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('order')
-                    ->label('Порядок')
-                    ->numeric()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Создано')
                     ->dateTime()

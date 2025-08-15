@@ -31,16 +31,6 @@ class AnswersRelationManager extends RelationManager
                     ->required()
                     ->maxLength(255)
                     ->columnSpanFull(),
-                Forms\Components\TextInput::make('value')
-                    ->label('Значение')
-                    ->numeric()
-                    ->default(0)
-                    ->required(),
-                Forms\Components\TextInput::make('order')
-                    ->label('Порядок')
-                    ->numeric()
-                    ->default(0)
-                    ->required(),
             ]);
     }
 
@@ -53,14 +43,6 @@ class AnswersRelationManager extends RelationManager
                     ->label('Вопрос')
                     ->searchable()
                     ->limit(50),
-                Tables\Columns\TextColumn::make('value')
-                    ->label('Значение')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('order')
-                    ->label('Порядок')
-                    ->numeric()
-                    ->sortable(),
             ])
             ->filters([
                 //
@@ -76,7 +58,6 @@ class AnswersRelationManager extends RelationManager
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ])
-            ->defaultSort('order');
+            ]);
     }
 }

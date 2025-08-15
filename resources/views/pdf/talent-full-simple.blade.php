@@ -362,68 +362,29 @@
                         </div>
                     </div>
 
-                    <!-- Советы для развития таланта -->
+                    <!-- 5 советов для развития таланта -->
                     <div class="bg-white border border-gray-200 p-6 rounded-lg">
-                        <h3 class="text-lg font-semibold mb-4 text-gray-900">Советы для развития таланта "{{ $talent['name'] }}"</h3>
+                        <h3 class="text-lg font-semibold mb-4 text-gray-900">5 советов для развития таланта "{{ $talent['name'] }}"</h3>
                         <div class="space-y-4">
-                            @if(isset($talentAdvice[$talent['name']]) && !empty($talentAdvice[$talent['name']]))
-                                @php
-                                    // Проверяем тип данных advice
-                                    $adviceData = $talentAdvice[$talent['name']];
-                                    
-                                    // Если это строка, пытаемся декодировать JSON
-                                    if (is_string($adviceData)) {
-                                        $decodedData = json_decode($adviceData, true);
-                                        if (json_last_error() === JSON_ERROR_NONE && is_array($decodedData)) {
-                                            $adviceData = $decodedData;
-                                        }
-                                    }
-                                @endphp
-                                
-                                @if(is_array($adviceData))
-                                    {{-- Если advice - это JSON массив с объектами --}}
-                                    @foreach($adviceData as $tipIndex => $adviceItem)
-                                        <div class="flex items-start space-x-3">
-                                            <div class="w-6 h-6 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5" style="background-color: {{ $talentDomainColor }}">
-                                                {{ $tipIndex + 1 }}
-                                            </div>
-                                            <div class="flex-1">
-                                                @if(is_array($adviceItem) && isset($adviceItem['name']))
-                                                    <h4 class="text-sm font-semibold text-gray-800 mb-1">{{ $adviceItem['name'] }}</h4>
-                                                    <p class="text-sm text-gray-700 leading-relaxed">{{ $adviceItem['description'] ?? '' }}</p>
-                                                @else
-                                                    <p class="text-sm text-gray-700 leading-relaxed">{{ is_string($adviceItem) ? $adviceItem : '' }}</p>
-                                                @endif
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                @else
-                                    {{-- Если advice - это обычная строка или HTML --}}
-                                    <div class="text-sm text-gray-700 leading-relaxed">
-                                        {!! is_string($adviceData) ? $adviceData : '' !!}
-                                    </div>
-                                @endif
-                            @else
-                                {{-- Fallback советы, если нет данных в базе --}}
-                                @php
-                                    $defaultTips = [
-                                        "Определите конкретные области, где ваш талант \"" . $talent['name'] . "\" может принести максимальную пользу, и сосредоточьтесь на их развитии.",
-                                        "Ищите возможности для практического применения этого таланта в повседневной работе и личной жизни.",
-                                        "Изучайте успешных людей, которые эффективно используют схожие таланты, и адаптируйте их подходы под свои потребности.",
-                                        "Создавайте среду и условия, которые способствуют проявлению и развитию вашего таланта \"" . $talent['name'] . "\".",
-                                        "Регулярно оценивайте прогресс в развитии этого таланта и корректируйте свои подходы для достижения лучших результатов."
-                                    ];
-                                @endphp
+                            @php
+                                // Создаем персонализированные советы для каждого таланта
+                                $tips = [
+                                    "Определите конкретные области, где ваш талант \"" . $talent['name'] . "\" может принести максимальную пользу, и сосредоточьтесь на их развитии.",
+                                    "Ищите возможности для практического применения этого таланта в повседневной работе и личной жизни.",
+                                    "Изучайте успешных людей, которые эффективно используют схожие таланты, и адаптируйте их подходы под свои потребности.",
+                                    "Создавайте среду и условия, которые способствуют проявлению и развитию вашего таланта \"" . $talent['name'] . "\".",
+                                    "Регулярно оценивайте прогресс в развитии этого таланта и корректируйте свои подходы для достижения лучших результатов."
+                                ];
+                            @endphp
 
-                                @foreach($defaultTips as $tipIndex => $tip)
-                                    <div class="flex items-start space-x-3">
-                                        <div class="w-6 h-6 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5" style="background-color: {{ $talentDomainColor }}">
-                                            {{ $tipIndex + 1 }}
-                                        </div>
-                                        <p class="text-sm text-gray-700 leading-relaxed">{{ $tip }}</p>
+                            @foreach($tips as $tipIndex => $tip)
+                                <div class="flex items-start space-x-3">
+                                    <div class="w-6 h-6 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0 mt-0.5" style="background-color: {{ $talentDomainColor }}">
+                                        {{ $tipIndex + 1 }}
                                     </div>
-                                @endforeach
-                            @endif
+                                    <p class="text-sm text-gray-700 leading-relaxed">{{ $tip }}</p>
+                                </div>
+                            @endforeach
                         </div>
                     </div>
                 </div>

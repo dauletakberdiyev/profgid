@@ -57,21 +57,50 @@ class PromoCodeResource extends Resource
                             ->helperText('Неактивные промокоды нельзя использовать'),
                     ]),
 
-                Forms\Components\Section::make('Информация об использовании')
+                Forms\Components\Section::make('Настройки использования')
                     ->schema([
-                        Forms\Components\Toggle::make('is_used')
-                            ->label('Использован')
+                        Forms\Components\TextInput::make('max_uses')
+                            ->label('Максимальное количество использований')
+                            ->numeric()
+                            ->default(1)
+                            ->minValue(1)
+                            ->maxValue(1000)
+                            ->helperText('Сколько раз можно использовать этот промокод'),
+
+                        Forms\Components\DateTimePicker::make('expires_at')
+                            ->label('Дата истечения')
+                            ->nullable()
+                            ->helperText('Оставьте пустым для бессрочного промокода')
+                            ->minDate(now()),
+                    ]),
+
+                Forms\Components\Section::make('Статистика использования')
+                    ->schema([
+                        Forms\Components\TextInput::make('current_uses')
+                            ->label('Текущее количество использований')
+                            ->numeric()
                             ->disabled()
-                            ->helperText('Автоматически устанавливается при использовании'),
+                            ->default(0)
+                            ->helperText('Автоматически увеличивается при использовании'),
+
+                        Forms\Components\Placeholder::make('remaining_uses')
+                            ->label('Оставшееся количество использований')
+                            ->content(fn ($record) => $record ? $record->remaining_uses : 'Н/Д')
+                            ->visible(fn ($record) => $record?->exists),
+
+                        Forms\Components\Toggle::make('is_used')
+                            ->label('Полностью использован')
+                            ->disabled()
+                            ->helperText('Автоматически устанавливается при достижении лимита'),
 
                         Forms\Components\Select::make('used_by')
-                            ->label('Использован пользователем')
+                            ->label('Последний пользователь')
                             ->relationship('usedBy', 'email')
                             ->disabled()
                             ->placeholder('Не использован'),
 
                         Forms\Components\DateTimePicker::make('used_at')
-                            ->label('Дата использования')
+                            ->label('Дата последнего использования')
                             ->disabled()
                             ->placeholder('Не использован'),
                     ])
@@ -107,23 +136,58 @@ class PromoCodeResource extends Resource
                     ->falseColor('danger')
                     ->sortable(),
 
-                Tables\Columns\IconColumn::make('is_used')
-                    ->label('Использован')
-                    ->boolean()
-                    ->trueIcon('heroicon-o-check-circle')
-                    ->falseIcon('heroicon-o-clock')
-                    ->trueColor('warning')
-                    ->falseColor('gray')
+                Tables\Columns\TextColumn::make('usage_progress')
+                    ->label('Использование')
+                    ->state(function ($record) {
+                        $current = $record->current_uses;
+                        $max = $record->max_uses;
+                        $percentage = $max > 0 ? round(($current / $max) * 100) : 0;
+                        return "{$current}/{$max} ({$percentage}%)";
+                    })
+                    ->badge()
+                    ->color(function ($record) {
+                        $percentage = $record->max_uses > 0 ? ($record->current_uses / $record->max_uses) * 100 : 0;
+                        if ($percentage >= 100) return 'danger';
+                        if ($percentage >= 75) return 'warning';
+                        if ($percentage >= 50) return 'info';
+                        return 'success';
+                    })
                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('usedBy.email')
-                    ->label('Использован пользователем')
-                    ->searchable()
-                    ->placeholder('Не использован')
-                    ->limit(30),
+                Tables\Columns\TextColumn::make('remaining_uses')
+                    ->label('Осталось')
+                    ->state(fn ($record) => $record->remaining_uses)
+                    ->badge()
+                    ->color(function ($record) {
+                        $remaining = $record->remaining_uses;
+                        if ($remaining == 0) return 'danger';
+                        if ($remaining <= 5) return 'warning';
+                        return 'success';
+                    })
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('expires_at')
+                    ->label('Истекает')
+                    ->dateTime('d.m.Y H:i')
+                    ->placeholder('Бессрочно')
+                    ->color(function ($record) {
+                        if (!$record->expires_at) return 'success';
+                        $daysUntilExpiry = now()->diffInDays($record->expires_at, false);
+                        if ($daysUntilExpiry < 0) return 'danger';
+                        if ($daysUntilExpiry <= 7) return 'warning';
+                        return 'success';
+                    })
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('users_count')
+                    ->label('Пользователи')
+                    ->counts('users')
+                    ->badge()
+                    ->color('info')
+                    ->sortable(),
 
                 Tables\Columns\TextColumn::make('used_at')
-                    ->label('Дата использования')
+                    ->label('Последнее использование')
                     ->dateTime('d.m.Y H:i')
                     ->placeholder('Не использован')
                     ->sortable(),
@@ -141,17 +205,95 @@ class PromoCodeResource extends Resource
                     ->trueLabel('Только активные')
                     ->falseLabel('Только неактивные'),
 
-                Tables\Filters\TernaryFilter::make('is_used')
-                    ->label('Использование')
+                Tables\Filters\TernaryFilter::make('is_available')
+                    ->label('Доступность')
                     ->placeholder('Все')
-                    ->trueLabel('Только использованные')
-                    ->falseLabel('Только неиспользованные'),
+                    ->trueLabel('Доступные для использования')
+                    ->falseLabel('Недоступные')
+                    ->queries(
+                        true: fn (Builder $query) => $query->whereRaw('current_uses < COALESCE(max_uses, 1)')
+                            ->where('is_active', true)
+                            ->where(function($q) {
+                                $q->whereNull('expires_at')
+                                  ->orWhere('expires_at', '>', now());
+                            }),
+                        false: fn (Builder $query) => $query->where(function($q) {
+                            $q->whereRaw('current_uses >= COALESCE(max_uses, 1)')
+                              ->orWhere('is_active', false)
+                              ->orWhere('expires_at', '<=', now());
+                        })
+                    ),
+
+                Tables\Filters\Filter::make('expires_soon')
+                    ->label('Истекают скоро')
+                    ->query(fn (Builder $query) => $query->where('expires_at', '<=', now()->addDays(7))
+                        ->where('expires_at', '>', now()))
+                    ->toggle(),
+
+                Tables\Filters\Filter::make('expired')
+                    ->label('Истекшие')
+                    ->query(fn (Builder $query) => $query->where('expires_at', '<=', now()))
+                    ->toggle(),
+
+                Tables\Filters\SelectFilter::make('max_uses')
+                    ->label('Тип использования')
+                    ->options([
+                        '1' => 'Одноразовые',
+                        '2-10' => 'Ограниченные (2-10)',
+                        '11-100' => 'Массовые (11-100)',
+                        '100+' => 'Неограниченные (100+)',
+                    ])
+                    ->query(function (Builder $query, array $data) {
+                        if (!$data['value']) return $query;
+                        
+                        return match($data['value']) {
+                            '1' => $query->where('max_uses', 1),
+                            '2-10' => $query->whereBetween('max_uses', [2, 10]),
+                            '11-100' => $query->whereBetween('max_uses', [11, 100]),
+                            '100+' => $query->where('max_uses', '>', 100),
+                            default => $query,
+                        };
+                    }),
 
                 Tables\Filters\TrashedFilter::make(),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                
+                Tables\Actions\Action::make('reset_usage')
+                    ->label('Сбросить использования')
+                    ->icon('heroicon-o-arrow-path')
+                    ->color('warning')
+                    ->action(function ($record) {
+                        $record->users()->detach();
+                        $record->update([
+                            'current_uses' => 0,
+                            'is_used' => false,
+                            'used_by' => null,
+                            'used_at' => null,
+                        ]);
+                    })
+                    ->requiresConfirmation()
+                    ->modalHeading('Сбросить использования')
+                    ->modalDescription('Это действие удалит всю историю использования промокода. Продолжить?')
+                    ->visible(fn ($record) => $record->current_uses > 0),
+                
+                Tables\Actions\Action::make('extend_expiry')
+                    ->label('Продлить срок')
+                    ->icon('heroicon-o-calendar-days')
+                    ->color('info')
+                    ->form([
+                        Forms\Components\DateTimePicker::make('new_expires_at')
+                            ->label('Новая дата истечения')
+                            ->required()
+                            ->minDate(now()),
+                    ])
+                    ->action(function ($record, array $data) {
+                        $record->update(['expires_at' => $data['new_expires_at']]);
+                    })
+                    ->visible(fn ($record) => $record->expires_at),
+                
                 Tables\Actions\DeleteAction::make(),
                 Tables\Actions\RestoreAction::make(),
                 Tables\Actions\ForceDeleteAction::make(),
@@ -187,6 +329,44 @@ class PromoCodeResource extends Resource
                         ->requiresConfirmation()
                         ->modalHeading('Деактивировать промокоды')
                         ->modalDescription('Вы уверены, что хотите деактивировать выбранные промокоды?'),
+
+                    Tables\Actions\BulkAction::make('extend_expiry')
+                        ->label('Продлить срок')
+                        ->icon('heroicon-o-calendar-days')
+                        ->color('info')
+                        ->form([
+                            Forms\Components\DateTimePicker::make('new_expires_at')
+                                ->label('Новая дата истечения')
+                                ->required()
+                                ->minDate(now()),
+                        ])
+                        ->action(function ($records, array $data) {
+                            $records->each(function ($record) use ($data) {
+                                $record->update(['expires_at' => $data['new_expires_at']]);
+                            });
+                        })
+                        ->requiresConfirmation()
+                        ->modalHeading('Продлить срок действия')
+                        ->modalDescription('Установить новую дату истечения для выбранных промокодов?'),
+
+                    Tables\Actions\BulkAction::make('reset_usage')
+                        ->label('Сбросить использования')
+                        ->icon('heroicon-o-arrow-path')
+                        ->color('warning')
+                        ->action(function ($records) {
+                            $records->each(function ($record) {
+                                $record->users()->detach();
+                                $record->update([
+                                    'current_uses' => 0,
+                                    'is_used' => false,
+                                    'used_by' => null,
+                                    'used_at' => null,
+                                ]);
+                            });
+                        })
+                        ->requiresConfirmation()
+                        ->modalHeading('Сбросить использования')
+                        ->modalDescription('Это действие удалит всю историю использования выбранных промокодов. Продолжить?'),
                 ]),
             ])
             ->defaultSort('created_at', 'desc')
@@ -213,11 +393,14 @@ class PromoCodeResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::active()->unused()->count();
+        return static::getModel()::available()->count();
     }
 
     public static function getNavigationBadgeColor(): ?string
     {
+        $count = static::getModel()::available()->count();
+        if ($count == 0) return 'danger';
+        if ($count < 10) return 'warning';
         return 'success';
     }
 }

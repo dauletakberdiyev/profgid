@@ -27,6 +27,8 @@ class TestSession extends Model
         "completed_at",
         "total_time_spent",
         "average_response_time",
+        "order_id",
+        "order_password",
     ];
 
     protected $casts = [

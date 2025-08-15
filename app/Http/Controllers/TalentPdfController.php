@@ -99,9 +99,11 @@ class TalentPdfController extends Controller
         );
         $talentAdvice = [];
         foreach ($topTenTalents as $talent) {
-            $talentAdvice[$talent["name"]] = app(
-                "App\\Livewire\\Pages\\TalentTestResults"
-            )->getTalentAdvice($talent["name"]);
+            // Get advice directly from the Talent model instead of using Livewire component
+            $talentModel = Talent::where('name', $talent["name"])->first();
+            $talentAdvice[$talent["name"]] = $talentModel && !empty($talentModel->advice)
+                ? $talentModel->advice
+                : null;
         }
         $domainColors = [
             "executing" => "#702B7C",
@@ -109,6 +111,20 @@ class TalentPdfController extends Controller
             "strategic" => "#429162",
             "influencing" => "#DA782D",
         ];
+
+        // Переопределяем домены для правильного отображения всех 4 доменов
+        $allDomains = [
+            'executing' => 'ИСПОЛНЕНИЕ',
+            'influencing' => 'ВЛИЯНИЕ',
+            'relationship' => 'ОТНОШЕНИЯ',
+            'strategic' => 'МЫШЛЕНИЕ'
+        ];
+
+        // Убираем расчёты очков и процентов для доменов
+        $domainScores = [];
+        foreach ($allDomains as $domainKey => $domainName) {
+            $domainScores[$domainKey] = 0;
+        }
         $testDate = $testSession->completed_at ?? $testSession->created_at;
         $userName = Auth::user()->name ?? "User";
         $fileName =
@@ -117,7 +133,7 @@ class TalentPdfController extends Controller
         if ($plan === "talents") {
             $html = view("pdf.talent-full", [
                 "userResults" => $userResults,
-                "domains" => $domains,
+                "domains" => $allDomains,
                 "domainScores" => $domainScores,
                 "testDate" => $testDate,
                 "talentAdvice" => $talentAdvice,
@@ -149,15 +165,15 @@ class TalentPdfController extends Controller
                 ->header(
                     "Content-Disposition",
                     'attachment; filename="отчет-' .
-                        $userName .
-                        "_" .
-                        now()->format("Y-m-d") .
-                        '.pdf"'
+                    $userName .
+                    "_" .
+                    now()->format("Y-m-d") .
+                    '.pdf"'
                 );
         } elseif ($plan === "talents_spheres") {
             $talentsHtml = view("pdf.talent-full", [
                 "userResults" => $userResults,
-                "domains" => $domains,
+                "domains" => $allDomains,
                 "domainScores" => $domainScores,
                 "testDate" => $testDate,
                 "talentAdvice" => $talentAdvice,
@@ -188,11 +204,9 @@ class TalentPdfController extends Controller
                         if (
                             !$existingTalent ||
                             $talent->pivot->coefficient >
-                                $existingTalent->coefficient
+                            $existingTalent->coefficient
                         ) {
-                            $sphereTalents = $sphereTalents->reject(function (
-                                $t
-                            ) use ($talent) {
+                            $sphereTalents = $sphereTalents->reject(function ($t) use ($talent) {
                                 return $t->id === $talent->id;
                             });
                             $sphereTalents->push(
@@ -240,9 +254,9 @@ class TalentPdfController extends Controller
                     "is_top" => false,
                     "relevance_score" => 999,
                     "compatibility_percentage" => round(
-                        $compatibilityPercentage,
-                        1
-                    ),
+                            $compatibilityPercentage,
+                            1
+                        ),
                 ]);
             }
             $sortedSpheres = $spheresData->sortByDesc(
@@ -301,9 +315,9 @@ class TalentPdfController extends Controller
                     "is_top" => false,
                     "relevance_score" => 999,
                     "compatibility_percentage" => round(
-                        $compatibilityPercentage,
-                        1
-                    ),
+                            $compatibilityPercentage,
+                            1
+                        ),
                 ]);
             }
             $sortedProfessions = $professionsData
@@ -311,10 +325,7 @@ class TalentPdfController extends Controller
                 ->sortBy("name")
                 ->sortByDesc("compatibility_percentage")
                 ->values();
-            $topProfessions = $sortedProfessions->map(function (
-                $profession,
-                $index
-            ) {
+            $topProfessions = $sortedProfessions->map(function ($profession, $index) {
                 $profession["is_top"] = $index < 8;
                 return $profession;
             });
@@ -348,10 +359,10 @@ class TalentPdfController extends Controller
                 ->header(
                     "Content-Disposition",
                     'attachment; filename="отчет-' .
-                        $userName .
-                        "_" .
-                        now()->format("Y-m-d") .
-                        '.pdf"'
+                    $userName .
+                    "_" .
+                    now()->format("Y-m-d") .
+                    '.pdf"'
                 );
         } elseif ($plan === "talents_spheres_professions") {
             // Генерируем PDF с талантами + сферами + профессиями
@@ -389,11 +400,9 @@ class TalentPdfController extends Controller
                         if (
                             !$existingTalent ||
                             $talent->pivot->coefficient >
-                                $existingTalent->coefficient
+                            $existingTalent->coefficient
                         ) {
-                            $sphereTalents = $sphereTalents->reject(function (
-                                $t
-                            ) use ($talent) {
+                            $sphereTalents = $sphereTalents->reject(function ($t) use ($talent) {
                                 return $t->id === $talent->id;
                             });
                             $sphereTalents->push(
@@ -489,10 +498,7 @@ class TalentPdfController extends Controller
                 ->sortBy("name")
                 ->sortByDesc("compatibility_percentage")
                 ->values();
-            $topProfessions = $sortedProfessions->map(function (
-                $profession,
-                $index
-            ) {
+            $topProfessions = $sortedProfessions->map(function ($profession, $index) {
                 $profession["is_top"] = $index < 8;
                 return $profession;
             });
@@ -511,10 +517,10 @@ class TalentPdfController extends Controller
 
             // Объединяем HTML всех трех разделов: Таланты + Сферы + Профессии
             $html = $talentsHtml .
-                    '<div style="page-break-before: always;"></div>' .
-                    $spheresHtml .
-                    '<div style="page-break-before: always;"></div>' .
-                    $professionsHtml;
+                '<div style="page-break-before: always;"></div>' .
+                $spheresHtml .
+                '<div style="page-break-before: always;"></div>' .
+                $professionsHtml;
 
             $header = view("pdf.header", [
                 "userName" => $userName,
@@ -533,13 +539,13 @@ class TalentPdfController extends Controller
 
             return response($pdf)
                 ->header("Content-Type", "application/pdf")
-                 ->header(
+                ->header(
                     "Content-Disposition",
                     'attachment; filename="отчет-' .
-                        $userName .
-                        "_" .
-                        now()->format("Y-m-d") .
-                        '.pdf"'
+                    $userName .
+                    "_" .
+                    now()->format("Y-m-d") .
+                    '.pdf"'
                 );
         } else {
             abort(400, "Unknown plan or plan not provided");

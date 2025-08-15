@@ -12,7 +12,7 @@
 
     <link rel="stylesheet" href="{{ asset('assets/fonts/atyp/stylesheet.css') }}">
 
-    <link rel="stylesheet" href="{{ asset('build/assets/app-Ct8oqkp4.css') }}">
+    <link rel="stylesheet" href="{{ asset('build/assets/app-CkJVntjE.css') }}">
 
     @livewireStyles
 
