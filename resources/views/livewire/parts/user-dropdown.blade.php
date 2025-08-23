@@ -27,9 +27,9 @@
         <div class="py-1">
             <a href="{{ route('profile') }}" class="block px-4 py-2 text-sm {{ request()->routeIs('profile') ? 'text-blue-600 bg-blue-50 font-medium' : 'text-gray-700' }} hover:bg-gray-100"
                 role="menuitem">{{ __('messages.profile') }}</a>
-            <a href="{{ route('settings') }}"
-                class="block px-4 py-2 text-sm {{ request()->routeIs('settings') ? 'text-blue-600 bg-blue-50 font-medium' : 'text-gray-700' }} hover:bg-gray-100"
-                role="menuitem">{{ __('messages.settings') }}</a>
+{{--            <a href="{{ route('settings') }}"--}}
+{{--                class="block px-4 py-2 text-sm {{ request()->routeIs('settings') ? 'text-blue-600 bg-blue-50 font-medium' : 'text-gray-700' }} hover:bg-gray-100"--}}
+{{--                role="menuitem">{{ __('messages.settings') }}</a>--}}
             <a href="{{ route('test.history') }}"
                 class="block px-4 py-2 text-sm {{ request()->routeIs('test.history') ? 'text-blue-600 bg-blue-50 font-medium' : 'text-gray-700' }} hover:bg-gray-100"
                 role="menuitem">{{ __('messages.test_history') }}</a>

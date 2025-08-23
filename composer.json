@@ -8,6 +8,9 @@
     "require": {
         "php": "^8.2",
         "barryvdh/laravel-dompdf": "^3.1",
+        "blade-ui-kit/blade-icons": "^1.8",
+        "codeat3/blade-google-material-design-icons": "^1.20",
+        "codeat3/blade-phosphor-icons": "^2.3",
         "doctrine/dbal": "^4.2",
         "filament/filament": "^3.3",
         "google/apiclient": "^2.18",

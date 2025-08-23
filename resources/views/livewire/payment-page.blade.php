@@ -3,7 +3,7 @@
         <!-- Header -->
         <div class="text-center mb-12 md:mb-16">
             <h1 class="text-2xl md:text-3xl lg:text-4xl font-light text-gray-900 mb-4">Выберите тарифный план</h1>
-с            @if($testSession)
+            @if($testSession)
                 <p class="text-lg md:text-xl text-gray-600 font-light">Получите полный доступ к результатам вашего теста талантов</p>
             @else
                 <p class="text-lg md:text-xl text-gray-600 font-light">Ознакомьтесь с нашими тарифными планами</p>
@@ -20,69 +20,230 @@
 
         <!-- Pricing Cards -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-12 mb-12 md:mb-16">
-            @foreach($plans as $key => $plan)
-                <div class="relative bg-white border {{ $loop->last ? 'border-yellow-300 scale-105' : 'border-gray-200' }} rounded-xl transition-all duration-300 hover:border-gray-300 flex flex-col {{ $loop->last ? 'lg:transform lg:scale-105' : '' }}">
-                    
-                    <!-- Crown for the last plan -->
-                    @if($loop->last)
-                        <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
-                            <div class="bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-full p-3">
-                                <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M5 16L3 6l5.5 4L12 4l3.5 6L21 6l-2 10H5z"/>
-                                </svg>
-                            </div>
-                        </div>
-                    @endif
-                    
-                    <div class="p-8 md:p-10 flex flex-col flex-grow">
-                        <!-- Plan Header -->
-                        <div class="text-center mb-8">
-                            <h3 class="text-xl md:text-2xl font-medium text-gray-900 mb-4 {{ $loop->last ? 'mt-4' : '' }}">
-                                {{ $plan['name'] }}
-                                @if($loop->last)
-                                    <span class="block text-sm text-yellow-600 font-normal mt-1">Рекомендуемый</span>
-                                @endif
-                            </h3>
-                            <div class="mb-6">
-                                <span class="text-4xl md:text-5xl font-light text-gray-900">{{ number_format($plan['price']) }}</span>
-                                <span class="text-gray-500 ml-2 text-lg">{{ $plan['currency'] }}</span>
-                            </div>
-                        </div>
+            <div class="relative bg-white border border-yellow-300 scale-105 rounded-xl transition-all duration-300 hover:border-gray-300 flex flex-col lg:transform lg:scale-105">
 
-                        <!-- Features -->
-                        <ul class="space-y-4 mb-8 flex-grow">
-                            @foreach($plan['features'] as $feature)
-                                <li class="flex items-start">
-                                    <div class="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
-                                    <span class="text-sm md:text-base text-gray-700 leading-relaxed">{{ $feature }}</span>
-                                </li>
-                            @endforeach
-                        </ul>
-
-                        <!-- CTA Button -->
-                        <button 
-                            wire:click="selectPlan('{{ $key }}')"
-                            class="w-full py-4 px-6 rounded-lg font-medium transition-all duration-200 text-sm md:text-base border mt-auto
-                                {{ $loop->last ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 text-white border-yellow-500 hover:from-yellow-600 hover:to-yellow-700' : '' }}
-                                {{ $plan['color'] === 'blue' && !$loop->last ? 'bg-blue-500 text-white border-blue-500 hover:bg-blue-600' : '' }}
-                                {{ $plan['color'] === 'purple' && !$loop->last ? 'bg-purple-500 text-white border-purple-500 hover:bg-purple-600' : '' }}
-                            ">
-                            @if($testSession)
-                                @if($loop->last)
-                                    Выбрать лучший план
-                                @else
-                                    Выбрать план
-                                @endif
-                            @else
-                                @if($loop->last)
-                                    Пройти тест и выбрать план
-                                @else
-                                    Пройти ��ест для этого плана
-                                @endif
-                            @endif
-                        </button>
+                <!-- Crown for the last plan -->
+                <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
+                    <div class="bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-full p-3">
+                        <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M5 16L3 6l5.5 4L12 4l3.5 6L21 6l-2 10H5z"/>
+                        </svg>
                     </div>
                 </div>
+
+                <div class="p-8 md:p-10 flex flex-col flex-grow">
+                    <!-- Plan Header -->
+                    <div class="text-center mb-8">
+                        <h3 class="text-xl md:text-2xl font-medium text-gray-900 mb-4 mt-4">
+                            {{ __('all.payment.cards.top.title') }}
+                            <span class="block text-sm text-yellow-600 font-normal mt-1">{{ __('all.payment.cards.top.recommendation') }}</span>
+                        </h3>
+                        <div class="mb-6">
+                            <span class="text-4xl md:text-5xl font-light text-gray-900">{{ number_format((int) __('all.payment.cards.top.price')) }}</span>
+                            <span class="text-gray-500 ml-2 text-lg">{{ __('all.payment.cards.top.currency') }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Features -->
+                    <ul class="space-y-4 mb-8 flex-grow">
+                        <li class="flex items-start">
+                            <div class="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                            <span class="text-sm md:text-base text-gray-700 leading-relaxed">{{ __('all.payment.cards.top.desc_1') }}</span>
+                        </li>
+                        <li class="flex items-start">
+                            <div class="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                            <span class="text-sm md:text-base text-gray-700 leading-relaxed">{{ __('all.payment.cards.top.desc_2') }}</span>
+                        </li>
+                        <li class="flex items-start">
+                            <div class="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                            <span class="text-sm md:text-base text-gray-700 leading-relaxed">{{ __('all.payment.cards.top.desc_3') }}</span>
+                        </li>
+                        <li class="flex items-start">
+                            <div class="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                            <span class="text-sm md:text-base text-gray-700 leading-relaxed">{{ __('all.payment.cards.top.desc_4') }}</span>
+                        </li>
+                        <li class="flex items-start">
+                            <div class="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                            <span class="text-sm md:text-base text-gray-700 leading-relaxed">{{ __('all.payment.cards.top.desc_5') }}</span>
+                        </li>
+                        <li class="flex items-start">
+                            <div class="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                            <span class="text-sm md:text-base text-gray-700 leading-relaxed">{{ __('all.payment.cards.top.desc_6') }}</span>
+                        </li>
+                        <li class="flex items-start">
+                            <div class="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                            <span class="text-sm md:text-base text-gray-700 leading-relaxed">{{ __('all.payment.cards.top.desc_7') }}</span>
+                        </li>
+                    </ul>
+
+                    <!-- CTA Button -->
+                    <button
+                        wire:click="selectPlan('talents_spheres_professions')"
+                        class="w-full py-4 px-6 rounded-lg font-medium transition-all duration-200 text-sm md:text-base border mt-auto
+                                bg-gradient-to-r from-yellow-500 to-yellow-600 text-white border-yellow-500 hover:from-yellow-600 hover:to-yellow-700">
+                        @if($testSession)
+                            {{ __('all.payment.cards.top.submit_btn') }}
+                        @else
+                            {{ __('all.payment.cards.top.submit_btn_no_session') }}
+                        @endif
+                    </button>
+                </div>
+            </div>
+
+            <div class="relative bg-white border border-gray-200 rounded-xl transition-all duration-300 hover:border-gray-300 flex flex-col">
+
+                <div class="p-8 md:p-10 flex flex-col flex-grow">
+                    <!-- Plan Header -->
+                    <div class="text-center mb-8">
+                        <h3 class="text-xl md:text-2xl font-medium text-gray-900 mb-4">
+                            {{ __('all.payment.cards.middle.title') }}
+                        </h3>
+                        <div class="mb-6">
+                            <span class="text-4xl md:text-5xl font-light text-gray-900">{{ number_format((int) __('all.payment.cards.middle.price')) }}</span>
+                            <span class="text-gray-500 ml-2 text-lg">{{ __('all.payment.cards.middle.currency') }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Features -->
+                    <ul class="space-y-4 mb-8 flex-grow">
+                        <li class="flex items-start">
+                            <div class="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                            <span class="text-sm md:text-base text-gray-700 leading-relaxed">{{ __('all.payment.cards.middle.desc_1') }}</span>
+                        </li>
+                        <li class="flex items-start">
+                            <div class="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                            <span class="text-sm md:text-base text-gray-700 leading-relaxed">{{ __('all.payment.cards.middle.desc_2') }}</span>
+                        </li>
+                        <li class="flex items-start">
+                            <div class="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                            <span class="text-sm md:text-base text-gray-700 leading-relaxed">{{ __('all.payment.cards.middle.desc_3') }}</span>
+                        </li>
+                    </ul>
+
+                    <!-- CTA Button -->
+                    <button
+                        wire:click="selectPlan('talents')"
+                        class="w-full py-4 px-6 rounded-lg font-medium transition-all duration-200 text-sm md:text-base border mt-auto
+                                bg-blue-500 text-white border-blue-500 hover:bg-blue-600">
+                        @if($testSession)
+                            {{ __('all.payment.cards.middle.submit_btn') }}
+                        @else
+                            {{ __('all.payment.cards.middle.submit_btn_no_session') }}
+                        @endif
+                    </button>
+                </div>
+            </div>
+
+            <div class="relative bg-white border border-gray-200 rounded-xl transition-all duration-300 hover:border-gray-300 flex flex-col">
+
+                <div class="p-8 md:p-10 flex flex-col flex-grow">
+                    <!-- Plan Header -->
+                    <div class="text-center mb-8">
+                        <h3 class="text-xl md:text-2xl font-medium text-gray-900 mb-4">
+                            {{ __('all.payment.cards.bottom.title') }}
+                        </h3>
+                        <div class="mb-6">
+                            <span class="text-4xl md:text-5xl font-light text-gray-900">{{ number_format((int) __('all.payment.cards.bottom.price')) }}</span>
+                            <span class="text-gray-500 ml-2 text-lg">{{ __('all.payment.cards.bottom.currency') }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Features -->
+                    <ul class="space-y-4 mb-8 flex-grow">
+                        <li class="flex items-start">
+                            <div class="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                            <span class="text-sm md:text-base text-gray-700 leading-relaxed">{{ __('all.payment.cards.bottom.desc_1') }}</span>
+                        </li>
+                        <li class="flex items-start">
+                            <div class="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                            <span class="text-sm md:text-base text-gray-700 leading-relaxed">{{ __('all.payment.cards.bottom.desc_2') }}</span>
+                        </li>
+                        <li class="flex items-start">
+                            <div class="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                            <span class="text-sm md:text-base text-gray-700 leading-relaxed">{{ __('all.payment.cards.bottom.desc_3') }}</span>
+                        </li>
+                        <li class="flex items-start">
+                            <div class="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>
+                            <span class="text-sm md:text-base text-gray-700 leading-relaxed">{{ __('all.payment.cards.bottom.desc_4') }}</span>
+                        </li>
+                    </ul>
+
+                    <!-- CTA Button -->
+                    <button
+                        wire:click="selectPlan('talents_spheres')"
+                        class="w-full py-4 px-6 rounded-lg font-medium transition-all duration-200 text-sm md:text-base border mt-auto
+                                bg-blue-500 text-white border-blue-500 hover:bg-blue-600">
+                        @if($testSession)
+                            {{ __('all.payment.cards.bottom.submit_btn') }}
+                        @else
+                            {{ __('all.payment.cards.bottom.submit_btn_no_session') }}
+                        @endif
+                    </button>
+                </div>
+            </div>
+            @foreach($plans as $key => $plan)
+{{--                <div class="relative bg-white border {{ $loop->last ? 'border-yellow-300 scale-105' : 'border-gray-200' }} rounded-xl transition-all duration-300 hover:border-gray-300 flex flex-col {{ $loop->last ? 'lg:transform lg:scale-105' : '' }}">--}}
+
+{{--                    <!-- Crown for the last plan -->--}}
+{{--                    @if($loop->last)--}}
+{{--                        <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">--}}
+{{--                            <div class="bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-full p-3">--}}
+{{--                                <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">--}}
+{{--                                    <path d="M5 16L3 6l5.5 4L12 4l3.5 6L21 6l-2 10H5z"/>--}}
+{{--                                </svg>--}}
+{{--                            </div>--}}
+{{--                        </div>--}}
+{{--                    @endif--}}
+
+{{--                    <div class="p-8 md:p-10 flex flex-col flex-grow">--}}
+{{--                        <!-- Plan Header -->--}}
+{{--                        <div class="text-center mb-8">--}}
+{{--                            <h3 class="text-xl md:text-2xl font-medium text-gray-900 mb-4 {{ $loop->last ? 'mt-4' : '' }}">--}}
+{{--                                {{ $plan['name'] }}--}}
+{{--                                @if($loop->last)--}}
+{{--                                    <span class="block text-sm text-yellow-600 font-normal mt-1">Рекомендуемый</span>--}}
+{{--                                @endif--}}
+{{--                            </h3>--}}
+{{--                            <div class="mb-6">--}}
+{{--                                <span class="text-4xl md:text-5xl font-light text-gray-900">{{ number_format($plan['price']) }}</span>--}}
+{{--                                <span class="text-gray-500 ml-2 text-lg">{{ $plan['currency'] }}</span>--}}
+{{--                            </div>--}}
+{{--                        </div>--}}
+
+{{--                        <!-- Features -->--}}
+{{--                        <ul class="space-y-4 mb-8 flex-grow">--}}
+{{--                            @foreach($plan['features'] as $feature)--}}
+{{--                                <li class="flex items-start">--}}
+{{--                                    <div class="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2.5 mr-3 flex-shrink-0"></div>--}}
+{{--                                    <span class="text-sm md:text-base text-gray-700 leading-relaxed">{{ $feature }}</span>--}}
+{{--                                </li>--}}
+{{--                            @endforeach--}}
+{{--                        </ul>--}}
+
+{{--                        <!-- CTA Button -->--}}
+{{--                        <button--}}
+{{--                            wire:click="selectPlan('{{ $key }}')"--}}
+{{--                            class="w-full py-4 px-6 rounded-lg font-medium transition-all duration-200 text-sm md:text-base border mt-auto--}}
+{{--                                {{ $loop->last ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 text-white border-yellow-500 hover:from-yellow-600 hover:to-yellow-700' : '' }}--}}
+{{--                                {{ $plan['color'] === 'blue' && !$loop->last ? 'bg-blue-500 text-white border-blue-500 hover:bg-blue-600' : '' }}--}}
+{{--                                {{ $plan['color'] === 'purple' && !$loop->last ? 'bg-purple-500 text-white border-purple-500 hover:bg-purple-600' : '' }}--}}
+{{--                            ">--}}
+{{--                            @if($testSession)--}}
+{{--                                @if($loop->last)--}}
+{{--                                    Выбрать лучший план--}}
+{{--                                @else--}}
+{{--                                    Выбрать план--}}
+{{--                                @endif--}}
+{{--                            @else--}}
+{{--                                @if($loop->last)--}}
+{{--                                    Пройти тест и выбрать план--}}
+{{--                                @else--}}
+{{--                                    Пройти тест для этого плана--}}
+{{--                                @endif--}}
+{{--                            @endif--}}
+{{--                        </button>--}}
+{{--                    </div>--}}
+{{--                </div>--}}
             @endforeach
         </div>
 

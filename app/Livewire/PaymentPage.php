@@ -10,10 +10,10 @@ class PaymentPage extends Component
 {
     public $sessionId;
     public $testSession;
-    
+
     public $plans = [
         'talents' => [
-            'name' => 'Таланты',
+            'name' => 'Мои Таланты',
             'price' => 3000,
             'currency' => 'тг',
             'features' => [
@@ -26,7 +26,7 @@ class PaymentPage extends Component
             'popular' => false
         ],
         'talents_spheres' => [
-            'name' => 'Таланты + Топ сферы',
+            'name' => 'Мои Профессии',
             'price' => 6000,
             'currency' => 'тг',
             'features' => [
@@ -40,7 +40,7 @@ class PaymentPage extends Component
             'popular' => false
         ],
         'talents_spheres_professions' => [
-            'name' => 'Таланты + Топ сферы + Топ профессии',
+            'name' => 'Мои таланты + Профессии',
             'price' => 9000,
             'currency' => 'тг',
             'features' => [
@@ -57,18 +57,18 @@ class PaymentPage extends Component
     public function mount($sessionId = null)
     {
         $this->sessionId = $sessionId ?? session('last_test_session_id');
-        
+
         // Если sessionId отсутствует, показываем примерную страницу
         if (!$this->sessionId) {
             // Устанавливаем флаг для отображения примерной страницы
             $this->testSession = null;
             return;
         }
-        
+
         if ($this->sessionId) {
             $this->testSession = TestSession::where('session_id', $this->sessionId)->first();
         }
-        
+
         if (!$this->testSession) {
             session()->flash('error', 'Сессия теста не найдена');
             return redirect()->route('talent-test');
@@ -78,14 +78,14 @@ class PaymentPage extends Component
     public function selectPlan($planKey)
     {
         $plan = $this->plans[$planKey];
-        
+
         // Если нет активной сессии теста, перенаправляем на тест
         if (!$this->testSession) {
             session()->flash('info', 'Для оплаты необходимо сначала пройти тест талантов');
             return redirect()->route('talent-test');
         }
-        
-        // Обновляем сессию с выбранным план��м
+
+        // Обновляем сессию с выбранным планом
         $this->testSession->update([
             'selected_plan' => $planKey,
             'payment_status' => 'pending',

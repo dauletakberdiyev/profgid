@@ -59,28 +59,28 @@ class PaymentStatus extends Component
 
             if ($response->successful()) {
                 $responseData = $response->json();
-                
+
                 if (isset($responseData['order']['id']) && isset($responseData['order']['password'])) {
                     $id = $responseData['order']['id'];
                     $password = $responseData['order']['password'];
-                    
+
                     // Save order ID and password to the database
                     $this->testSession->update([
                         'order_id' => $id,
                         'order_password' => $password,
                         'payment_status' => 'processing'
                     ]);
-                    
+
                     // Generate payment URL
                     $paymentUrl = "https://ecom.fortebank.com/flex/?id={$id}&password={$password}";
-                    
+
                     // Log successful payment URL generation
                     Log::info('Payment URL generated:', [
                         'url' => $paymentUrl,
                         'order_id' => $id,
                         'session_id' => $this->sessionId
                     ]);
-                    
+
                     // Redirect to payment page
                     return redirect()->away($paymentUrl);
                 } else {
@@ -105,17 +105,17 @@ class PaymentStatus extends Component
 
     public $plans = [
         "talents" => [
-            "name" => "Таланты",
+            "name" => "Мои Таланты",
             "price" => 3000,
             "currency" => "тг",
         ],
         "talents_spheres" => [
-            "name" => "Таланты + Топ сферы",
+            "name" => "Мои Профессии",
             "price" => 6000,
             "currency" => "тг",
         ],
         "talents_spheres_professions" => [
-            "name" => "Таланты + Топ сферы + Топ профессии",
+            "name" => "Мои таланты + Профессии",
             "price" => 9000,
             "currency" => "тг",
         ],
@@ -154,12 +154,12 @@ class PaymentStatus extends Component
     public function refreshPaymentStatus()
     {
         $this->testSession = $this->testSession->fresh();
-        
+
         // If we have order_id and order_password, check payment status with ForteBank
         if ($this->testSession->order_id && $this->testSession->order_password && $this->testSession->payment_status === 'processing') {
             $this->checkPaymentStatusWithForteBank();
         }
-        
+
         $this->paymentConfirmed = $this->testSession->payment_status === "completed";
     }
 
@@ -168,7 +168,7 @@ class PaymentStatus extends Component
         try {
             $orderId = $this->testSession->order_id;
             $orderPassword = $this->testSession->order_password;
-            
+
             // Make API request to check payment status
             $response = Http::timeout(30)
                 ->withBasicAuth('TerminalSys/OMAROVA28000381', 'OMAROVA28000381@1498')
@@ -186,25 +186,25 @@ class PaymentStatus extends Component
 
             if ($response->successful()) {
                 $responseData = $response->json();
-                
+
                 if (isset($responseData['order']['status'])) {
                     $forteStatus = $responseData['order']['status'];
-                    
+
                     // Map ForteBank status to our payment status
                     $paymentStatus = $this->mapForteStatusToPaymentStatus($forteStatus);
-                    
+
                     // Update test session with new status
                     $this->testSession->update([
                         'payment_status' => $paymentStatus
                     ]);
-                    
+
                     Log::info('Payment status updated:', [
                         'order_id' => $orderId,
                         'forte_status' => $forteStatus,
                         'payment_status' => $paymentStatus,
                         'session_id' => $this->sessionId
                     ]);
-                    
+
                     // Show success message if payment is completed
                     if ($paymentStatus === 'completed') {
                         session()->flash('success', 'Оплата успешно подтверждена!');

@@ -44,53 +44,88 @@
 
     <section class="py-8 md:py-12 bg-gray-50">
         <div class="mx-auto max-w-7xl py-8 md:py-12 text-blue-700 sm:py-16 lg:py-20">
-            <div class="mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
                 <div class="mx-auto max-w-2xl text-center">
-                    <p class="text-xs md:text-sm font-medium text-gray-600">ВВЕДЕНИЕ</p>
                     <h2 class="mt-2 text-2xl md:text-3xl font-bold sm:text-4xl xl:text-4xl text-gray-900 uppercase">Как это
                         работает?</h2>
                 </div>
 
-                <div
-                    class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 text-center sm:mx-auto sm:max-w-sm md:mt-20 md:max-w-full md:text-left">
-                    <div
-                        class="group flex flex-col items-center justify-center border-1 border-white transition-all duration-200 hover:border-gray-500 md:flex-row gap-6 md:gap-10 shadow-2xl bg-white shadow-gray-200 p-6 md:p-10 rounded-2xl hover:animate-pulse cursor-pointer">
-                        <div class="relative">
-                            <h3 class="text-lg md:text-2xl font-semibold text-black">Пройди тест</h3>
-                            <p class="mt-2 text-sm md:text-base text-gray-500 leading-5">
-                                Ответь на вопросы теста, основанного на признанных методиках (Gallup CS34, Gardner MI,
-                                MBTI). Это займет всего 20 минут!</p>
+                <div class="w-full">
+                    <!-- Accordion item -->
+                    <div x-data="{ open: false }" class="bg-white rounded-lg shadow mt-3 py-3 px-6">
+                        <button @click="open = !open" class="flex justify-between items-center w-full py-3 text-left text-gray-800 font-semibold">
+                            Пройди тест
+                            <span
+                                x-text="open ? '-' : '+'"
+                                class="inline-block transform transition-all duration-100 ease-in-out font-normal"
+                                :class="open ? 'rotate-180 scale-125 opacity-100' : 'rotate-0 scale-100 opacity-80'"
+                            ></span>
+                        </button>
+                        <div x-show="open" x-transition class="pb-3 text-gray-600">
+                            Ответь на вопросы теста, основанного на признанных методиках (Gallup CS34, Gardner MI, MBTI). Это займет всего 20 минут!
                         </div>
                     </div>
 
-                    <div
-                        class="group flex flex-col items-center justify-center border-1 border-white transition-all duration-200  md:flex-row gap-6 md:gap-10 shadow-2xl bg-white shadow-gray-200 p-6 md:p-10 rounded-2xl hover:border-gray-500 hover:animate-pulse cursor-pointer">
-                        <div>
-                            <h3 class="text-lg md:text-2xl font-semibold text-black">Получи результат</h3>
-                            <p class="mt-2 text-sm md:text-base text-gray-400 leading-5">
-                                Мы анализируем твои ответы и составляем подробный отчет о твоих сильных сторонах,
-                                способностях и потенциальных сферах деятельности. <span class="text-blue-600 font-medium">Результаты доступны сразу после оплаты!</span></p>
+                    <!-- Accordion item -->
+                    <div x-data="{ open: false }" class="bg-white rounded-lg shadow mt-3 py-3 px-6">
+                        <button @click="open = !open" class="flex justify-between items-center w-full py-3 text-left text-gray-800 font-semibold">
+                            Получи результат
+                            <span
+                                x-text="open ? '-' : '+'"
+                                class="inline-block transform transition-all duration-100 ease-in-out font-normal"
+                                :class="open ? 'rotate-180 scale-125 opacity-100' : 'rotate-0 scale-100 opacity-80'"
+                            ></span>
+                        </button>
+                        <div x-show="open" x-transition class="pb-3 text-gray-600">
+                            Мы анализируем твои ответы и составляем подробный отчет о твоих сильных сторонах, способностях и потенциальных сферах деятельности.
                         </div>
                     </div>
 
-                    <div
-                        class="group flex flex-col items-center justify-center border-1 border-white transition-all duration-200 hover:border-gray-500 md:flex-row gap-6 md:gap-10 shadow-2xl bg-white shadow-gray-200 p-6 md:p-10 rounded-2xl hover:animate-pulse cursor-pointer">
-                        <div>
-                            <h3 class="text-lg md:text-2xl font-semibold text-black">Изучи подходящие <br class="hidden md:block"> профессии</h3>
-                            <p class="mt-2 text-sm md:text-base text-gray-500 leading-5">
-                                На основе результатов ты получишь список
-                                профессий, которые максимально подходят твоему профилю.</p>
+                    <!-- Accordion item -->
+                    <div x-data="{ open: false }" class="bg-white rounded-lg shadow mt-3 py-3 px-6">
+                        <button @click="open = !open" class="flex justify-between items-center w-full py-3 text-left text-gray-800 font-semibold">
+                            Изучи подходящие профессии
+                            <span
+                                x-text="open ? '-' : '+'"
+                                class="inline-block transform transition-all duration-100 ease-in-out font-normal"
+                                :class="open ? 'rotate-180 scale-125 opacity-100' : 'rotate-0 scale-100 opacity-80'"
+                            ></span>
+                        </button>
+                        <div x-show="open" x-transition class="pb-3 text-gray-600">
+                            На основе результатов ты получишь список профессий, которые максимально подходят твоему профилю.
                         </div>
                     </div>
 
-                    <div class="flex flex-col items-center justify-center border-1 border-white transition-all duration-200 hover:border-gray-500 md:flex-row gap-6 md:gap-10 shadow-2xl bg-white shadow-gray-200 p-6 md:p-10 rounded-2xl hover:animate-pulse cursor-pointer">
-                        <div>
-                            <h3 class="text-lg md:text-2xl font-semibold text-black">Сделай шаг к <br class="hidden md:block"> будущему</h3>
-                            <p class="mt-2 text-sm md:text-base text-gray-500 leading-5">
-                                Мы подскажем, какие навыки развивать и что делать, чтобы построить успешную карьеру</p>
+                    <!-- Accordion item -->
+                    <div x-data="{ open: false }" class="bg-white rounded-lg shadow mt-3 py-3 px-6">
+                        <button @click="open = !open" class="flex justify-between items-center w-full py-3 text-left text-gray-800 font-semibold">
+                            Что вы получите
+                            <span
+                                x-text="open ? '-' : '+'"
+                                class="inline-block transform transition-all duration-100 ease-in-out font-normal"
+                                :class="open ? 'rotate-180 scale-125 opacity-100' : 'rotate-0 scale-100 opacity-80'"
+                            ></span>
+                        </button>
+                        <div x-show="open" x-transition class="pb-3 text-gray-600">
+                            <ul>
+                                <li>
+                                    Полный анализ всех 24 талантов
+                                </li>
+                                <li>
+                                    Персональные рекомендации по развитию
+                                </li>
+                                <li>
+                                    Подходящие сферы деятельности
+                                </li>
+                                <li>
+                                    Список профессий, которые вам подходят
+                                </li>
+                                <li>
+                                    В процентах (%) — насколько каждая профессия вам подходит
+                                </li>
+                            </ul>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -162,12 +197,12 @@
                                  class="w-full h-auto rounded-2xl"
                                  alt="Карта профессий">
                         </div>
-                    
+
                         <div class="absolute -bottom-4 -right-4 w-16 h-16 md:w-24 md:h-24 bg-gradient-to-br from-blue-600 to-blue-400 rounded-full opacity-20 blur-2xl"></div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
-    
+
 </div>

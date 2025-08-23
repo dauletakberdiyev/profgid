@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Pages;
 
+use App\Models\Profession;
 use Livewire\Component;
 use App\Models\Sphere;
 use Illuminate\Support\Facades\Auth;
@@ -32,7 +33,7 @@ class ProfessionMap extends Component
             }
             $query->orderBy('name');
         }])->find($sphereId);
-        
+
         if ($sphere) {
             $sphere->loadedProfessions = $sphere->professions;
             $this->selectedSphere = $sphere;
@@ -50,7 +51,7 @@ class ProfessionMap extends Component
     public function showProfessionInfo($professionId)
     {
         $profession = \App\Models\Profession::find($professionId);
-        
+
         if ($profession) {
             $this->selectedProfession = $profession;
             $this->showProfessionModal = true;
@@ -97,11 +98,11 @@ class ProfessionMap extends Component
         }
 
         $favoriteSpheres = $user->favorite_spheres ?? [];
-        
+
         if (!in_array($sphereId, $favoriteSpheres)) {
             $favoriteSpheres[] = $sphereId;
             $user->update(['favorite_spheres' => $favoriteSpheres]);
-            
+
             session()->flash('sphere-added', 'Сфера добавлена в избранное!');
         } else {
             // Удаляем из избранного
@@ -109,8 +110,33 @@ class ProfessionMap extends Component
                 return $id != $sphereId;
             });
             $user->update(['favorite_spheres' => array_values($favoriteSpheres)]);
-            
+
             session()->flash('sphere-added', 'Сфера удалена из избранного!');
+        }
+    }
+
+    public function likeProfession($professionId): void
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return;
+        }
+
+        $favoriteProfessions = $user->favorite_professions ?? [];
+
+        if (!in_array($professionId, $favoriteProfessions)) {
+            $favoriteProfessions[] = $professionId;
+            $user->update(['favorite_professions' => $favoriteProfessions]);
+
+            session()->flash('profession-added', __('messages.session.add.profession'));
+        } else {
+            // Удаляем из избранного
+            $favoriteSpheres = array_filter($favoriteProfessions, function($id) use ($professionId) {
+                return $id != $professionId;
+            });
+            $user->update(['favorite_professions' => array_values($favoriteSpheres)]);
+
+            session()->flash('profession-added', __('messages.session.remove.profession'));
         }
     }
 
@@ -154,32 +180,24 @@ class ProfessionMap extends Component
             $query->where('is_active', true);
         }
 
-        // Apply sorting
-        if ($this->sortBy === 'professions_count') {
-            $query->orderBy('professions_count', $this->sortDirection);
-        } else {
-            $query->orderBy($this->sortBy, $this->sortDirection);
-        }
+        $query->orderBy('name');
 
-        // Add default ordering
-        if ($this->sortBy !== 'sort_order') {
-            $query->orderBy('sort_order');
-        }
-        if ($this->sortBy !== 'name') {
-            $query->orderBy('name');
-        }
-
+        /** @var Sphere $spheres */
         $spheres = $query->get();
 
         // Получаем избранные сферы пользователя
         $userFavoriteSpheres = Auth::check() ? (Auth::user()->favorite_spheres ?? []) : [];
+        $userFavoriteProfessions = Auth::check() ? (Auth::user()->favorite_professions ?? []) : [];
 
         // Добавляем информацию об избранности
-        $spheres = $spheres->map(function($sphere) use ($userFavoriteSpheres) {
+        $spheres = $spheres->map(function(Sphere $sphere) use ($userFavoriteSpheres, $userFavoriteProfessions) {
             $sphere->is_favorite = in_array($sphere->id, $userFavoriteSpheres);
+            $sphere->professions->map(function(Profession $profession) use ($userFavoriteProfessions) {
+                $profession->is_favourite = in_array($profession->id, $userFavoriteProfessions);
+            });
             return $sphere;
         });
-            
+
         return view('livewire.pages.profession-map', [
             'spheres' => $spheres
         ]);

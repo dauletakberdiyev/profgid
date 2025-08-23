@@ -70,26 +70,23 @@
         <!-- Что получите -->
         <div class="bg-gray-50 rounded-2xl p-4 md:p-8 my-4 md:my-12">
             <h2 class="text-lg md:text-2xl font-light text-gray-900 mb-3 md:mb-6">
-                Что вы получите
+                {{ __('all.test_preparation.about.what_you_get') }}
             </h2>
 
             <div class="grid grid-cols-3 md:grid-cols-3 gap-3 md:gap-6 text-center">
                 <div>
-                    <div class="text-xl md:text-3xl font-light text-blue-600 mb-1 md:mb-2">24</div>
-                    <p class="text-xs md:text-base text-gray-600">персональных таланта</p>
+                    <div class="text-xl md:text-3xl font-light text-blue-600 mb-1 md:mb-2">{{ __('all.test_preparation.about.talents.title') }}</div>
+                    <p class="text-xs md:text-base text-gray-600">{{ __('all.test_preparation.about.talents.desc') }}</p>
                 </div>
                 <div>
-                    <div class="text-xl md:text-3xl font-light text-blue-600 mb-1 md:mb-2">15+</div>
-                    <p class="text-xs md:text-base text-gray-600">рекомендаций профессий</p>
+                    <div class="text-xl md:text-3xl font-light text-blue-600 mb-1 md:mb-2">{{ __('all.test_preparation.about.sphere.title') }}</div>
+                    <p class="text-xs md:text-base text-gray-600">{{ __('all.test_preparation.about.sphere.desc') }}</p>
                 </div>
                 <div>
-                    <div class="text-xl md:text-3xl font-light text-blue-600 mb-1 md:mb-2">4</div>
-                    <p class="text-xs md:text-base text-gray-600">домена способностей</p>
+                    <div class="text-xl md:text-3xl font-light text-blue-600 mb-1 md:mb-2">{{ __('all.test_preparation.about.profession.title') }}</div>
+                    <p class="text-xs md:text-base text-gray-600">{{ __('all.test_preparation.about.profession.desc') }}</p>
                 </div>
             </div>
         </div>
-
-
-
     </div>
 </div>

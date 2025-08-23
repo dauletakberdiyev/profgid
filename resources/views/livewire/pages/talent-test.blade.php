@@ -41,7 +41,7 @@
 
                     <!-- Answer Options -->
                     <div class="space-y-3 md:space-y-4 mb-6 md:mb-8">
-                        <template x-for="(option, index) in answerOptions" :key="index">
+                        <template x-for="(option, index) in answersOp['{{app()->getLocale()}}']" :key="index">
                             <label class="flex items-center p-3 md:p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition-all duration-200"
                                    :class="selectedAnswer === index + 1 ? 'border-blue-500 bg-blue-50 scale-[1.02]' : 'border-gray-200'"
                                    @click="selectAnswerAndNext(index + 1)">
@@ -125,10 +125,26 @@ function talentTest(questions, timePerQuestion, testSessionId) {
         answerOptions: [
             'Нет',
             'Скорее нет, чем да',
-            'не знаю',
+            'Не знаю',
             'Скорее да, чем нет',
-            'да',
+            'Да',
         ],
+        answersOp: {
+            'ru': [
+                'Нет',
+                'Скорее нет, чем да',
+                'Не знаю',
+                'Скорее да, чем нет',
+                'Да',
+            ],
+            'kz': [
+                'Жоқ',
+                'Жоққа жақынырақ',
+                'Білмеймін',
+                'Иәға жақынырақ',
+                'Иә',
+            ]
+        },
 
         get currentQuestion() {
             return this.allQuestions[this.currentQuestionIndex] || null;
