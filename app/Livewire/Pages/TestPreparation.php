@@ -3,7 +3,6 @@
 namespace App\Livewire\Pages;
 
 use Livewire\Component;
-use Illuminate\Support\Facades\Auth;
 
 class TestPreparation extends Component
 {

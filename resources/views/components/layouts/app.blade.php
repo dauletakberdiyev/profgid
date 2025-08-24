@@ -13,7 +13,7 @@
 
     <link rel="stylesheet" href="{{ asset('assets/fonts/atyp/stylesheet.css') }}">
 
-    <link rel="stylesheet" href="{{ asset('build/assets/app-CpbGTD6R.css') }}">
+    <link rel="stylesheet" href="{{ asset('build/assets/app-DyZg3kHg.css') }}">
 
     @livewireStyles
 
@@ -29,7 +29,7 @@
 
     @livewireScripts
 
-    <script src="{{ asset('build/assets/app-B6G8EThm.js') }}"></script>
+    <script src="{{ asset('build/assets/app-BfJCirg0.js') }}"></script>
 
 </body>
 

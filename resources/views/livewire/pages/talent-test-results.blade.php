@@ -328,7 +328,7 @@
                                 </button>
                             @endif
                         </nav>
-                        
+
                         <!-- Кнопка скачать рядом с табами -->
                         <div class="flex flex-col items-center">
                             @php
@@ -336,7 +336,7 @@
                                 $canDownloadSpheres = $this->canViewSpheresTab;
                                 $canDownloadProfessions = $this->canViewProfessionsTab;
                             @endphp
-                            
+
                             <!-- Проверяем доступность скачивания для текущей вкладки -->
                             <div x-data="{
                                 canDownload: function() {
@@ -400,7 +400,7 @@
                 </div>
             </div>
 
-            
+
             <!-- Tab Content -->
             <div id="talents-section" x-show="activeTab === 'talents'" x-transition:enter="transition ease-out duration-200"
                 x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
@@ -416,7 +416,7 @@
                         Вы лидируете с <span class="font-extrabold">{{ $topDomainName }}</span> темами.
                     </h1>
                 </div>
-                
+
                     @php
                         $domainColors = [
                             'executing' => '#702B7C',
@@ -471,11 +471,11 @@
                         // Гарантируем наличие всех доменов в массиве названий
                         $defaultDomainNames = [
                             'executing' => 'ИСПОЛНЕНИЕ',
-                            'influencing' => 'ВЛИЯНИЕ', 
+                            'influencing' => 'ВЛИЯНИЕ',
                             'relationship' => 'ОТНОШЕНИЯ',
                             'strategic' => 'МЫШЛЕНИЕ'
                         ];
-                        
+
                         foreach ($defaultDomainNames as $key => $name) {
                             if (!isset($domains[$key])) {
                                 $domains[$key] = $name;
@@ -485,7 +485,7 @@
                         // Sort domains by score (descending) - только для определения топ домена
                         $sortedForTop = $completeDomainScores;
                         arsort($sortedForTop);
-                        
+
                         // Для отображения используем стандартный порядок доменов (исполнение, влияние, отношения, мышление)
                         $sortedDomainScores = $completeDomainScores;
 
@@ -497,7 +497,7 @@
                     @endphp
 
                     <!-- Temporary Debug Info (remove in production) -->
-                    {{-- 
+                    {{--
                     <div class="mb-4 p-3 bg-yellow-100 border border-yellow-400 rounded text-sm">
                         <strong>Debug Info:</strong><br>
                         Domain Scores: {{ json_encode($domainScores) }}<br>
@@ -521,7 +521,7 @@
                             @endphp
                             <div class="{{ $domainBgColors[$domain] ?? 'bg-gray-400' }} flex items-center justify-center text-white font-bold text-xs md:text-sm flex-shrink-0"
                                 style="width: {{ $adjustedPercentage }}%; min-width: 10%;">
-                                
+
                             </div>
                         @endforeach
                     </div>
@@ -540,7 +540,7 @@
                                 <div class="text-xs md:text-sm font-medium text-gray-700 truncate">
                                     {{ $domains[$domain] ?? $domain }}
                                 </div>
-                                
+
                             </div>
                         @endforeach
                     </div>

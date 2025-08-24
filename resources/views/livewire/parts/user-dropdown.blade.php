@@ -27,9 +27,6 @@
         <div class="py-1">
             <a href="{{ route('profile') }}" class="block px-4 py-2 text-sm {{ request()->routeIs('profile') ? 'text-blue-600 bg-blue-50 font-medium' : 'text-gray-700' }} hover:bg-gray-100"
                 role="menuitem">{{ __('messages.profile') }}</a>
-{{--            <a href="{{ route('settings') }}"--}}
-{{--                class="block px-4 py-2 text-sm {{ request()->routeIs('settings') ? 'text-blue-600 bg-blue-50 font-medium' : 'text-gray-700' }} hover:bg-gray-100"--}}
-{{--                role="menuitem">{{ __('messages.settings') }}</a>--}}
             <a href="{{ route('test.history') }}"
                 class="block px-4 py-2 text-sm {{ request()->routeIs('test.history') ? 'text-blue-600 bg-blue-50 font-medium' : 'text-gray-700' }} hover:bg-gray-100"
                 role="menuitem">{{ __('messages.test_history') }}</a>
@@ -42,7 +39,7 @@
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
                     </svg>
-                    Мои профессии
+                    {{ __('all.header.my_professions') }}
                     @if($favoriteProfessions->count() > 0)
                         <span class="ml-auto bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded-full">
                             {{ $favoriteProfessions->count() }}
@@ -58,7 +55,7 @@
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
                     </svg>
-                    Мои сферы
+                    {{ __('all.header.my_spheres') }}
                     @if($favoriteSpheres->count() > 0)
                         <span class="ml-auto bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded-full">
                             {{ $favoriteSpheres->count() }}
@@ -66,20 +63,6 @@
                     @endif
                 </div>
             </a>
-
-            {{-- <!-- Profession Recommendations Link -->
-            @if($favoriteProfessions->count() > 0)
-                <a href="{{ route('profession-recommendations') }}"
-                    class="block px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 font-medium"
-                    role="menuitem">
-                    <div class="flex items-center">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
-                        </svg>
-                        Рекомендации профессий
-                    </div>
-                </a>
-            @endif --}}
 
             <form method="POST" action="{{ route('logout') }}">
                 @csrf

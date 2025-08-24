@@ -13,34 +13,34 @@ use Illuminate\Support\Str;
 class TestHistory extends Component
 {
     use WithPagination;
-    
+
     public $statusFilter = 'all';
     public $timeFilter = 'all';
     public $paymentFilter = 'all';
     public $search = '';
-    
+
     protected $paginationTheme = 'tailwind';
-    
+
     public function updatingSearch()
     {
         $this->resetPage();
     }
-    
+
     public function updatingStatusFilter()
     {
         $this->resetPage();
     }
-    
+
     public function updatingTimeFilter()
     {
         $this->resetPage();
     }
-    
+
     public function updatingPaymentFilter()
     {
         $this->resetPage();
     }
-    
+
     public function getFilteredTestsProperty()
     {
         $query = TestSession::where('user_id', Auth::id())
@@ -99,7 +99,7 @@ class TestHistory extends Component
         return $query->paginate(5)->through(function ($session) {
             // Обновляем временные метрики перед отображением
             $session->updateTimeMetrics();
-            
+
             return [
                 'id' => $session->id,
                 'session_id' => $session->session_id,
@@ -141,6 +141,10 @@ class TestHistory extends Component
             return route('talent-test-results', ['sessionId' => $session->session_id]);
         } elseif ($session->status === 'completed' && $session->payment_status === 'pending') {
             return route('payment', ['sessionId' => $session->session_id]);
+        } elseif ($session->status === 'completed' && $session->payment_status === 'processing') {
+            return null;
+        } elseif ($session->status === 'completed' && $session->payment_status === 'cancelled') {
+            return null;
         } elseif (in_array($session->status, ['started', 'in_progress'])) {
             return route('talent-test');
         } else {
@@ -153,7 +157,11 @@ class TestHistory extends Component
         if ($session->status === 'completed' && in_array($session->payment_status, ['completed', 'free'])) {
             return 'Просмотр результатов';
         } elseif ($session->status === 'completed' && $session->payment_status === 'pending') {
-            return 'Выбрать тариф';
+            return 'Оплатить';
+        } elseif ($session->status === 'completed' && $session->payment_status === 'processing') {
+            return 'Оплата в процессе';
+        } elseif ($session->status === 'completed' && $session->payment_status === 'cancelled') {
+            return 'Оплата отменена';
         } elseif (in_array($session->status, ['started', 'in_progress'])) {
             return 'Продолжить тест';
         } else {
@@ -179,7 +187,7 @@ class TestHistory extends Component
             return sprintf('%dс', $remainingSeconds);
         }
     }
-    
+
     public function render()
     {
         return view('livewire.pages.test-history', [

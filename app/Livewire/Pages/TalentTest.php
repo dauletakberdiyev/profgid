@@ -20,17 +20,18 @@ class TalentTest extends Component
     {
         // Генерируем уникальный ID для сессии теста
         $this->testSessionId = Str::uuid()->toString();
-        
+
         // Получаем все ответы (вопросы) из базы данных
+        /** @var Answer[] $answers */
         $answers = Answer::with('talent')->orderBy('id')->get();
 
-        // Добавляем все 87 вопросов в массив
+        // Добавляем все 120 вопросов в массив
         foreach ($answers as $index => $answer) {
             $this->allQuestions[] = [
                 'id' => $answer->id,
                 'question' => $answer->question,
                 'talent_name' => $answer->talent ? $answer->talent->name : 'Unknown',
-                'talent_id' => $answer->talent ? $answer->talent->id : null,
+                'talent_id' => $answer->talent ? $answer->talent_id : null,
                 'question_number' => $index + 1,
             ];
         }
@@ -39,7 +40,7 @@ class TalentTest extends Component
         shuffle($this->allQuestions);
 
         // Создаем запись TestSession
-        TestSession::create([
+        TestSession::query()->create([
             'session_id' => $this->testSessionId,
             'user_id' => Auth::id() ?? 1,
             'payment_status' => 'pending',
@@ -51,21 +52,21 @@ class TalentTest extends Component
             'started_at' => now(),
         ]);
     }
-    
+
     public function submitTestResults($answers, $responseTimes)
     {
         // Декодируем данные с фронтенда
         $answersData = json_decode($answers, true);
         $responseTimesData = json_decode($responseTimes, true);
-        
+
         // Сохраняем все ответы пакетом
         $answersToSave = [];
-        
+
         foreach ($answersData as $index => $value) {
             if ($value !== null && isset($this->allQuestions[$index])) {
                 $question = $this->allQuestions[$index];
                 $responseTime = $responseTimesData[$index] ?? $this->timePerQuestion;
-                
+
                 $answersToSave[] = [
                     'user_id' => Auth::id() ?? 1,
                     'question_id' => $question['id'],
@@ -78,12 +79,12 @@ class TalentTest extends Component
                 ];
             }
         }
-        
+
         // Вставляем все ответы одним запросом
         if (!empty($answersToSave)) {
             UserAnswer::insert($answersToSave);
         }
-        
+
         // Обновляем TestSession при завершении теста
         $testSession = TestSession::where('session_id', $this->testSessionId)->first();
         if ($testSession) {
@@ -93,7 +94,7 @@ class TalentTest extends Component
                 'status' => 'completed',
                 'completed_at' => now()
             ]);
-            
+
             // Обновляем метрики времени если методы существуют
             if (method_exists($testSession, 'updateProgress')) {
                 $testSession->updateProgress();
@@ -105,7 +106,7 @@ class TalentTest extends Component
 
         session()->flash('message', 'Ваш тест завершен! Выберите тарифный план для получения результатов.');
         session()->put('last_test_session_id', $this->testSessionId);
-        
+
         return redirect()->route('payment', ['sessionId' => $this->testSessionId]);
     }
 

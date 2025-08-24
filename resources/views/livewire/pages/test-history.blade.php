@@ -12,7 +12,7 @@
                 <!-- Filters -->
                 <div class="flex flex-wrap gap-4">
                     <div class="relative">
-                        <select wire:model.live="statusFilter" 
+                        <select wire:model.live="statusFilter"
                                 class="appearance-none w-full sm:w-auto bg-white border border-gray-200 text-gray-700 py-2 px-3 pr-8 rounded-lg leading-tight focus:outline-none focus:bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm">
                             <option value="all">Все тесты</option>
                             <option value="completed">Завершенные</option>
@@ -24,7 +24,7 @@
                         </div>
                     </div>
                     <div class="relative">
-                        <select wire:model.live="timeFilter" 
+                        <select wire:model.live="timeFilter"
                                 class="appearance-none w-full sm:w-auto bg-white border border-gray-200 text-gray-700 py-2 px-3 pr-8 rounded-lg leading-tight focus:outline-none focus:bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm">
                             <option value="all">За все время</option>
                             <option value="month">За месяц</option>
@@ -35,7 +35,7 @@
                         </div>
                     </div>
                     <div class="relative">
-                        <select wire:model.live="paymentFilter" 
+                        <select wire:model.live="paymentFilter"
                                 class="appearance-none w-full sm:w-auto bg-white border border-gray-200 text-gray-700 py-2 px-3 pr-8 rounded-lg leading-tight focus:outline-none focus:bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm">
                             <option value="all">Все тесты</option>
                             <option value="paid">Оплаченные</option>
@@ -46,12 +46,12 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Search -->
                 <div class="relative w-full sm:w-64">
-                    <input wire:model.live.debounce.300ms="search" 
-                           type="text" 
-                           placeholder="Поиск..." 
+                    <input wire:model.live.debounce.300ms="search"
+                           type="text"
+                           placeholder="Поиск..."
                            class="w-full px-3 py-2 pl-9 text-sm border border-gray-200 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 bg-white placeholder-gray-400">
                     <svg class="absolute left-3 top-2.5 h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
@@ -122,21 +122,28 @@
                                 <td class="px-4 py-3">
                                     @if($test['selected_plan'])
                                         @if($test['selected_plan'] === 'talents')
-                                            <span class="inline-flex px-2 py-1 text-xs font-medium rounded-lg bg-gray-100 text-gray-700">Таланты</span>
+                                            <span class="inline-flex px-2 py-1 text-xs font-medium rounded-lg bg-gray-100 text-gray-700">{{ __('all.payment.cards.middle.title') }}</span>
                                         @elseif($test['selected_plan'] === 'talents_spheres')
-                                            <span class="inline-flex px-2 py-1 text-xs font-medium rounded-lg bg-blue-100 text-blue-700">Таланты + Сферы</span>
+                                            <span class="inline-flex px-2 py-1 text-xs font-medium rounded-lg bg-blue-100 text-blue-700">{{ __('all.payment.cards.bottom.title') }}</span>
                                         @elseif($test['selected_plan'] === 'talents_spheres_professions')
-                                            <span class="inline-flex px-2 py-1 text-xs font-medium rounded-lg bg-purple-100 text-purple-700">Полный</span>
+                                            <span class="inline-flex px-2 py-1 text-xs font-medium rounded-lg bg-purple-100 text-purple-700">{{ __('all.payment.cards.top.title') }}</span>
+                                        @else
+                                            <span class="text-sm text-gray-400">—</span>
                                         @endif
-                                    @else
-                                        <span class="text-sm text-gray-400">—</span>
                                     @endif
                                 </td>
                                 <td class="px-4 py-3">
-                                    <a href="{{ $test['action_url'] }}" 
-                                       class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors">
-                                        {{ $test['action_text'] }}
-                                    </a>
+                                    @if(empty($test['action_url']))
+                                        <span
+                                           class="inline-flex items-center px-3 py-1.5 text-xs font-medium {{ $test['payment_status'] === 'cancelled' ? 'text-red-600 hover:text-red-700' : 'text-yellow-600 hover:text-yellow-700' }} hover:bg-yellow-50 rounded-lg transition-colors">
+                                            {{ $test['action_text'] }}
+                                        </span>
+                                    @else
+                                        <a href="{{ $test['action_url'] }}"
+                                           class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors">
+                                            {{ $test['action_text'] }}
+                                        </a>
+                                    @endif
                                 </td>
                             </tr>
                         @empty
@@ -212,7 +219,7 @@
                                     @endif
                                 </div>
                             @endif
-                            
+
                             @if ($test['is_paid'])
                                 <div class="flex items-center text-green-600">
                                     <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -229,8 +236,8 @@
                                 </div>
                             @endif
                         </div>
-                        
-                        <a href="{{ $test['action_url'] }}" 
+
+                        <a href="{{ $test['action_url'] }}"
                            class="inline-flex items-center justify-center px-3 py-1.5 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors">
                             {{ $test['action_text'] }}
                         </a>
@@ -242,12 +249,12 @@
                 </div>
             @endforelse
         </div>
-        
+
         <!-- Pagination -->
         <div class="mt-6">
             {{ $filteredTests->links('livewire.pagination-links') }}
         </div>
-        
-        
+
+
     </div>
 </div>

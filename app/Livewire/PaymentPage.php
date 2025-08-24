@@ -66,7 +66,7 @@ class PaymentPage extends Component
         }
 
         if ($this->sessionId) {
-            $this->testSession = TestSession::where('session_id', $this->sessionId)->first();
+            $this->testSession = TestSession::query()->where('session_id', $this->sessionId)->first();
         }
 
         if (!$this->testSession) {

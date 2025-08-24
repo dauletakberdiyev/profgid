@@ -17,11 +17,12 @@ class TalentTestController extends Controller
             $testSessionId = $request->input('testSessionId');
             $answers = $request->input('answers', []);
             $responseTimes = $request->input('responseTimes', []);
-            
+
             // Получаем все вопросы в том же порядке, что и в Livewire компоненте
+            /** @var Answer[] $allAnswers */
             $allAnswers = Answer::with('talent')->orderBy('id')->get();
             $allQuestions = [];
-            
+
             foreach ($allAnswers as $index => $answer) {
                 $allQuestions[] = [
                     'id' => $answer->id,
@@ -31,15 +32,15 @@ class TalentTestController extends Controller
                     'question_number' => $index + 1,
                 ];
             }
-            
+
             // Сохраняем все ответы пакетом
             $answersToSave = [];
-            
+
             foreach ($answers as $index => $value) {
                 if ($value !== null && isset($allQuestions[$index])) {
                     $question = $allQuestions[$index];
                     $responseTime = $responseTimes[$index] ?? 20; // default 20 seconds
-                    
+
                     $answersToSave[] = [
                         'user_id' => Auth::id() ?? 1,
                         'question_id' => $question['id'],
@@ -52,12 +53,12 @@ class TalentTestController extends Controller
                     ];
                 }
             }
-            
+
             // Вставляем все ответы одним запросом
             if (!empty($answersToSave)) {
-                UserAnswer::insert($answersToSave);
+                UserAnswer::query()->insert($answersToSave);
             }
-            
+
             // Обновляем TestSession при завершении теста
             $testSession = TestSession::where('session_id', $testSessionId)->first();
             if ($testSession) {
@@ -68,16 +69,16 @@ class TalentTestController extends Controller
                     'completed_at' => now()
                 ]);
             }
-            
+
             return response()->json([
                 'success' => true,
                 'message' => 'Тест успешно завершен!',
                 'redirect_url' => route('payment', ['sessionId' => $testSessionId])
             ]);
-            
+
         } catch (\Exception $e) {
             // \Log::error('Error submitting test results: ' . $e->getMessage());
-            
+
             return response()->json([
                 'success' => false,
                 'message' => 'Произошла ошибка при сохранении результатов. Попробуйте еще раз.'

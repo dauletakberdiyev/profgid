@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Pages;
 
+use App\Models\Sphere;
 use Livewire\Component;
 use App\Models\Answer;
 use App\Models\Talent;
@@ -133,7 +134,7 @@ class TalentTestResults extends Component
         foreach ($talents as $talent) {
             $score = $talentScores[$talent->id] ?? 0;
             $domainName = $talent->domain ? $talent->domain->name : "executing";
-            
+
             // Преобразуем название домена из БД в стандартный ключ
             $domainKey = $this->mapDomainNameToKey($domainName);
 
@@ -242,7 +243,7 @@ class TalentTestResults extends Component
         $maxUserScore = max($maxUserScore, 1); // Избегаем деления на 0
 
         // Получаем все сферы с профессиями и талантами
-        $allSpheres = \App\Models\Sphere::with(["professions.talents"])->get();
+        $allSpheres = Sphere::query()->with(["professions.talents"])->get();
         $spheresData = collect();
 
         foreach ($allSpheres as $sphere) {
@@ -668,14 +669,14 @@ class TalentTestResults extends Component
             'ИСПОЛНЕНИЕ' => 'executing',
             'исполнение' => 'executing',
             'Исполнение' => 'executing',
-            
+
             'influencing' => 'influencing',
-            'INFLUENCING' => 'influencing', 
+            'INFLUENCING' => 'influencing',
             'Influencing' => 'influencing',
             'ВЛИЯНИЕ' => 'influencing',
             'влияние' => 'influencing',
             'Влияние' => 'influencing',
-            
+
             'relationship' => 'relationship',
             'RELATIONSHIP' => 'relationship',
             'Relationship' => 'relationship',
@@ -685,7 +686,7 @@ class TalentTestResults extends Component
             'ОТНОШЕНИЯ' => 'relationship',
             'отношения' => 'relationship',
             'Отношения' => 'relationship',
-            
+
             'strategic' => 'strategic',
             'STRATEGIC' => 'strategic',
             'Strategic' => 'strategic',
@@ -696,7 +697,7 @@ class TalentTestResults extends Component
             'мышление' => 'strategic',
             'Мышление' => 'strategic',
         ];
-        
+
         return $mapping[$domainName] ?? 'executing'; // По умолчанию executing
     }
 

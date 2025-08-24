@@ -7,7 +7,7 @@
                     <span class="text-xl font-semibold text-gray-900"><span class="text-blue-500">Prof</span>Gid<span class="text-blue-500">.</span></span>
                 </a>
                 <p class="text-sm text-gray-500 mb-4">
-                    Платформа для профориентации, которая поможет определить твои сильные стороны и найти подходящую профессию.
+                    {{ __('all.footer.desc') }}
                 </p>
                 <div class="flex space-x-4">
                     <a href="#" class="text-gray-400 hover:text-blue-500 transition-colors">
@@ -30,45 +30,45 @@
 
             <!-- Quick Links -->
             <div>
-                <h3 class="text-sm font-semibold text-gray-900 tracking-wider uppercase mb-4">Навигация</h3>
+                <h3 class="text-sm font-semibold text-gray-900 tracking-wider uppercase mb-4">{{ __('all.footer.navigation') }}</h3>
                 <ul class="space-y-3">
                     <li>
-                        <a href="{{ route('home') }}" class="text-sm text-gray-500 hover:text-blue-600 transition-colors">Главная</a>
+                        <a href="{{ route('home') }}" class="text-sm text-gray-500 hover:text-blue-600 transition-colors">{{ __('all.footer.main') }}</a>
                     </li>
                     <li>
-                        <a href="{{ route('home') }}" class="text-sm text-gray-500 hover:text-blue-600 transition-colors">Как это работает</a>
+                        <a href="{{ route('home') }}" class="text-sm text-gray-500 hover:text-blue-600 transition-colors">{{ __('all.footer.how_works') }}</a>
                     </li>
                     <li>
-                        <a href="{{ route('about') }}" class="text-sm text-gray-500 hover:text-blue-600 transition-colors">О нас</a>
+                        <a href="{{ route('about') }}" class="text-sm text-gray-500 hover:text-blue-600 transition-colors">{{ __('all.footer.about') }}</a>
                     </li>
                     <li>
-                        <a href="{{ route('test-preparation') }}" class="text-sm text-gray-500 hover:text-blue-600 transition-colors">Пройти тест</a>
+                        <a href="{{ route('test-preparation') }}" class="text-sm text-gray-500 hover:text-blue-600 transition-colors">{{ __('all.footer.pass_test') }}</a>
                     </li>
                 </ul>
             </div>
 
             <!-- Resources -->
             <div>
-                <h3 class="text-sm font-semibold text-gray-900 tracking-wider uppercase mb-4">Ресурсы</h3>
+                <h3 class="text-sm font-semibold text-gray-900 tracking-wider uppercase mb-4">{{ __('all.footer.resources') }}</h3>
                 <ul class="space-y-3">
                     <li>
-                        <a href="#" class="text-sm text-gray-500 hover:text-blue-600 transition-colors">Блог</a>
+                        <a href="#" class="text-sm text-gray-500 hover:text-blue-600 transition-colors">{{ __('all.footer.blog') }}</a>
                     </li>
                     <li>
-                        <a href="{{ route('profession-map') }}" class="text-sm text-gray-500 hover:text-blue-600 transition-colors">Карта профессий</a>
+                        <a href="{{ route('profession-map') }}" class="text-sm text-gray-500 hover:text-blue-600 transition-colors">{{ __('all.footer.professions_map') }}</a>
                     </li>
                     <li>
-                        <a href="#" class="text-sm text-gray-500 hover:text-blue-600 transition-colors">Университеты</a>
+                        <a href="#" class="text-sm text-gray-500 hover:text-blue-600 transition-colors">{{ __('all.footer.universities') }}</a>
                     </li>
                     <li>
-                        <a href="#" class="text-sm text-gray-500 hover:text-blue-600 transition-colors">FAQ</a>
+                        <a href="#" class="text-sm text-gray-500 hover:text-blue-600 transition-colors">{{ __('all.footer.faq') }}</a>
                     </li>
                 </ul>
             </div>
 
             <!-- Contact -->
             <div>
-                <h3 class="text-sm font-semibold text-gray-900 tracking-wider uppercase mb-4">Контакты</h3>
+                <h3 class="text-sm font-semibold text-gray-900 tracking-wider uppercase mb-4">{{ __('all.footer.contacts') }}</h3>
                 <ul class="space-y-3">
                     <li class="flex items-start">
                         <svg class="h-5 w-5 text-gray-400 mr-2 mt-0.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -95,11 +95,11 @@
 
         <div class="border-t border-gray-200 pt-8">
             <div class="flex flex-col md:flex-row justify-between items-center">
-                <p class="text-xs text-gray-500">&copy; 2025 PROFGID. Все права защищены.</p>
+                <p class="text-xs text-gray-500">&copy; {{ __('all.footer.rights') }}</p>
                 <div class="flex space-x-6 mt-4 md:mt-0">
-                <a href="{{ route('payment-terms') }}" class="text-xs text-gray-500 hover:text-blue-600 transition-colors">Условия оплаты и возврата</a>
-                    <a href="{{ route('terms-of-service') }}" class="text-xs text-gray-500 hover:text-blue-600 transition-colors">Договор оферты</a>
-                    <a href="{{ route('privacy-policy') }}" class="text-xs text-gray-500 hover:text-blue-600 transition-colors">Политика конфиденциальности</a>
+                <a href="{{ route('payment-terms') }}" class="text-xs text-gray-500 hover:text-blue-600 transition-colors">{{ __('all.footer.payment_conditions') }}</a>
+                    <a href="{{ route('terms-of-service') }}" class="text-xs text-gray-500 hover:text-blue-600 transition-colors">{{ __('all.footer.contract') }}</a>
+                    <a href="{{ route('privacy-policy') }}" class="text-xs text-gray-500 hover:text-blue-600 transition-colors">{{ __('all.footer.policy') }}</a>
                 </div>
             </div>
         </div>

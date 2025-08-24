@@ -11,7 +11,7 @@
                 <div class="group relative mt-6 md:mt-10 inline-flex">
                     <a href="{{ route('test-preparation') }}" title=""
                         class="w-full sm:w-auto rounded-xl bg-blue-700 px-8 md:px-10 py-3 md:py-4 font-medium text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:ring-offset-2 hover:bg-blue-600 text-base md:text-lg">
-                        Пройти тест
+                        {{ __('all.home.top.pass_test') }}
                     </a>
                     <div class="-scale-x-100 absolute left-0 -bottom-10 hidden h-10 w-10 -rotate-12 text-blue-600 lg:inline-flex">
                         <svg viewBox="0 0 82 35" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -31,13 +31,13 @@
         <div
             class="mt-6 md:mt-16 mb-6 md:mb-16 flex flex-col items-center justify-center space-y-6 sm:flex-row sm:space-y-0 sm:space-x-4 divide-y divide-gray-300 sm:divide-x sm:divide-y-0">
             <div class="flex max-w-xs px-4 py-4 text-center">
-                <p class="text-sm md:text-base text-gray-600">Индивидуальный разбор твоих талантов и способностей.</p>
+                <p class="text-sm md:text-base text-gray-600">{{ __('all.home.top.text_1') }}</p>
             </div>
             <div class="flex max-w-xs px-4 py-4 text-center">
-                <p class="text-sm md:text-base text-gray-600">Рекомендации по выбору профессий, которые подходят именно тебе.</p>
+                <p class="text-sm md:text-base text-gray-600">{{ __('all.home.top.text_2') }}</p>
             </div>
             <div class="flex max-w-xs px-4 py-4 text-center">
-                <p class="text-sm md:text-base text-gray-600">Подход к развитию, основанный на твоих уникальных качествах.</p>
+                <p class="text-sm md:text-base text-gray-600">{{ __('all.home.top.text_3') }}</p>
             </div>
         </div>
     </section>
@@ -46,15 +46,14 @@
         <div class="mx-auto max-w-7xl py-8 md:py-12 text-blue-700 sm:py-16 lg:py-20">
             <div class="mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
                 <div class="mx-auto max-w-2xl text-center">
-                    <h2 class="mt-2 text-2xl md:text-3xl font-bold sm:text-4xl xl:text-4xl text-gray-900 uppercase">Как это
-                        работает?</h2>
+                    <h2 class="mt-2 text-2xl md:text-3xl font-bold sm:text-4xl xl:text-4xl text-gray-900 uppercase">{{ __('all.home.middle.title') }}</h2>
                 </div>
 
                 <div class="w-full">
                     <!-- Accordion item -->
                     <div x-data="{ open: false }" class="bg-white rounded-lg shadow mt-3 py-3 px-6">
                         <button @click="open = !open" class="flex justify-between items-center w-full py-3 text-left text-gray-800 font-semibold">
-                            Пройди тест
+                            {{ __('all.home.middle.accordion_1.title') }}
                             <span
                                 x-text="open ? '-' : '+'"
                                 class="inline-block transform transition-all duration-100 ease-in-out font-normal"
@@ -62,14 +61,14 @@
                             ></span>
                         </button>
                         <div x-show="open" x-transition class="pb-3 text-gray-600">
-                            Ответь на вопросы теста, основанного на признанных методиках (Gallup CS34, Gardner MI, MBTI). Это займет всего 20 минут!
+                            {{ __('all.home.middle.accordion_1.desc') }}
                         </div>
                     </div>
 
                     <!-- Accordion item -->
                     <div x-data="{ open: false }" class="bg-white rounded-lg shadow mt-3 py-3 px-6">
                         <button @click="open = !open" class="flex justify-between items-center w-full py-3 text-left text-gray-800 font-semibold">
-                            Получи результат
+                            {{ __('all.home.middle.accordion_2.title') }}
                             <span
                                 x-text="open ? '-' : '+'"
                                 class="inline-block transform transition-all duration-100 ease-in-out font-normal"
@@ -77,14 +76,14 @@
                             ></span>
                         </button>
                         <div x-show="open" x-transition class="pb-3 text-gray-600">
-                            Мы анализируем твои ответы и составляем подробный отчет о твоих сильных сторонах, способностях и потенциальных сферах деятельности.
+                            {{ __('all.home.middle.accordion_2.desc') }}
                         </div>
                     </div>
 
                     <!-- Accordion item -->
                     <div x-data="{ open: false }" class="bg-white rounded-lg shadow mt-3 py-3 px-6">
                         <button @click="open = !open" class="flex justify-between items-center w-full py-3 text-left text-gray-800 font-semibold">
-                            Изучи подходящие профессии
+                            {{ __('all.home.middle.accordion_3.title') }}
                             <span
                                 x-text="open ? '-' : '+'"
                                 class="inline-block transform transition-all duration-100 ease-in-out font-normal"
@@ -92,14 +91,14 @@
                             ></span>
                         </button>
                         <div x-show="open" x-transition class="pb-3 text-gray-600">
-                            На основе результатов ты получишь список профессий, которые максимально подходят твоему профилю.
+                            {{ __('all.home.middle.accordion_3.desc') }}
                         </div>
                     </div>
 
                     <!-- Accordion item -->
                     <div x-data="{ open: false }" class="bg-white rounded-lg shadow mt-3 py-3 px-6">
                         <button @click="open = !open" class="flex justify-between items-center w-full py-3 text-left text-gray-800 font-semibold">
-                            Что вы получите
+                            {{ __('all.home.middle.accordion_4.title') }}
                             <span
                                 x-text="open ? '-' : '+'"
                                 class="inline-block transform transition-all duration-100 ease-in-out font-normal"
@@ -108,21 +107,7 @@
                         </button>
                         <div x-show="open" x-transition class="pb-3 text-gray-600">
                             <ul>
-                                <li>
-                                    Полный анализ всех 24 талантов
-                                </li>
-                                <li>
-                                    Персональные рекомендации по развитию
-                                </li>
-                                <li>
-                                    Подходящие сферы деятельности
-                                </li>
-                                <li>
-                                    Список профессий, которые вам подходят
-                                </li>
-                                <li>
-                                    В процентах (%) — насколько каждая профессия вам подходит
-                                </li>
+                                {!! __('all.home.middle.accordion_4.desc') !!}
                             </ul>
                         </div>
                     </div>
@@ -138,10 +123,10 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-8 md:mb-16">
                 <h2 class="text-2xl md:text-3xl lg:text-4xl font-bold">
-                    Карта профессий
+                    {{ __('all.home.bottom.title') }}
                 </h2>
                 <p class="mt-3 md:mt-4 text-sm md:text-base text-gray-600 max-w-2xl mx-auto">
-                    Исследуйте мир возможностей и найдите свой профессиональный путь
+                    {{ __('all.home.bottom.desc') }}
                 </p>
             </div>
 
@@ -158,8 +143,8 @@
                                     </div>
                                 </div>
                                 <div>
-                                    <h3 class="text-lg md:text-xl font-semibold text-gray-900 mb-1 md:mb-2">Исследуйте профессии</h3>
-                                    <p class="text-sm md:text-base text-gray-600">Откройте для себя разнообразие современных профессий и расширьте свои горизонты карьерного развития.</p>
+                                    <h3 class="text-lg md:text-xl font-semibold text-gray-900 mb-1 md:mb-2">{{ __('all.home.bottom.content.title_1') }}</h3>
+                                    <p class="text-sm md:text-base text-gray-600">{{ __('all.home.bottom.content.desc_1') }}</p>
                                 </div>
                             </div>
 
@@ -172,14 +157,14 @@
                                     </div>
                                 </div>
                                 <div>
-                                    <h3 class="text-lg md:text-xl font-semibold text-gray-900 mb-1 md:mb-2">Найдите свой путь</h3>
-                                    <p class="text-sm md:text-base text-gray-600">Определите свои интересы и предпочтения, чтобы выбрать наиболее подходящую для вас карьерную траекторию.</p>
+                                    <h3 class="text-lg md:text-xl font-semibold text-gray-900 mb-1 md:mb-2">{{ __('all.home.bottom.content.title_2') }}</h3>
+                                    <p class="text-sm md:text-base text-gray-600">{{ __('all.home.bottom.content.desc_2') }}</p>
                                 </div>
                             </div>
 
                             <div class="pt-4 md:pt-6">
                                 <a href="{{ route('profession-map') }}" class="inline-flex items-center justify-center w-full sm:w-auto px-6 md:px-8 py-3 text-sm md:text-base font-medium text-white bg-gradient-to-r from-blue-600 to-blue-500 rounded-xl hover:bg-blue-700 transform transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                    <span>Открыть карту профессий</span>
+                                    <span>{{ __('all.home.bottom.btn') }}</span>
                                     <svg class="ml-2 -mr-1 w-4 h-4 md:w-5 md:h-5" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
                                     </svg>

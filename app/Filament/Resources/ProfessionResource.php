@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProfessionResource\Pages;
 use App\Models\Profession;
+use App\Models\Sphere;
 use App\Models\Talent;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -35,18 +36,18 @@ class ProfessionResource extends Resource
                             ->label('Название профессии')
                             ->required()
                             ->maxLength(255),
-                        
+
                         Forms\Components\Select::make('sphere_id')
                             ->label('Сфера')
                             ->options(\App\Models\Sphere::pluck('name', 'id'))
                             ->searchable()
                             ->nullable(),
-                            
+
                         Forms\Components\Textarea::make('description')
                             ->label('Описание')
                             ->maxLength(65535)
                             ->columnSpanFull(),
-                        
+
                         Forms\Components\Toggle::make('is_active')
                             ->label('Активна')
                             ->default(true),
@@ -61,12 +62,12 @@ class ProfessionResource extends Resource
                             ->required()
                             ->distinct()
                             ->disableOptionsWhenSelectedInSiblingRepeaterItems(),
-                            
+
                         Forms\Components\TextInput::make('coefficient')
                             ->label('Коэффициент')
                             ->numeric()
                             ->step(0.01)
-                            ->minValue(0.01)
+                            ->minValue(0)
                             ->maxValue(9.99)
                             ->default(1.00)
                             ->required(),
@@ -78,7 +79,7 @@ class ProfessionResource extends Resource
                     ->columnSpanFull()
                     ->addActionLabel('Добавить талант')
                     ->collapsible()
-                    ->itemLabel(fn (array $state): ?string => 
+                    ->itemLabel(fn (array $state): ?string =>
                         $state['talent_id'] ? Talent::find($state['talent_id'])?->name . ' (коэф.: ' . ($state['coefficient'] ?? '1.00') . ')' : null
                     ),
             ]);
@@ -92,26 +93,26 @@ class ProfessionResource extends Resource
                     ->label('Название')
                     ->searchable()
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('sphere.name')
                     ->label('Сфера')
                     ->sortable()
                     ->searchable()
                     ->badge(),
-                    
+
                 Tables\Columns\TextColumn::make('description')
                     ->label('Описание')
                     ->limit(50)
                     ->searchable(),
-                    
+
                 Tables\Columns\TextColumn::make('talents_count')
                     ->label('Количество талантов')
                     ->counts('talents'),
-                
+
                 Tables\Columns\IconColumn::make('is_active')
                     ->label('Активна')
                     ->boolean(),
-                    
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('Создано')
                     ->dateTime()
@@ -119,7 +120,9 @@ class ProfessionResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('sphere_id')
+                    ->options(Sphere::query()->pluck('name', 'id'))
+                    ->label('Сфера')
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

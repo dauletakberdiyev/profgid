@@ -33,15 +33,15 @@
                     {{ __('messages.nav_how_it_works') }}
                 </a>
                 <a href="{{ route('about') }}" class="text-sm font-medium {{ request()->routeIs('about') ? 'text-blue-600 font-semibold' : 'text-gray-500' }} hover:text-blue-600 transition-colors">
-                    О нас
+                    {{ __('all.header.about') }}
                 </a>
                 <a href="{{ route('profession-map') }}"
                     class="text-sm font-medium {{ request()->routeIs('profession-map') ? 'text-blue-600 font-semibold' : 'text-gray-500' }} hover:text-blue-600 transition-colors">
-                    Карта профессий
+                    {{ __('all.header.professions') }}
                 </a>
                 <a href="{{ route('grant-analysis') }}"
                     class="text-sm font-medium {{ request()->routeIs('grant-analysis') ? 'text-blue-600 font-semibold' : 'text-gray-500' }} hover:text-blue-600 transition-colors">
-                    Грант анализ
+                    {{ __('all.header.grant') }}
                 </a>
                 <a href="{{ route('test-preparation') }}"
                     class="text-sm font-medium {{ request()->routeIs(['test-preparation', 'test', 'talent-test', 'test.results', 'talent-test-results']) ? 'text-blue-600 font-semibold' : 'text-gray-500' }} hover:text-blue-600 transition-colors">
@@ -51,12 +51,12 @@
 
             <!-- Desktop Auth/Actions -->
             <div class="hidden md:flex items-center space-x-4">
-                {{-- <div class="relative inline-block text-left" x-data="{ open: false }">
+                 <div class="relative inline-block text-left" x-data="{ open: false }">
                     <div>
                         <button type="button"
                             class="flex items-center gap-x-2 text-sm font-medium text-gray-700 hover:text-gray-900 focus:outline-none"
                             @click="open = !open" @click.away="open = false">
-                            {{ strtoupper(App::getLocale()) }}
+                            {{ strtoupper(session()->get('locale') ?? 'ru') }}
                             <svg class="-mr-1 ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                                 fill="currentColor" aria-hidden="true">
                                 <path fill-rule="evenodd"
@@ -76,16 +76,16 @@
                         x-transition:leave-end="transform opacity-0 scale-95">
                         <div class="py-1">
                             <a href="{{ route('locale.set', 'kk') }}"
-                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 {{ app()->getLocale() == 'kk' ? 'bg-gray-100 font-medium' : '' }}">
+                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 {{ session()->get('locale') == 'kk' ? 'bg-gray-100 font-medium' : '' }}">
                                 {{ __('messages.language_kk') }}
                             </a>
                             <a href="{{ route('locale.set', 'ru') }}"
-                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 {{ app()->getLocale() == 'ru' ? 'bg-gray-100 font-medium' : '' }}">
+                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 {{ session()->get('locale') == 'ru' ? 'bg-gray-100 font-medium' : '' }}">
                                 {{ __('messages.language_ru') }}
                             </a>
                         </div>
                     </div>
-                </div> --}}
+                </div>
 
                 @auth
                     <!-- User Dropdown -->
@@ -102,10 +102,6 @@
                             class="text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors">
                             {{ __('messages.register') }}
                         </a>
-                        {{-- <a href="#"
-                            class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-md text-sm font-medium transition-colors ml-2">
-                            {{ __('messages.nav_take_test') }}
-                        </a> --}}
                     </div>
                 @endauth
             </div>
@@ -128,16 +124,16 @@
                 </a>
                 <a href="{{ route('about') }}"
                    class="block px-3 py-2 text-base font-medium {{ request()->routeIs('about') ? 'text-blue-600 bg-blue-50 font-semibold' : 'text-gray-700' }} hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors">
-                    О нас
+                    {{ __('all.header.about') }}
                 </a>
                 <a href="{{ route('profession-map') }}"
                    class="block px-3 py-2 text-base font-medium {{ request()->routeIs('profession-map') ? 'text-blue-600 bg-blue-50 font-semibold' : 'text-gray-700' }} hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors">
-                    Карта профессий
+                    {{ __('all.header.professions') }}
                 </a>
 
                 <a href="{{ route('grant-analysis') }}"
                    class="block px-3 py-2 text-base font-medium {{ request()->routeIs('grant-analysis') ? 'text-blue-600 bg-blue-50 font-semibold' : 'text-gray-700' }} hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors">
-                    Грант анализ
+                    {{ __('all.header.grant') }}
                 </a>
 
                 <a href="{{ route('test-preparation') }}"
@@ -162,23 +158,47 @@
                             </div>
                         </div>
                         <div class="mt-3 space-y-1">
-                            <a href="#"
+                            <a href="{{ route('profile') }}"
                                class="block px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors">
-                                Профиль
-                            </a>
-                            <a href="{{ route('profession-map') }}"
-                               class="block px-3 py-2 text-base font-medium {{ request()->routeIs('profession-map') ? 'text-blue-600 bg-blue-50 font-semibold' : 'text-gray-700' }} hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors">
-                                Карта профессий
+                                {{ __('messages.profile') }}
                             </a>
                             <a href="{{ route('test.history') }}"
                                 class="block px-3 py-2 text-base font-medium {{ request()->routeIs('test.history') ? 'text-blue-600 bg-blue-50 font-semibold' : 'text-gray-700' }} hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors">
-                                Мои отчеты
+                                {{ __('messages.test_history') }}
+                            </a>
+                            <a href="{{ route('my-professions') }}"
+                               class="block px-3 py-2 text-base font-medium {{ request()->routeIs('my-professions') ? 'text-blue-600 bg-blue-50 font-semibold' : 'text-blue-600' }} hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors">
+                                <div class="flex items-center">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                                    </svg>
+                                    {{ __('all.header.my_professions') }}
+                                    @if($favoriteProfessions->count() > 0)
+                                        <span class="ml-auto bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded-full">
+                                            {{ $favoriteProfessions->count() }}
+                                        </span>
+                                    @endif
+                                </div>
+                            </a>
+                            <a href="{{ route('my-spheres') }}"
+                               class="block px-3 py-2 text-base font-medium {{ request()->routeIs('my-spheres') ? 'text-blue-600 bg-blue-50 font-semibold' : 'text-blue-600' }} hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors">
+                                <div class="flex items-center">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                                    </svg>
+                                    {{ __('all.header.my_spheres') }}
+                                    @if($favoriteSpheres->count() > 0)
+                                        <span class="ml-auto bg-blue-100 text-blue-800 text-xs font-medium px-2 py-0.5 rounded-full">
+                                            {{ $favoriteSpheres->count() }}
+                                        </span>
+                                    @endif
+                                </div>
                             </a>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <button type="submit"
                                         class="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors">
-                                    Выйти
+                                    {{ __('messages.logout') }}
                                 </button>
                             </form>
                         </div>

@@ -122,13 +122,6 @@ function talentTest(questions, timePerQuestion, testSessionId) {
         testSessionId: testSessionId,
         isSubmitting: false,
         isTransitioning: false, // Добавляем флаг для предотвращения двойных переходов
-        answerOptions: [
-            'Нет',
-            'Скорее нет, чем да',
-            'Не знаю',
-            'Скорее да, чем нет',
-            'Да',
-        ],
         answersOp: {
             'ru': [
                 'Нет',
@@ -137,7 +130,7 @@ function talentTest(questions, timePerQuestion, testSessionId) {
                 'Скорее да, чем нет',
                 'Да',
             ],
-            'kz': [
+            'kk': [
                 'Жоқ',
                 'Жоққа жақынырақ',
                 'Білмеймін',
