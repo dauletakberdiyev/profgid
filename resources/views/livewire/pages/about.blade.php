@@ -3,10 +3,10 @@
     <section class="py-16 md:py-24">
         <div class="max-w-4xl mx-auto px-4 text-center">
             <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-                О нас
+                {{ __('all.about.title') }}
             </h1>
             <p class="text-xl md:text-2xl text-gray-600 leading-relaxed">
-                Помогаем найти профессию, которая подходит именно вам
+                {{ __('all.about.desc') }}
             </p>
         </div>
     </section>
@@ -16,40 +16,40 @@
         <div class="max-w-4xl mx-auto px-4">
             <div class="prose prose-lg mx-auto text-gray-700">
                 <p class="text-xl leading-relaxed mb-8">
-                    ProfGid — это команда профессионалов, помогающая людям определить свои сильные стороны, найти подходящую профессию и построить успешную карьеру.
+                    {{ __('all.about.content.text_1') }}
                 </p>
 
                 <div class="space-y-8">
                     <div>
 
                         <p class="text-lg leading-relaxed">
-                            Мы верим, что у каждого есть уникальные таланты и способности, которые можно раскрыть и направить на достижение целей. Наша миссия — помочь людям лучше понять себя и выбрать путь, который принесёт удовлетворение и успех.
+                            {{ __('all.about.content.text_2') }}
                         </p>
                     </div>
 
                     <div>
-                        <h2 class="text-2xl font-semibold text-gray-900 mb-4">Чем мы занимаемся?</h2>
+                        <h2 class="text-2xl font-semibold text-gray-900 mb-4">{{ __('all.about.content.text_3') }}</h2>
                         <ul class="list-disc list-inside">
-                            <li class="text-lg leading-relaxed">Профориентация: Индивидуальные консультации для школьников, студентов и взрослых.</li>
-                            <li class="text-lg leading-relaxed">Анализ талантов: Используем современные методики, такие как тест Gallup CliftonStrengths, MBTI, и другие международно признанные инструменты.</li>
+                            <li class="text-lg leading-relaxed">{{ __('all.about.content.text_4') }}</li>
+                            <li class="text-lg leading-relaxed">{{ __('all.about.content.text_5') }}</li>
                             <li class="text-lg leading-relaxed">
-                                Рекомендации: Подбор профессий и сфер деятельности, соответствующих вашим интересам и сильным сторонам.
+                                {{ __('all.about.content.text_6') }}
                             </li>
                         </ul>
                     </div>
 
                     <div>
-                        <h2 class="text-2xl font-semibold text-gray-900 mb-4">Наши ценности</h2>
+                        <h2 class="text-2xl font-semibold text-gray-900 mb-4">{{ __('all.about.content.text_7') }}</h2>
                         <ul class="list-disc list-inside">
-                            <li class="text-lg leading-relaxed">Индивидуальный подход: Каждый человек уникален, и мы учитываем это в своей работе.</li>
-                            <li class="text-lg leading-relaxed">Достоверность: Все наши рекомендации основаны на научных методах и глубоких анализах.</li>
-                            <li class="text-lg leading-relaxed">Постоянное развитие: Мы следим за новыми тенденциями и совершенствуем наши услуги.</li>
+                            <li class="text-lg leading-relaxed">{{ __('all.about.content.text_8') }}</li>
+                            <li class="text-lg leading-relaxed">{{ __('all.about.content.text_9') }}</li>
+                            <li class="text-lg leading-relaxed">{{ __('all.about.content.text_10') }}</li>
                         </ul>
                     </div>
 
                     <div>
                         <p class="text-lg leading-relaxed">
-                            С ProfGid вы получаете не просто советы, а чёткий план действий для достижения ваших карьерных целей. Мы — ваш проводник в мире профессий и возможностей!
+                            {{ __('all.about.content.text_11') }}
                         </p>
                     </div>
                 </div>
@@ -61,10 +61,10 @@
     <section class="py-16">
         <div class="max-w-4xl mx-auto px-4 text-center">
             <h2 class="text-3xl font-bold text-gray-900 mb-8">
-                Есть вопросы?
+                {{ __('all.about.footer.title') }}
             </h2>
             <p class="text-lg text-gray-600 mb-8">
-                Свяжитесь с нами, и мы поможем вам разобраться
+                {{ __('all.about.footer.desc') }}
             </p>
 
             <div class="space-y-4 text-lg">
@@ -81,14 +81,14 @@
     <section class="py-16 bg-blue-50">
         <div class="max-w-4xl mx-auto px-4 text-center">
             <h2 class="text-3xl font-bold text-gray-900 mb-6">
-                Готовы найти свою профессию?
+                {{ __('all.about.cta.title') }}
             </h2>
             <p class="text-lg text-gray-600 mb-8">
-                Пройдите тест и получите персональные рекомендации
+                {{ __('all.about.cta.desc') }}
             </p>
             <a href="{{ route('test-preparation') }}"
                class="inline-block bg-blue-600 text-white px-8 py-3 rounded-lg text-lg font-medium hover:bg-blue-700 transition-colors">
-                Пройти тест
+                {{ __('all.about.cta.btn') }}
             </a>
         </div>
     </section>

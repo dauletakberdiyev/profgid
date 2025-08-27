@@ -1283,7 +1283,7 @@
 
                 @php
                     $topThirtyProfessions = collect($topProfessions)->take(30)->toArray();
-                    $nextTenProfessions = collect($topProfessions)->skip(30)->take(10)->toArray();
+                    $nextTenProfessions = collect($topProfessions)->take(-10)->toArray();
 
                     // Фиолетовый цвет для профессий
                     $professionColor = '#8B5CF6';

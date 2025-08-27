@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
+/**
+ * @property int $id
+ */
 class Profession extends Model
 {
     protected $fillable = [
@@ -51,7 +54,7 @@ class Profession extends Model
     public function getLocalizedNameAttribute()
     {
         $locale = app()->getLocale();
-        
+
         return match($locale) {
             'kz' => $this->name_kz ?? $this->name,
             'en' => $this->name_en ?? $this->name,
@@ -65,7 +68,7 @@ class Profession extends Model
     public function getLocalizedDescriptionAttribute()
     {
         $locale = app()->getLocale();
-        
+
         return match($locale) {
             'kz' => $this->description_kz ?? $this->description,
             'en' => $this->description_en ?? $this->description,
