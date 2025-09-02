@@ -32,10 +32,10 @@ class TalentPdfController extends Controller
         // Общие данные
         $userResults = [];
         $domains = [
-            "executing" => "EXECUTING",
-            "influencing" => "INFLUENCING",
-            "relationship" => "RELATIONSHIP BUILDING",
-            "strategic" => "STRATEGIC THINKING",
+            "executing" => "ИСПОЛНЕНИЕ",
+            "influencing" => "ВЛИЯНИЕ",
+            "relationship" => "ОТНОШЕНИЯ",
+            "strategic" => "МЫШЛЕНИЕ",
         ];
         $domainScores = [
             "executing" => 0,
@@ -43,8 +43,10 @@ class TalentPdfController extends Controller
             "relationship" => 0,
             "strategic" => 0,
         ];
+
         $talents = Talent::with("domain")->orderBy("id")->get();
         $answers = Answer::with("talent.domain")->orderBy("id")->get();
+
         $questionScores = [];
         foreach ($testSession->userAnswers as $userAnswer) {
             $questionId = $userAnswer->question_id;
@@ -53,42 +55,51 @@ class TalentPdfController extends Controller
             }
             $questionScores[$questionId] += $userAnswer->answer_value;
         }
+
         $talentScores = [];
         foreach ($talents as $talent) {
             $talentScores[$talent->id] = 0;
         }
+
         foreach ($questionScores as $questionId => $score) {
-            $questionIndex = $questionId - 1;
-            if ($questionIndex >= 0 && $questionIndex < count($answers)) {
-                $answer = $answers[$questionIndex];
-                if ($answer->talent) {
-                    $talentScores[$answer->talent->id] += $score;
-                }
+            // Находим ответ (вопрос) по его ID
+            $answer = $answers->firstWhere('id', $questionId);
+            if ($answer && $answer->talent) {
+                // Add the score to the corresponding talent
+                $talentScores[$answer->talent->id] += $score;
             }
         }
+
         foreach ($talents as $talent) {
             $score = $talentScores[$talent->id] ?? 0;
             $domainName = $talent->domain ? $talent->domain->name : "executing";
+
+            $domainKey = $this->mapDomainNameToKey($domainName);
+
             $userResults[] = [
                 "id" => $talent->id,
                 "name" => $talent->name,
                 "description" => $talent->description ?? "",
                 "short_description" => $talent->short_description ?? "",
                 "advice" => $talent->advice ?? "",
-                "domain" => $domainName,
+                "domain" => $domainKey,
                 "score" => $score,
                 "rank" => 0,
             ];
-            if (isset($domainScores[$domainName])) {
-                $domainScores[$domainName] += $score;
+
+            if (isset($domainScores[$domainKey])) {
+                $domainScores[$domainKey] += $score;
             }
         }
+
         usort($userResults, function ($a, $b) {
             return $b["score"] <=> $a["score"];
         });
+
         for ($i = 0; $i < count($userResults); $i++) {
             $userResults[$i]["rank"] = $i + 1;
         }
+
         $maxScore = max(array_column($userResults, "score"));
         $topTenTalents = array_slice(
             array_filter($userResults, function ($talent) {
@@ -129,6 +140,7 @@ class TalentPdfController extends Controller
         $userName = Auth::user()->name ?? "User";
         $fileName =
             "Отчет_" . $userName . "_" . now()->format("Y-m-d") . ".pdf";
+
         // Генерация PDF в зависимости от тарифного плана
         if ($plan === "talents") {
             $html = view("pdf.talent-full", [
@@ -186,14 +198,18 @@ class TalentPdfController extends Controller
             foreach ($userResults as $result) {
                 $userTalentScores[$result["id"]] = $result["score"];
             }
+
             $maxUserScore = max(array_column($userResults, "score"));
             $maxUserScore = max($maxUserScore, 1);
+
             $allSpheres = \App\Models\Sphere::with([
                 "professions.talents",
             ])->get();
             $spheresData = collect();
+
             foreach ($allSpheres as $sphere) {
                 $compatibilityPercentage = 0;
+
                 $sphereTalents = collect();
                 foreach ($sphere->professions as $profession) {
                     foreach ($profession->talents as $talent) {
@@ -220,10 +236,12 @@ class TalentPdfController extends Controller
                         }
                     }
                 }
+
                 if ($sphereTalents->count() > 0) {
                     $totalWeightedScore = 0;
                     $totalWeight = 0;
                     $matchingTalentsCount = 0;
+
                     foreach ($sphereTalents as $talent) {
                         $userScore = $userTalentScores[$talent->id] ?? 0;
                         $coefficient = $talent->coefficient ?? 0.5;
@@ -266,6 +284,7 @@ class TalentPdfController extends Controller
                 $sphere["is_top"] = $index < 8;
                 return $sphere;
             });
+
             // --- topProfessions ---
             $allProfessions = \App\Models\Profession::with([
                 "talents",
@@ -528,6 +547,8 @@ class TalentPdfController extends Controller
             ])->render();
 
             $pdf = Browsershot::html($html)
+                ->setNodeBinary('/Users/dauletakberdiyev/.nvm/versions/node/v20.15.0/bin/node')
+                ->setNpmBinary('/Users/dauletakberdiyev/.nvm/versions/node/v20.15.0/bin/npm')
                 ->noSandbox()
                 ->showBackground()
                 ->format("A4")
@@ -550,5 +571,47 @@ class TalentPdfController extends Controller
         } else {
             abort(400, "Unknown plan or plan not provided");
         }
+    }
+
+    private function mapDomainNameToKey($domainName)
+    {
+        // Сопоставление различных вариантов названий доменов
+        $mapping = [
+            'executing' => 'executing',
+            'EXECUTING' => 'executing',
+            'Executing' => 'executing',
+            'ИСПОЛНЕНИЕ' => 'executing',
+            'исполнение' => 'executing',
+            'Исполнение' => 'executing',
+
+            'influencing' => 'influencing',
+            'INFLUENCING' => 'influencing',
+            'Influencing' => 'influencing',
+            'ВЛИЯНИЕ' => 'influencing',
+            'влияние' => 'influencing',
+            'Влияние' => 'influencing',
+
+            'relationship' => 'relationship',
+            'RELATIONSHIP' => 'relationship',
+            'Relationship' => 'relationship',
+            'RELATIONSHIP BUILDING' => 'relationship',
+            'relationship building' => 'relationship',
+            'Relationship Building' => 'relationship',
+            'ОТНОШЕНИЯ' => 'relationship',
+            'отношения' => 'relationship',
+            'Отношения' => 'relationship',
+
+            'strategic' => 'strategic',
+            'STRATEGIC' => 'strategic',
+            'Strategic' => 'strategic',
+            'STRATEGIC THINKING' => 'strategic',
+            'strategic thinking' => 'strategic',
+            'Strategic Thinking' => 'strategic',
+            'МЫШЛЕНИЕ' => 'strategic',
+            'мышление' => 'strategic',
+            'Мышление' => 'strategic',
+        ];
+
+        return $mapping[$domainName] ?? 'executing'; // По умолчанию executing
     }
 }
