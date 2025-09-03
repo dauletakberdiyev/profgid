@@ -547,8 +547,8 @@ class TalentPdfController extends Controller
             ])->render();
 
             $pdf = Browsershot::html($html)
-                ->setNodeBinary('/usr/bin/node')
-                ->setNpmBinary('/usr/bin/npm')
+                ->setNodeBinary('/Users/dauletakberdiyev/.nvm/versions/node/v20.15.0/bin/node')
+                ->setNpmBinary('/Users/dauletakberdiyev/.nvm/versions/node/v20.15.0/bin/npm')
                 ->noSandbox()
                 ->showBackground()
                 ->format("A4")

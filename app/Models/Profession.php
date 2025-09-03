@@ -13,7 +13,9 @@ class Profession extends Model
 {
     protected $fillable = [
         'name',
+        'name_kz',
         'description',
+        'description_kz',
         'sphere_id',
         'is_active'
     ];
@@ -56,7 +58,7 @@ class Profession extends Model
         $locale = app()->getLocale();
 
         return match($locale) {
-            'kz' => $this->name_kz ?? $this->name,
+            'kk' => $this->name_kz ?? $this->name,
             'en' => $this->name_en ?? $this->name,
             default => $this->name
         };
@@ -70,7 +72,7 @@ class Profession extends Model
         $locale = app()->getLocale();
 
         return match($locale) {
-            'kz' => $this->description_kz ?? $this->description,
+            'kk' => $this->description_kz ?? $this->description,
             'en' => $this->description_en ?? $this->description,
             default => $this->description
         };

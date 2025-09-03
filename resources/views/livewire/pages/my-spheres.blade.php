@@ -2,16 +2,16 @@
     <div class="max-w-2xl mx-auto">
         <!-- Header -->
         <div class="mb-6 text-center">
-            <h1 class="text-2xl font-light text-gray-900 mb-1">Избранные сферы</h1>
-            <p class="text-sm text-gray-600">Ваши сохраненные сферы деятельности</p>
+            <h1 class="text-2xl font-light text-gray-900 mb-1">{{ __('all.my_spheres.title') }}</h1>
+            <p class="text-sm text-gray-600">{{ __('all.my_spheres.desc') }}</p>
         </div>
 
         <!-- Flash Message -->
-        @if(session('message'))
-            <div class="mb-4 text-center">
-                <p class="text-green-600 text-sm font-medium">{{ session('message') }}</p>
-            </div>
-        @endif
+{{--        @if(session('message'))--}}
+{{--            <div class="mb-4 text-center">--}}
+{{--                <p class="text-green-600 text-sm font-medium">{{ session('message') }}</p>--}}
+{{--            </div>--}}
+{{--        @endif--}}
 
         @if($favoriteSpheres->count() > 0)
             <!-- Spheres List -->
@@ -28,12 +28,9 @@
 
                                 <div class="flex items-center space-x-1">
                                     <button wire:click.stop="removeSphere({{ $sphere->id }})"
-                                        class="text-gray-400 hover:text-red-600 transition-colors p-0.5"
+                                        class="text-gray-400 hover:text-red-600 transition-colors p-0.5 cursor-pointer"
                                         title="Удалить из избранного">
-                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                                d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
-                                        </svg>
+                                        <div class="w-4 h-4 text-gray-500">{{ svg('ionicon-heart-dislike-outline') }}</div>
                                     </button>
 
                                     <div class="text-gray-400 transition-transform duration-200 {{ in_array($sphere->id, $expandedSpheres) ? 'rotate-90' : '' }}">
@@ -58,11 +55,11 @@
                                 <!-- Professions List -->
                                 @if($sphere->professions->count() > 0)
                                     <div class="p-3">
-                                        <h4 class="text-xs font-medium text-gray-900 mb-2">Профессии в этой сфере:</h4>
+                                        <h4 class="text-xs font-medium text-gray-900 mb-2">{{ __('all.my_spheres.professions.title') }}</h4>
                                         <div class="grid grid-cols-1 gap-1">
                                             @foreach($sphere->professions as $profession)
                                                 <div class="bg-white border border-gray-200 rounded px-2 py-1 text-xs text-gray-700 hover:bg-gray-50 transition-colors">
-                                                    {{ $profession->name }}
+                                                    {{ $profession->localized_name }}
                                                 </div>
                                             @endforeach
                                         </div>

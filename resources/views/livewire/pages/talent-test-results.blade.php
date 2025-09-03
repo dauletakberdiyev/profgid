@@ -304,7 +304,7 @@
                             <button @click="setActiveTab('talents')"
                                 :class="activeTab === 'talents' ? 'border-blue-600 text-blue-600' :
                                     'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-                                class="py-3 px-1 border-b-2 font-medium text-sm transition-colors duration-200">
+                                class="py-3 px-1 border-b-2 font-medium text-xs md:text-sm transition-colors duration-200">
                                 Топ Таланты
                             </button>
 
@@ -313,7 +313,7 @@
                                 <button @click="setActiveTab('spheres')"
                                     :class="activeTab === 'spheres' ? 'border-blue-600 text-blue-600' :
                                         'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-                                    class="py-3 px-1 border-b-2 font-medium text-sm transition-colors duration-200">
+                                    class="py-3 px-1 border-b-2 font-medium text-xs md:text-sm transition-colors duration-200">
                                     Топ Сферы
                                 </button>
                             @endif
@@ -323,7 +323,7 @@
                                 <button @click="setActiveTab('professions')"
                                     :class="activeTab === 'professions' ? 'border-blue-600 text-blue-600' :
                                         'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-                                    class="py-3 px-1 border-b-2 font-medium text-sm transition-colors duration-200">
+                                    class="py-3 px-1 border-b-2 font-medium text-xs md:text-sm transition-colors duration-200">
                                     Топ Профессии
                                 </button>
                             @endif
@@ -365,7 +365,7 @@
                                             d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
                                         </path>
                                     </svg>
-                                    <span class="text-sm md:text-base text-gray-600 group-hover:text-gray-800 font-medium">
+                                    <span class="text-sm md:text-base text-gray-600 group-hover:text-gray-800 hidden md:block font-medium">
                                         Скачать отчет
                                     </span>
                                 </a>
@@ -412,7 +412,7 @@
                         $topDomain = array_keys($domainScores, max($domainScores))[0] ?? 'executing';
                         $topDomainName = $domains[$topDomain] ?? 'EXECUTING';
                     @endphp
-                    <h1 class="text-xl md:text-2xl font-medium text-gray-900 mb-2 md:mb-4 leading-relaxed">
+                    <h1 class="text-sm md:text-2xl font-medium text-gray-900 mb-2 md:mb-4 leading-relaxed">
                         Вы лидируете с <span class="font-extrabold">{{ $topDomainName }}</span> темами.
                     </h1>
                 </div>
@@ -494,49 +494,46 @@
                         foreach ($sortedDomainScores as $domain => $score) {
                             $domainPercentages[$domain] = round(($score / $totalScore) * 100);
                         }
+
+                        $percentages = [40, 30, 20, 10];
+                        $i = 0;
+                        $j = 0;
+                        $k = 0;
                     @endphp
 
                     <!-- Temporary Debug Info (remove in production) -->
-                    {{--
-                    <div class="mb-4 p-3 bg-yellow-100 border border-yellow-400 rounded text-sm">
-                        <strong>Debug Info:</strong><br>
-                        Domain Scores: {{ json_encode($domainScores) }}<br>
-                        Complete Domain Scores: {{ json_encode($completeDomainScores) }}<br>
-                        Domains: {{ json_encode($domains) }}<br>
-                        Total Score: {{ $totalScore }}
-                    </div>
-                    --}}
+{{--                    <div class="mb-4 p-3 bg-yellow-100 border border-yellow-400 rounded text-sm">--}}
+{{--                        <strong>Debug Info:</strong><br>--}}
+{{--                        Domain Scores: {{ json_encode($domainScores) }}<br>--}}
+{{--                        Complete Domain Scores: {{ json_encode($completeDomainScores) }}<br>--}}
+{{--                        Domains: {{ json_encode($domains) }}<br>--}}
+{{--                        Sorted Domains: {{ json_encode($sortedForTop) }}<br>--}}
+{{--                        Total Score: {{ $totalScore }}--}}
+{{--                    </div>--}}
+
 
                     <!-- Single horizontal bar -->
-                    <div class="flex w-full h-6 md:h-8 overflow-hidden mb-3 md:mb-4 bg-gray-200 rounded">
-                        @foreach ($sortedDomainScores as $domain => $score)
+                    <div class="flex w-full h-6 md:h-8 overflow-hidden mb-3 md:mb-4 bg-gray-200 rounded hidden md:flex">
+                        @foreach ($sortedForTop as $domain => $score)
                             @php
-                                $percentage = $totalScore > 0 ? ($score / $totalScore) * 100 : 25; // Равномерное распределение если нет данных
-                                // Если все домены имеют одинаковые оценки или нет данных, делаем равномерное распределение
-                                if ($totalScore == 0 || count(array_unique($completeDomainScores)) == 1) {
-                                    $percentage = 25; // 100% / 4 домена = 25% каждый
-                                }
-                                // Гарантируем минимальную видимость для каждого домена
-                                $adjustedPercentage = max($percentage, 10);
+                                $percentage = $percentages[$i] ?? 10; // default to 10 if more domains
+                                $i++;
                             @endphp
                             <div class="{{ $domainBgColors[$domain] ?? 'bg-gray-400' }} flex items-center justify-center text-white font-bold text-xs md:text-sm flex-shrink-0"
-                                style="width: {{ $adjustedPercentage }}%; min-width: 10%;">
+                                style="width: {{ $percentage }}%; min-width: 10%;">
 
                             </div>
                         @endforeach
                     </div>
 
                     <!-- Domain labels with scores and percentages -->
-                    <div class="flex w-full">
-                        @foreach ($sortedDomainScores as $domain => $score)
+                    <div class="flex w-full hidden md:flex">
+                        @foreach ($sortedForTop as $domain => $score)
                             @php
-                                $percentage = $totalScore > 0 ? ($score / $totalScore) * 100 : 25;
-                                if ($totalScore == 0 || count(array_unique($completeDomainScores)) == 1) {
-                                    $percentage = 25;
-                                }
-                                $adjustedPercentage = max($percentage, 10);
+                                $percentage = $percentages[$j] ?? 10; // default to 10 if more domains
+                                $j++;
                             @endphp
-                            <div class="text-left flex-shrink-0" style="width: {{ $adjustedPercentage }}%; min-width: 10%;">
+                            <div class="text-left flex-shrink-0" style="width: {{ $percentage }}%; min-width: 10%;">
                                 <div class="text-xs md:text-sm font-medium text-gray-700 truncate">
                                     {{ $domains[$domain] ?? $domain }}
                                 </div>
@@ -544,20 +541,37 @@
                             </div>
                         @endforeach
                     </div>
+
+                    <div class="flex w-full flex-col md:hidden">
+                        @foreach ($sortedForTop as $domain => $score)
+                            @php
+                                $percentage = $percentages[$k] ?? 10; // default to 10 if more domains
+                                $k++;
+                            @endphp
+                            <div class="flex flex-col text-left flex-shrink-0 mb-2">
+                                <div class="text-sm font-medium text-gray-700 truncate">
+                                    {{ $domains[$domain] ?? $domain }}
+                                </div>
+                                <div class="{{ $domainBgColors[$domain] ?? 'bg-gray-400' }} flex items-center justify-center p-0.5 flex-shrink-0"
+                                     style="width: {{ $percentage + 30 }}%; min-width: 10%;">
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
 
-                <p class="text-xs md:text-sm text-gray-600 mb-6 md:mb-8 leading-relaxed">
+                <p class="text-sm md:text-sm text-gray-600 mb-6 md:mb-8 leading-relaxed">
                     Вы умеете брать на себя инициативу, уверенно выражать свои мысли и вдохновлять других на действия.
                     Ваши таланты из блока
                     Влияние помогают мотивировать окружающих, убеждать их и добиваться значимых изменений
                 </p>
 
-                <h2 class="text-lg md:text-xl font-bold mb-3 md:mb-4">Ваши таланты по доменам</h2>
+                <h2 class="text-lg md:text-xl font-semibold mb-3 md:mb-4">Ваши таланты по доменам</h2>
 
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-1 mb-6 md:mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-3 md:gap-1 mb-6 md:mb-8">
                     @foreach ($domains as $domain => $name)
                         <div class="mb-4 md:mb-0">
-                            <div class="text-center font-bold uppercase text-xs md:text-sm mb-2 md:mb-3 pb-1 md:pb-2 text-gray-800 p-1 md:p-2 border-b-4 md:border-b-8"
+                            <div class="text-center font-semibold uppercase text-xs md:text-sm mb-2 md:mb-3 pb-1 md:pb-2 text-gray-800 p-1 md:p-2 border-b-4 md:border-b-8"
                                 style="border-color: {{ $domainColors[$domain] }}">
                                 {{ $name }}
                             </div>
@@ -595,8 +609,8 @@
                                     @endphp
                                     <div
                                         class="{{ $bgColor }} {{ $textColor }} text-center aspect-square flex flex-col items-center justify-center p-1">
-                                        <div class="text-lg md:text-xl font-bold">{{ $talent['rank'] }}</div>
-                                        <div class="text-xs md:text-xs px-1 text-center leading-tight mt-1">{{ $talent['name'] }}
+                                        <div class="text-lg md:text-xl font-semibold">{{ $talent['rank'] }}</div>
+                                        <div class="text-xs md:text-xs text-center leading-tight mt-1">{{ $talent['name'] }}
                                         </div>
                                     </div>
                                 @endforeach
@@ -607,27 +621,27 @@
 
 
                 <div class="space-y-5">
-                    <h2 class="text-lg md:text-xl font-bold mb-3 md:mb-4">Цифры в профиле показывают, какие таланты у
+                    <h2 class="text-lg md:text-xl font-semibold mb-3 md:mb-4">Цифры в профиле показывают, какие таланты у
                         тебя выражены сильнее всего:</h2>
 
-                    <span class="block">
+                    <span class="block text-sm md:text-base">
                         Топ-8 талантов: Они выделены ярким цветом, чтобы показать их важность. Это твои главные сильные
                         стороны, которые ты чаще
                         всего используешь
                     </span>
 
-                    <span class="block">
+                    <span class="block text-sm md:text-base">
                         9–16: Эти таланты тоже заметны, но немного меньше.
                     </span>
 
-                    <span class="block">
+                    <span class="block text-sm md:text-base">
                         17–24: Эти таланты менее выражены, но это не слабости, просто ты используешь их реже.
                     </span>
                 </div>
 
                 <!-- Таланты блок -->
-                <div class="mt-20 space-y-6" x-data="{ expandedTalents: [] }">
-                    <h2 class="text-lg md:text-xl font-bold text-center">Описание ваших талантов</h2>
+                <div class="mt-6 space-y-6" x-data="{ expandedTalents: [] }">
+                    <h2 class="text-lg md:text-xl font-semibold text-center">Описание ваших талантов</h2>
 
                     @php
                         $topTenTalents = collect($userResults)->take(10)->toArray();
@@ -653,22 +667,22 @@
 
                                     <!-- Все топ 10 талантов с аккордеоном -->
                                     <div class="border-gray-200 p-3 transition-all hover:bg-blue-100 bg-blue-50"
-                                        style="border-left: 4px solid {{ $talentDomainColor }}">
+                                        style="background-color: {{$talentDomainColor}}">
                                         <!-- Заголовок таланта -->
                                         <div class="flex items-center justify-between cursor-pointer"
                                             @click="expandedTalents.includes('{{ $talentId }}') ? expandedTalents.splice(expandedTalents.indexOf('{{ $talentId }}'), 1) : expandedTalents.push('{{ $talentId }}')">
                                             <div class="flex items-center flex-1 min-w-0">
-                                                <div class="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold mr-2"
+                                                <div class="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-semibold mr-2"
                                                     style="background-color: {{ $talentDomainColor }}">
                                                     {{ $talent['rank'] }}
                                                 </div>
                                                 <div class="flex-1 min-w-0">
-                                                    <h3 class="text-sm font-bold text-gray-900 truncate">{{ $talent['name'] }}</h3>
-                                                    <span class="text-xs text-gray-500 truncate block">{{ $domains[$talent['domain']] ?? '' }}</span>
+                                                    <h3 class="text-sm text-white font-semibold text-gray-900 truncate">{{ $talent['name'] }}</h3>
+{{--                                                    <span class="text-xs text-gray-500 truncate block">{{ $domains[$talent['domain']] ?? '' }}</span>--}}
                                                 </div>
                                             </div>
                                             <!-- Стрелка аккордеона -->
-                                            <div class="text-gray-400 transition-transform duration-200"
+                                            <div class="text-white transition-transform duration-200"
                                                 :class="expandedTalents.includes('{{ $talentId }}') ? 'rotate-180' : ''">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
@@ -689,24 +703,24 @@
                                             <!-- Краткое описание - показывается в аккордеоне -->
                                             @if (!empty($talent['short_description']))
                                                 <div class="mb-3">
-                                                    <h4 class="text-xs font-semibold text-gray-900 mb-1">Краткое описание</h4>
-                                                    <p class="text-xs text-gray-700 leading-tight">{{ $talent['short_description'] }}</p>
+                                                    <h4 class="text-xs text-white font-semibold mb-1">Краткое описание</h4>
+                                                    <p class="text-xs text-white leading-tight">{{ $talent['short_description'] }}</p>
                                                 </div>
                                             @endif
 
                                             <!-- Обзор таланта (только для полного тарифа) -->
                                             @if (!empty($talent['description']) && $this->isFullPlan)
                                                 <div class="mb-3">
-                                                    <h4 class="text-xs font-semibold text-gray-900 mb-1">Обзор</h4>
-                                                    <p class="text-xs text-gray-700 leading-tight">{{ $talent['description'] }}</p>
+                                                    <h4 class="text-xs text-white font-semibold mb-1">Обзор</h4>
+                                                    <p class="text-xs text-white leading-tight">{{ $talent['description'] }}</p>
                                                 </div>
                                             @endif
 
                                             <!-- Советы (только для полного тарифа) -->
                                             @if ($this->isFullPlan)
                                                 <div class="pt-2 border-t border-gray-100">
-                                                    <h4 class="text-xs font-semibold text-gray-900 mb-1">Советы</h4>
-                                                    <div class="text-xs text-gray-700 leading-tight space-y-2">
+                                                    <h4 class="text-xs font-semibold text-white mb-1">Советы</h4>
+                                                    <div class="text-xs text-white leading-tight space-y-2">
                                                         @foreach ($this->getTalentAdvice($talent['name']) as $advice)
                                                             <div>
                                                                 <strong>{{ $advice['name'] }}</strong><br>
@@ -736,24 +750,28 @@
 
                                     <!-- Остальные таланты - с аккордеоном для краткого описания -->
                                     <div class="bg-gray-50 p-3 transition-all hover:bg-gray-100"
-                                        style="border-left: 4px solid {{ $talentDomainColor }}">
+                                        style="border: 1px solid {{ $talentDomainColor }}">
 
                                         <!-- Заголовок таланта с аккордеоном -->
                                         <div class="flex items-center justify-between cursor-pointer"
                                             @click="expandedTalents.includes('{{ $remainingTalentId }}') ? expandedTalents.splice(expandedTalents.indexOf('{{ $remainingTalentId }}'), 1) : expandedTalents.push('{{ $remainingTalentId }}')">
                                             <div class="flex items-center flex-1 min-w-0">
-                                                <div class="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold mr-2"
-                                                    style="background-color: {{ $talentDomainColor }}">
+                                                <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold mr-2"
+                                                    style="color: {{ $talentDomainColor }}">
                                                     {{ $talent['rank'] }}
                                                 </div>
                                                 <div class="flex-1 min-w-0">
-                                                    <h3 class="text-sm font-bold text-gray-900 truncate">{{ $talent['name'] }}</h3>
-                                                    <span class="text-xs text-gray-500 truncate block">{{ $domains[$talent['domain']] ?? '' }}</span>
+                                                    <h3 class="text-sm font-semibold truncate"
+                                                        style="color: {{ $talentDomainColor }}"
+                                                    >{{ $talent['name'] }}</h3>
+{{--                                                    <span class="text-xs text-gray-500 truncate block">{{ $domains[$talent['domain']] ?? '' }}</span>--}}
                                                 </div>
                                             </div>
                                             <!-- Стрелка аккордеона -->
-                                            <div class="text-gray-400 transition-transform duration-200"
-                                                :class="expandedTalents.includes('{{ $remainingTalentId }}') ? 'rotate-180' : ''">
+                                            <div class="transition-transform duration-200"
+                                                :class="expandedTalents.includes('{{ $remainingTalentId }}') ? 'rotate-180' : ''"
+                                                 style="color: {{ $talentDomainColor }}"
+                                            >
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                                 </svg>
