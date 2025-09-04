@@ -243,7 +243,9 @@ class TalentTestResults extends Component
         $maxUserScore = max($maxUserScore, 1); // Избегаем деления на 0
 
         // Получаем все сферы с профессиями и талантами
-        $allSpheres = Sphere::query()->with(["professions.talents"])->get();
+        $allSpheres = Sphere::query()->with([
+            "professions.talents"
+        ])->get();
         $spheresData = collect();
 
         foreach ($allSpheres as $sphere) {
