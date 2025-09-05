@@ -33,7 +33,7 @@ class PaymentStatus extends Component
                     'amount' => number_format($this->plans[$this->plan]['price'], 2, '.', ''),
                     'currency' => 'KZT',
                     'hppRedirectUrl' => route('payment-status', ['sessionId' => $this->sessionId, 'plan' => $this->plan]),
-                    'description' => 'Оплата тарифа ' . $this->plans[$this->plan]['name'],
+                    'description' => $this->plans[$this->plan]['name'],
                     'title' => 'PROFGID'
                 ]
             ];
@@ -106,17 +106,17 @@ class PaymentStatus extends Component
     public $plans = [
         "talents" => [
             "name" => "Мои Таланты",
-            "price" => 3000,
+            "price" => 15000,
             "currency" => "тг",
         ],
         "talents_spheres" => [
             "name" => "Мои Профессии",
-            "price" => 6000,
+            "price" => 15000,
             "currency" => "тг",
         ],
         "talents_spheres_professions" => [
             "name" => "Мои таланты + Профессии",
-            "price" => 9000,
+            "price" => 20000,
             "currency" => "тг",
         ],
     ];

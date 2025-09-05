@@ -2,52 +2,70 @@
     <div class="max-w-md w-full space-y-8">
         <div>
             <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-                Создать новый аккаунт
+                {{ __('all.registration.title') }}
             </h2>
             <p class="mt-2 text-center text-sm text-gray-600">
-                Или
+                {{ __('all.registration.desc_or') }}
                 <a href="{{ route('login') }}" class="font-medium text-[#ff8b0d] hover:text-[#e67d0c]">
-                    войти в существующий
+                    {{ __('all.registration.desc') }}
                 </a>
             </p>
         </div>
         <form class="mt-8 space-y-6" wire:submit.prevent="register">
             <div class="rounded-md shadow-sm -space-y-px">
                 <div>
-                    <label for="name" class="sr-only">Имя</label>
+                    <label for="name" class="sr-only">{{ __('all.registration.fields.name') }}</label>
                     <input wire:model="name" id="name" name="name" type="text" autocomplete="name" required
                         class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-[#ff8b0d] focus:border-[#ff8b0d] focus:z-10 sm:text-sm"
-                        placeholder="Имя">
+                        placeholder="{{ __('all.registration.fields.name') }}">
                     @error('name')
                         <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
                     @enderror
                 </div>
                 <div>
-                    <label for="email-address" class="sr-only">Email</label>
+                    <label for="school" class="sr-only">{{ __('all.registration.fields.school') }}</label>
+                    <input wire:model="school" id="school" name="school" type="text" autocomplete="school"
+                           class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-[#ff8b0d] focus:border-[#ff8b0d] focus:z-10 sm:text-sm"
+                           placeholder="{{ __('all.registration.fields.school') }}">
+                    @error('school')
+                    <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div>
+                    <label for="class" class="sr-only">{{ __('all.registration.fields.class') }}</label>
+                    <input wire:model="class" id="class" name="class" type="text" autocomplete="class"
+                           class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-[#ff8b0d] focus:border-[#ff8b0d] focus:z-10 sm:text-sm"
+                           placeholder="{{ __('all.registration.fields.class') }}">
+                    @error('class')
+                    <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div>
+                    <label for="email-address" class="sr-only">{{ __('all.registration.fields.email') }}</label>
                     <input wire:model="email" id="email-address" name="email" type="email" autocomplete="email"
                         required
                         class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-[#ff8b0d] focus:border-[#ff8b0d] focus:z-10 sm:text-sm"
-                        placeholder="Email адрес">
+                        placeholder="{{ __('all.registration.fields.email') }}">
                     @error('email')
                         <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
                     @enderror
                 </div>
                 <div>
-                    <label for="password" class="sr-only">Пароль</label>
+                    <label for="password" class="sr-only">{{ __('all.registration.fields.password') }}</label>
                     <input wire:model="password" id="password" name="password" type="password"
                         autocomplete="new-password" required
                         class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-[#ff8b0d] focus:border-[#ff8b0d] focus:z-10 sm:text-sm"
-                        placeholder="Пароль">
+                        placeholder="{{ __('all.registration.fields.password') }}">
                     @error('password')
                         <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
                     @enderror
                 </div>
                 <div>
-                    <label for="password_confirmation" class="sr-only">Подтверждение пароля</label>
+                    <label for="password_confirmation" class="sr-only">{{ __('all.registration.fields.password_confirm') }}</label>
                     <input wire:model="password_confirmation" id="password_confirmation" name="password_confirmation"
                         type="password" autocomplete="new-password" required
                         class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-[#ff8b0d] focus:border-[#ff8b0d] focus:z-10 sm:text-sm"
-                        placeholder="Подтверждение пароля">
+                        placeholder="{{ __('all.registration.fields.password_confirm') }}">
                 </div>
             </div>
 
@@ -62,7 +80,7 @@
                                 clip-rule="evenodd" />
                         </svg>
                     </span>
-                    Зарегистрироваться
+                    {{ __('all.registration.btn') }}
                 </button>
             </div>
         </form>
@@ -74,10 +92,10 @@
                     <div class="w-full border-t border-gray-300"></div>
                 </div>
                 <div class="relative flex justify-center text-sm">
-                    <span class="px-2 bg-gray-50 text-gray-500">Или войти через</span>
+                    <span class="px-2 bg-gray-50 text-gray-500">{{ __('all.registration.or_sign_in') }}</span>
                 </div>
             </div>
-            
+
             <div class="mt-6">
                 <a href="{{ route('auth.google') }}"
                    class="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
@@ -89,7 +107,7 @@
                             <path fill="#EA4335" d="M -14.754 43.989 C -12.984 43.989 -11.404 44.599 -10.154 45.789 L -6.734 42.369 C -8.804 40.429 -11.514 39.239 -14.754 39.239 C -19.444 39.239 -23.494 41.939 -25.464 45.859 L -21.484 48.949 C -20.534 46.099 -17.884 43.989 -14.754 43.989 Z" />
                         </g>
                     </svg>
-                    Регистрация через Google
+                    {{ __('all.registration.google_auth') }}
                 </a>
             </div>
         </div>

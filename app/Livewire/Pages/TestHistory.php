@@ -43,10 +43,14 @@ class TestHistory extends Component
 
     public function getFilteredTestsProperty()
     {
-        $query = TestSession::where('user_id', Auth::id())
-            ->with(['userAnswers' => function($q) {
-                $q->orderBy('created_at', 'desc');
+        $query = TestSession::query()
+            ->with([
+                'user',
+                'userAnswers' => function($q) {
+                    $q->orderBy('created_at', 'desc');
             }])
+            ->where('user_id', Auth::id())
+            ->where('status', 'completed')
             ->orderBy('created_at', 'desc');
 
         // Фильтр по статусу
@@ -96,14 +100,16 @@ class TestHistory extends Component
             });
         }
 
-        return $query->paginate(5)->through(function ($session) {
+        return $query->paginate(15)->through(function ($session) {
             // Обновляем временные метрики перед отображением
             $session->updateTimeMetrics();
 
             return [
                 'id' => $session->id,
                 'session_id' => $session->session_id,
-                'name' => 'Тест талантов CliftonStrengths',
+                'name' => $session->user?->name,
+                'school' => $session->user?->school,
+                'class' => $session->user?->class,
                 'date' => $session->created_at->format('d.m.Y H:i'),
                 'status' => $session->status,
                 'result' => $this->formatResult($session),
@@ -137,16 +143,12 @@ class TestHistory extends Component
 
     private function getActionUrl($session)
     {
-        if ($session->status === 'completed' && in_array($session->payment_status, ['completed', 'free'])) {
+        if (in_array($session->payment_status, ['completed', 'free'])) {
             return route('talent-test-results', ['sessionId' => $session->session_id]);
-        } elseif ($session->status === 'completed' && $session->payment_status === 'pending') {
+        } elseif ($session->payment_status === 'pending') {
             return route('payment', ['sessionId' => $session->session_id]);
-        } elseif ($session->status === 'completed' && $session->payment_status === 'processing') {
-            return null;
-        } elseif ($session->status === 'completed' && $session->payment_status === 'cancelled') {
-            return null;
-        } elseif (in_array($session->status, ['started', 'in_progress'])) {
-            return route('talent-test');
+        } elseif (in_array($session->payment_status ,['processing', 'cancelled', 'failed'])) {
+            return route('payment-status', ['sessionId' => $session->session_id, 'plan' => $session->selected_plan]);
         } else {
             return route('talent-test');
         }
@@ -154,18 +156,14 @@ class TestHistory extends Component
 
     private function getActionText($session)
     {
-        if ($session->status === 'completed' && in_array($session->payment_status, ['completed', 'free'])) {
-            return 'Просмотр результатов';
-        } elseif ($session->status === 'completed' && $session->payment_status === 'pending') {
-            return 'Оплатить';
-        } elseif ($session->status === 'completed' && $session->payment_status === 'processing') {
-            return 'Оплата в процессе';
-        } elseif ($session->status === 'completed' && $session->payment_status === 'cancelled') {
-            return 'Оплата отменена';
-        } elseif (in_array($session->status, ['started', 'in_progress'])) {
-            return 'Продолжить тест';
+        if (in_array($session->payment_status, ['completed', 'free'])) {
+            return __('all.test_history.actions.results');
+        } elseif ($session->payment_status === 'pending') {
+            return __('all.test_history.actions.pay');
+        } elseif (in_array($session->payment_status,['processing','cancelled','failed'])) {
+            return __('all.test_history.actions.pay');
         } else {
-            return 'Начать заново';
+            return __('all.test_history.actions.retry');
         }
     }
 

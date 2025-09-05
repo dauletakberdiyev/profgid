@@ -14,7 +14,7 @@ class PaymentPage extends Component
     public $plans = [
         'talents' => [
             'name' => 'Мои Таланты',
-            'price' => 3000,
+            'price' => 15000,
             'currency' => 'тг',
             'features' => [
                 'Полный анализ всех 34 талантов',
@@ -27,7 +27,7 @@ class PaymentPage extends Component
         ],
         'talents_spheres' => [
             'name' => 'Мои Профессии',
-            'price' => 6000,
+            'price' => 15000,
             'currency' => 'тг',
             'features' => [
                 'Все возможности тарифа "Таланты"',
@@ -41,7 +41,7 @@ class PaymentPage extends Component
         ],
         'talents_spheres_professions' => [
             'name' => 'Мои таланты + Профессии',
-            'price' => 9000,
+            'price' => 20000,
             'currency' => 'тг',
             'features' => [
                 'Все возможности предыдущих тарифов',

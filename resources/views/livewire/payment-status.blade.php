@@ -2,24 +2,24 @@
     <div class="max-w-4xl mx-auto">
         <!-- Status Header -->
         <div class="text-center mb-8 md:mb-12">
-            <div class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium mb-6 {{ $this->getStatusColor() }}">
-                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                    @if($testSession->payment_status === 'pending')
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
-                    @elseif($testSession->payment_status === 'processing')
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
-                    @elseif($testSession->payment_status === 'review')
-                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
-                    @elseif($testSession->payment_status === 'completed')
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                    @else
-                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
-                    @endif
-                </svg>
-                {{ $this->getStatusText() }}
-            </div>
+{{--            <div class="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium mb-6 {{ $this->getStatusColor() }}">--}}
+{{--                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">--}}
+{{--                    @if($testSession->payment_status === 'pending')--}}
+{{--                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>--}}
+{{--                    @elseif($testSession->payment_status === 'processing')--}}
+{{--                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>--}}
+{{--                    @elseif($testSession->payment_status === 'review')--}}
+{{--                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>--}}
+{{--                    @elseif($testSession->payment_status === 'completed')--}}
+{{--                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>--}}
+{{--                    @else--}}
+{{--                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>--}}
+{{--                    @endif--}}
+{{--                </svg>--}}
+{{--                {{ $this->getStatusText() }}--}}
+{{--            </div>--}}
 
-            <h1 class="text-2xl md:text-3xl lg:text-4xl font-light text-gray-900 mb-4">Оплата тарифа</h1>
+            <h1 class="text-2xl md:text-3xl lg:text-4xl font-light text-gray-900 mb-4">{{ __('all.payment_status.title') }}</h1>
             <h2 class="text-xl md:text-2xl font-medium text-gray-800 mb-2">{{ $plans[$plan]['name'] }}</h2>
             <p class="text-2xl md:text-3xl font-light text-gray-900">{{ number_format($plans[$plan]['price']) }} {{ $plans[$plan]['currency'] }}</p>
         </div>
@@ -60,7 +60,7 @@
                     if (this.cardOpen) this.kaspiOpen = false;
                 }
             }">
-                <h3 class="text-xl font-medium text-gray-900 mb-6">Способы оплаты</h3>
+                <h3 class="text-xl font-medium text-gray-900 mb-6">{{ __('all.payment_status.payment_methods') }}</h3>
 
                 <!-- Kaspi QR Accordion -->
 {{--                <div class="mb-4">--}}
@@ -120,20 +120,20 @@
 
                 <!-- Card Payment Accordion -->
                 <div class="mb-4">
-                    <button @click="openCard()"
-                            class="w-full flex items-center justify-between px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all duration-200 text-gray-700">
-                        <div class="flex items-center">
-                            <svg class="w-5 h-5 mr-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
-                            </svg>
-                            <span class="font-medium">Оплата банковской картой</span>
-                        </div>
-                        <svg class="w-4 h-4 text-gray-400 transition-transform duration-200" :class="{ 'rotate-180': cardOpen }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                        </svg>
-                    </button>
+{{--                    <button @click="openCard()"--}}
+{{--                            class="w-full flex items-center justify-between px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all duration-200 text-gray-700">--}}
+{{--                        <div class="flex items-center">--}}
+{{--                            <svg class="w-5 h-5 mr-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">--}}
+{{--                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>--}}
+{{--                            </svg>--}}
+{{--                            <span class="font-medium">Оплата банковской картой</span>--}}
+{{--                        </div>--}}
+{{--                        <svg class="w-4 h-4 text-gray-400 transition-transform duration-200" :class="{ 'rotate-180': cardOpen }" fill="none" stroke="currentColor" viewBox="0 0 24 24">--}}
+{{--                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>--}}
+{{--                        </svg>--}}
+{{--                    </button>--}}
 
-                    <div x-show="cardOpen"
+                    <div
                          x-transition:enter="transition ease-out duration-300"
                          x-transition:enter-start="opacity-0 transform scale-95"
                          x-transition:enter-end="opacity-100 transform scale-100"
@@ -143,13 +143,13 @@
                          class="mt-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
 
                         <div class="text-center">
-                            <p class="text-sm text-gray-600 mb-4">Нажмите кнопку для перехода на страницу оплаты</p>
+                            <p class="text-sm text-gray-600 mb-4">{{ __('all.payment_status.bank_card.title') }}</p>
                             <button wire:click="processCardPayment"
                                     class="w-full py-2.5 px-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium text-sm">
                                 <svg class="w-4 h-4 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
                                 </svg>
-                                Оплатить {{ number_format($plans[$plan]['price']) }} {{ $plans[$plan]['currency'] }}
+                                {{ __('all.payment_status.bank_card.pay') }} {{ number_format($plans[$plan]['price']) }} {{ $plans[$plan]['currency'] }}
                             </button>
                         </div>
 
@@ -163,9 +163,9 @@
 
             <!-- Payment Confirmation -->
             <div class="bg-white border border-gray-100 rounded-2xl p-6 md:p-8 shadow-sm">
-                <h3 class="text-xl font-medium text-gray-900 mb-6">Получите доступ используя код активации</h3>
+                <h3 class="text-xl font-medium text-gray-900 mb-6">{{ __('all.payment_status.activation.title') }}</h3>
 
-                @if(!$paymentConfirmed && !in_array($testSession->payment_status, ['completed', 'processing']))
+                @if(!$paymentConfirmed && $testSession->payment_status != 'completed')
                     <form wire:submit.prevent="confirmPayment">
                         <!-- PIN Input Fields -->
                         <div class="mb-6" x-data="{
@@ -197,7 +197,7 @@
                                        wire:model="pin1"
                                        x-ref="pin1"
                                        maxlength="1"
-                                       class="w-12 h-12 text-center text-lg font-medium border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                       class="w-10 h-10 md:w-12 md:h-12 text-center text-lg font-medium border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                                        @input="handleInput($event, 1)"
                                        @keydown="handleKeydown($event, 1)"
                                        @paste="handlePaste($event)">
@@ -205,7 +205,7 @@
                                        wire:model="pin2"
                                        x-ref="pin2"
                                        maxlength="1"
-                                       class="w-12 h-12 text-center text-lg font-medium border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                       class="w-10 h-10 md:w-12 md:h-12 text-center text-lg font-medium border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                                        @input="handleInput($event, 2)"
                                        @keydown="handleKeydown($event, 2)"
                                        @paste="handlePaste($event)">
@@ -213,7 +213,7 @@
                                        wire:model="pin3"
                                        x-ref="pin3"
                                        maxlength="1"
-                                       class="w-12 h-12 text-center text-lg font-medium border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                       class="w-10 h-10 md:w-12 md:h-12 text-center text-lg font-medium border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                                        @input="handleInput($event, 3)"
                                        @keydown="handleKeydown($event, 3)"
                                        @paste="handlePaste($event)">
@@ -221,7 +221,7 @@
                                        wire:model="pin4"
                                        x-ref="pin4"
                                        maxlength="1"
-                                       class="w-12 h-12 text-center text-lg font-medium border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                       class="w-10 h-10 md:w-12 md:h-12 text-center text-lg font-medium border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                                        @input="handleInput($event, 4)"
                                        @keydown="handleKeydown($event, 4)"
                                        @paste="handlePaste($event)">
@@ -229,7 +229,7 @@
                                        wire:model="pin5"
                                        x-ref="pin5"
                                        maxlength="1"
-                                       class="w-12 h-12 text-center text-lg font-medium border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                       class="w-10 h-10 md:w-12 md:h-12 text-center text-lg font-medium border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                                        @input="handleInput($event, 5)"
                                        @keydown="handleKeydown($event, 5)"
                                        @paste="handlePaste($event)">
@@ -237,7 +237,7 @@
                                        wire:model="pin6"
                                        x-ref="pin6"
                                        maxlength="1"
-                                       class="w-12 h-12 text-center text-lg font-medium border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                       class="w-10 h-10 md:w-12 md:h-12 text-center text-lg font-medium border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                                        @keydown="handleKeydown($event, 6)"
                                        @paste="handlePaste($event)">
                             </div>
@@ -247,7 +247,7 @@
                                     <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                                     </svg>
-                                    Подтвердить
+                                    {{ __('all.payment_status.activation.btn') }}
                                 </button>
                             </div>
                             @error('pin1')
@@ -272,29 +272,29 @@
 
                         <!-- No Code Section -->
                         <div class="text-center">
-                            <p class="text-gray-600 mb-4">Нет кода активации?</p>
+                            <p class="text-gray-600 mb-4">{{ __('all.payment_status.activation.no_code') }}</p>
                             <button type="button"
                                     wire:click="getPromoCode"
                                     class="w-full py-3 px-6 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors font-medium">
-                                Получить код у менеджера
+                                {{ __('all.payment_status.activation.get_code') }}
                             </button>
                         </div>
                     </form>
 
-                @elseif($testSession->payment_status === 'processing')
-                    <div class="text-center py-8">
-                        <div class="w-16 h-16 bg-blue-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-                            <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                            </svg>
-                        </div>
-                        <h4 class="text-lg font-medium text-gray-900 mb-2">Обработка оплаты</h4>
-                        <p class="text-gray-600 mb-4">Ваша оплата обрабатывается. Пожалуйста, подождите...</p>
-                        <button wire:click="checkPaymentStatusWithForteBank"
-                                class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm">
-                            Проверить статус
-                        </button>
-                    </div>
+{{--                @elseif($testSession->payment_status === 'processing')--}}
+{{--                    <div class="text-center py-8">--}}
+{{--                        <div class="w-16 h-16 bg-blue-100 rounded-full mx-auto mb-4 flex items-center justify-center">--}}
+{{--                            <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">--}}
+{{--                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>--}}
+{{--                            </svg>--}}
+{{--                        </div>--}}
+{{--                        <h4 class="text-lg font-medium text-gray-900 mb-2">Обработка оплаты</h4>--}}
+{{--                        <p class="text-gray-600 mb-4">Ваша оплата обрабатывается. Пожалуйста, подождите...</p>--}}
+{{--                        <button wire:click="checkPaymentStatusWithForteBank"--}}
+{{--                                class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm">--}}
+{{--                            Проверить статус--}}
+{{--                        </button>--}}
+{{--                    </div>--}}
 
                 @elseif($testSession->payment_status === 'review')
                     <div class="text-center py-8">
@@ -303,8 +303,8 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
                         </div>
-                        <h4 class="text-lg font-medium text-gray-900 mb-2">Информация получена</h4>
-                        <p class="text-gray-600">Мы проверяем вашу оплату. Это займет до 30 минут.</p>
+                        <h4 class="text-lg font-medium text-gray-900 mb-2">{{ __('all.payment_status.review.title') }}</h4>
+                        <p class="text-gray-600">{{ __('all.payment_status.review.desc') }}</p>
                     </div>
 
                 @elseif($testSession->payment_status === 'completed')
@@ -314,11 +314,11 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                             </svg>
                         </div>
-                        <h4 class="text-lg font-medium text-gray-900 mb-2">Оплата подтверждена!</h4>
-                        <p class="text-gray-600 mb-4">Результаты теста доступны в вашем профиле</p>
+                        <h4 class="text-lg font-medium text-gray-900 mb-2">{{ __('all.payment_status.complete.title') }}</h4>
+                        <p class="text-gray-600 mb-4">{{ __('all.payment_status.complete.desc') }}</p>
                         <a href="{{ route('talent-test-results') }}"
                            class="inline-flex items-center px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
-                            Посмотреть результаты
+                            {{ __('all.payment_status.complete.btn') }}
                         </a>
                     </div>
 
@@ -329,15 +329,15 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                             </svg>
                         </div>
-                        <h4 class="text-lg font-medium text-gray-900 mb-2">Оплата не прошла</h4>
-                        <p class="text-gray-600 mb-4">Попробуйте оплатить снова или свяжитесь с нами</p>
+                        <h4 class="text-lg font-medium text-gray-900 mb-2">{{ __('all.payment_status.fail.title') }}</h4>
+                        <p class="text-gray-600 mb-4">{{ __('all.payment_status.fail.desc') }}</p>
                         <button wire:click="processCardPayment"
                                 class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm mr-2">
-                            Попробовать снова
+                            {{ __('all.payment_status.fail.retry_btn') }}
                         </button>
                         <button wire:click="getPromoCode"
                                 class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm">
-                            Связаться с нами
+                            {{ __('all.payment_status.fail.contact_btn') }}
                         </button>
                     </div>
                 @endif
@@ -351,7 +351,7 @@
                 <svg class="w-4 h-4 md:w-5 md:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                 </svg>
-                Назад к профилю
+                {{ __('all.payment_status.back_btn') }}
             </a>
         </div>
     </div>

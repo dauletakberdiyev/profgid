@@ -26,6 +26,8 @@ class User extends Authenticatable
         'language',
         'favorite_professions',
         'favorite_spheres',
+        'school',
+        'class'
     ];
 
     /**

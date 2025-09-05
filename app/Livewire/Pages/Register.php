@@ -13,11 +13,15 @@ class Register extends Component
     public $email = '';
     public $password = '';
     public $password_confirmation = '';
+    public $school = '';
+    public $class = '';
 
     protected $rules = [
         'name' => 'required|min:2',
         'email' => 'required|email|unique:users',
         'password' => 'required|min:8|confirmed',
+        'school' => 'nullable',
+        'class' => 'nullable',
     ];
 
     public function register()
@@ -28,6 +32,8 @@ class Register extends Component
             'name' => $this->name,
             'email' => $this->email,
             'password' => Hash::make($this->password),
+            'school' => $this->school,
+            'class' => $this->class,
         ]);
 
         Auth::login($user);
