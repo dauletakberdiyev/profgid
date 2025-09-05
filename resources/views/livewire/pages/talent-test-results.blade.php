@@ -1042,7 +1042,7 @@
                 x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
                 <h2 class="text-lg md:text-xl font-bold mb-4">Все профессии</h2>
                 <p class="text-xs md:text-sm text-gray-600 mb-6 leading-relaxed">
-                    На основе ваших топ талантов мы подобрали наиболее подходящие профессии.
+                    {{ __('all.result.professions.desc') }}
                 </p>
 
                 @php
@@ -1066,8 +1066,8 @@
                         <!-- Desktop Table View -->
                         <div class="hidden md:block space-y-2">
                             @foreach ($topThirtyProfessions as $index => $profession)
-                                <div class="bg-white px-4 py-1 transition-all border border-gray-200 rounded-lg">
-                                    <div class="flex items-center justify-between">
+                                <div class="bg-white px-4 py-1 transition-all border border-gray-200 rounded-lg" x-data="{ open: false }">
+                                    <div class="flex items-center justify-between" @click="open = !open">
                                         <span class="text-sm font-medium text-gray-900">{{ $profession['name'] }}</span>
                                         <div class="flex items-center space-x-2">
                                             <div class="w-12 bg-gray-200 rounded-full h-1">
@@ -1075,7 +1075,20 @@
                                                     style="width: {{ round($profession['compatibility_percentage']) }}%"></div>
                                             </div>
                                             <span class="text-xs text-blue-600 min-w-[30px]">{{ round($profession['compatibility_percentage']) }}%</span>
+                                            <div class="text-gray-400 transition-transform duration-200"
+                                                 :class="open ? 'rotate-90' : ''">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                                          d="M9 5l7 7-7 7" />
+                                                </svg>
+                                            </div>
                                         </div>
+                                    </div>
+                                    <div x-show="open"
+                                         x-transition
+                                         class="py-4 text-sm"
+                                         style="display: none;">
+                                        {{$profession['description']}}
                                     </div>
                                 </div>
                             @endforeach
@@ -1083,13 +1096,29 @@
                         <!-- Mobile Card View -->
                         <div class="md:hidden space-y-2">
                             @foreach ($topThirtyProfessions as $index => $profession)
-                                <div class="bg-white px-3 py-2 transition-all border border-gray-200 rounded-lg">
-                                    <div class="flex items-center justify-between">
+                                <div class="bg-white px-3 py-2 transition-all border border-gray-200 rounded-lg" x-data="{ open: false }">
+                                    <div class="flex items-center justify-between space-x-1" @click="open = !open">
                                         <div class="flex items-center space-x-2">
                                             <span class="text-xs font-medium text-gray-900 inline-block">{{ $index + 1 }}</span>
                                         <span class="text-xs font-medium text-gray-900 inline-block leading-none">{{ $profession['name'] }}</span>
                                         </div>
-                                        <span class="text-xs text-blue-600 font-semibold">{{ round($profession['compatibility_percentage']) }}%</span>
+                                        <div class="flex space-x-1">
+                                            <span class="text-xs text-blue-600 font-semibold">{{ round($profession['compatibility_percentage']) }}%</span>
+                                            <div class="text-gray-400 transition-transform duration-200"
+                                                 :class="open ? 'rotate-90' : ''">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                                          d="M9 5l7 7-7 7" />
+                                                </svg>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div x-show="open"
+                                         x-transition
+                                         class="py-4 text-xs"
+                                         style="display: none;">
+                                        {{$profession['description']}}
                                     </div>
                                 </div>
                             @endforeach
@@ -1106,12 +1135,10 @@
                                     d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
                                     clip-rule="evenodd" />
                             </svg>
-                            <h3 class="text-lg font-semibold text-black">Профессии, которые меньше всего соответствуют
-                                вашим талантам и могут не раскрыть ваш потенциал</h3>
+                            <h3 class="text-lg font-semibold text-black">{{ __('all.result.professions.least.title') }}</h3>
                         </div>
                         <p class="text-sm text-black mb-4">
-                            Эти профессии показали низкую совместимость с вашими талантами. Работа в этих сферах может
-                            потребовать от вас больше усилий и не принести полного удовлетворения.
+                            {{ __('all.result.professions.least.desc') }}
                         </p>
                         <div class="space-y-2">
 
@@ -1121,36 +1148,36 @@
                             @endphp
 
                             @foreach ($nextTenProfessions as $index => $profession)
-                                <div class="bg-white border border-orange-200 p-2 rounded opacity-60">
+                                <div class="bg-white border border-red-400 p-2 rounded opacity-60">
                                     <div class="flex items-center justify-between">
                                         <div class="flex-1">
                                             <div class="flex items-center space-x-2">
-                                                <span class="text-xs font-medium text-orange-600">{{ $professionIndex = $professionIndex + 1 }}</span>
-                                                <h4 class="text-xs text-gray-700 truncate">{{ $profession['name'] }}</h4>
+                                                <span class="text-xs font-medium text-red-600">{{ $professionIndex = $professionIndex + 1 }}</span>
+                                                <h4 class="text-xs text-gray-950 truncate">{{ $profession['name'] }}</h4>
                                             </div>
                                         </div>
                                         <div class="flex items-center space-x-2">
                                             <!-- Прогресс-бар только для десктопа -->
                                             <div class="hidden lg:block flex-1 min-w-[60px]">
-                                                <div class="w-full bg-gray-200 rounded-full h-1">
-                                                    <div class="h-1 rounded-full transition-all duration-500 bg-orange-400"
+                                                <div class="w-full bg-red-100 rounded-full h-1">
+                                                    <div class="h-1 rounded-full transition-all duration-500 bg-red-500"
                                                         style="width: {{ round($profession['compatibility_percentage']) }}%">
                                                     </div>
                                                 </div>
                                             </div>
                                             <!-- Процент совместимости -->
-                                            <span class="text-xs px-1.5 py-0.5 bg-orange-100 text-orange-600 rounded">
+                                            <span class="text-xs px-1.5 py-0.5 bg-red-100 text-red-600 rounded">
                                                 {{ round($profession['compatibility_percentage']) }}%
                                             </span>
                                             <!-- Кнопка информации -->
-                                            <button @click="openProfessionModal({{ json_encode($profession) }})"
-                                                class="text-orange-400 hover:text-orange-600 transition-colors duration-200 p-1"
-                                                title="Показать описание">
-                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                </svg>
-                                            </button>
+{{--                                            <button @click="openProfessionModal({{ json_encode($profession) }})"--}}
+{{--                                                class="text-orange-400 hover:text-orange-600 transition-colors duration-200 p-1"--}}
+{{--                                                title="Показать описание">--}}
+{{--                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">--}}
+{{--                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"--}}
+{{--                                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />--}}
+{{--                                                </svg>--}}
+{{--                                            </button>--}}
                                         </div>
                                     </div>
                                 </div>
