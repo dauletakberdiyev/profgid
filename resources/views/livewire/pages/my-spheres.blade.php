@@ -93,14 +93,14 @@
                             d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-2.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 009.586 13H7"/>
                     </svg>
                 </div>
-                <h2 class="text-xl font-light text-gray-900 mb-2">Нет избранных сфер</h2>
-                <p class="text-gray-600 mb-6">Добавьте сферы в избранное для быстрого доступа</p>
+                <h2 class="text-xl font-light text-gray-900 mb-2">{{ __('all.my_spheres.no_found.title') }}</h2>
+                <p class="text-gray-600 mb-6">{{ __('all.my_spheres.no_found.desc') }}</p>
                 <a href="{{ route('profession-map') }}"
                    class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
                     </svg>
-                    Исследовать карту профессий
+                    {{ __('all.my_spheres.no_found.btn') }}
                 </a>
             </div>
         @endif

@@ -305,7 +305,7 @@
                                 :class="activeTab === 'talents' ? 'border-blue-600 text-blue-600' :
                                     'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
                                 class="py-3 px-1 border-b-2 font-medium text-xs md:text-sm transition-colors duration-200">
-                                Топ Таланты
+                                {{ __('all.test_result.talents.title') }}
                             </button>
 
                             <!-- Вкладка "Сферы" - доступна для средний и премиум тарифов -->
@@ -314,7 +314,7 @@
                                     :class="activeTab === 'spheres' ? 'border-blue-600 text-blue-600' :
                                         'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
                                     class="py-3 px-1 border-b-2 font-medium text-xs md:text-sm transition-colors duration-200">
-                                    Топ Сферы
+                                    {{ __('all.test_result.spheres.title') }}
                                 </button>
                             @endif
 
@@ -324,7 +324,7 @@
                                     :class="activeTab === 'professions' ? 'border-blue-600 text-blue-600' :
                                         'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
                                     class="py-3 px-1 border-b-2 font-medium text-xs md:text-sm transition-colors duration-200">
-                                    Топ Профессии
+                                    {{ __('all.test_result.professions.title') }}
                                 </button>
                             @endif
                         </nav>
@@ -366,7 +366,7 @@
                                         </path>
                                     </svg>
                                     <span class="text-sm md:text-base text-gray-600 group-hover:text-gray-800 hidden md:block font-medium">
-                                        Скачать отчет
+                                        {{ __('all.test_result.download') }}
                                     </span>
                                 </a>
 
@@ -384,13 +384,13 @@
                                             </path>
                                         </svg>
                                         <span class="text-sm md:text-base text-gray-500 font-medium">
-                                            Скачать отчет
+                                            {{ __('all.test_result.download') }}
                                         </span>
                                     </button>
 
                                     <!-- Подсказка о необходимости обновления тарифа -->
                                     <div class="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10">
-                                        <span>Обновите тариф для скачивания отчета</span>
+                                        <span>{{ __('all.test_result.update') }}</span>
                                         <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-b-gray-800"></div>
                                     </div>
                                 </div>
@@ -410,10 +410,10 @@
                     @php
                         // Найдем домен с максимальным счетом
                         $topDomain = array_keys($domainScores, max($domainScores))[0] ?? 'executing';
-                        $topDomainName = $domains[$topDomain] ?? 'EXECUTING';
+                        $topDomainName = $localizedDomains[app()->getLocale()][$topDomain] ?? 'EXECUTING';
                     @endphp
                     <h1 class="text-sm md:text-2xl font-medium text-gray-900 mb-2 md:mb-4 leading-relaxed">
-                        Вы лидируете с <span class="font-extrabold">{{ $topDomainName }}</span> темами.
+                        {{ __('all.test_result.talents.lead') }} <span class="font-extrabold">{{ $topDomainName }}</span> {{ __('all.test_result.talents.theme') }}.
                     </h1>
                 </div>
 
@@ -535,7 +535,7 @@
                             @endphp
                             <div class="text-left flex-shrink-0" style="width: {{ $percentage }}%; min-width: 10%;">
                                 <div class="text-xs md:text-sm font-medium text-gray-700 truncate">
-                                    {{ $domains[$domain] ?? $domain }}
+                                    {{ $localizedDomains[app()->getLocale()][$domain] ?? $domain }}
                                 </div>
 
                             </div>
@@ -550,7 +550,7 @@
                             @endphp
                             <div class="flex flex-col text-left flex-shrink-0 mb-2">
                                 <div class="text-sm font-medium text-gray-700 truncate">
-                                    {{ $domains[$domain] ?? $domain }}
+                                    {{ $localizedDomains[app()->getLocale()][$domain] ?? $domain }}
                                 </div>
                                 <div class="{{ $domainBgColors[$domain] ?? 'bg-gray-400' }} flex items-center justify-center p-0.5 flex-shrink-0"
                                      style="width: {{ $percentage + 30 }}%; min-width: 10%;">
@@ -561,19 +561,19 @@
                 </div>
 
                 <p class="text-sm md:text-sm text-gray-600 mb-6 md:mb-8 leading-relaxed">
-                    Вы умеете брать на себя инициативу, уверенно выражать свои мысли и вдохновлять других на действия.
-                    Ваши таланты из блока
-                    Влияние помогают мотивировать окружающих, убеждать их и добиваться значимых изменений
+                    {{ $domainsDescription[app()->getLocale()][$topDomain] }}
                 </p>
 
-                <h2 class="text-lg md:text-xl font-semibold mb-3 md:mb-4">Ваши таланты по доменам</h2>
+                <h2 class="text-lg md:text-xl font-semibold mb-3 md:mb-4">
+                    {{ __('all.test_result.talents.by_domains') }}
+                </h2>
 
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-3 md:gap-1 mb-6 md:mb-8">
                     @foreach ($domains as $domain => $name)
                         <div class="mb-4 md:mb-0">
                             <div class="text-center font-semibold uppercase text-xs md:text-sm mb-2 md:mb-3 pb-1 md:pb-2 text-gray-800 p-1 md:p-2 border-b-4 md:border-b-8"
                                 style="border-color: {{ $domainColors[$domain] }}">
-                                {{ $name }}
+                                {{ $localizedDomains[app()->getLocale()][$domain] ?? $name }}
                             </div>
 
                             @php
@@ -621,27 +621,24 @@
 
 
                 <div class="space-y-5">
-                    <h2 class="text-lg md:text-xl font-semibold mb-3 md:mb-4">Цифры в профиле показывают, какие таланты у
-                        тебя выражены сильнее всего:</h2>
+                    <h2 class="text-lg md:text-xl font-semibold mb-3 md:mb-4">{{ __('all.test_result.talents.desc_title') }}</h2>
 
                     <span class="block text-sm md:text-base">
-                        Топ-8 талантов: Они выделены ярким цветом, чтобы показать их важность. Это твои главные сильные
-                        стороны, которые ты чаще
-                        всего используешь
+                        {{ __('all.test_result.talents.desc_1') }}
                     </span>
 
                     <span class="block text-sm md:text-base">
-                        9–16: Эти таланты тоже заметны, но немного меньше.
+                        {{ __('all.test_result.talents.desc_2') }}
                     </span>
 
                     <span class="block text-sm md:text-base">
-                        17–24: Эти таланты менее выражены, но это не слабости, просто ты используешь их реже.
+                        {{ __('all.test_result.talents.desc_3') }}
                     </span>
                 </div>
 
                 <!-- Таланты блок -->
                 <div class="mt-6 space-y-6" x-data="{ expandedTalents: [] }">
-                    <h2 class="text-lg md:text-xl font-semibold text-center">Описание ваших талантов</h2>
+                    <h2 class="text-lg md:text-xl font-semibold text-center">{{ __('all.test_result.talents.content') }}</h2>
 
                     @php
                         $topTenTalents = collect($userResults)->take(10)->toArray();
@@ -703,7 +700,7 @@
                                             <!-- Краткое описание - показывается в аккордеоне -->
                                             @if (!empty($talent['short_description']))
                                                 <div class="mb-3">
-                                                    <h4 class="text-xs text-white font-semibold mb-1">Краткое описание</h4>
+                                                    <h4 class="text-xs text-white font-semibold mb-1">{{ __('all.test_result.talents.short_desc') }}</h4>
                                                     <p class="text-xs text-white leading-tight">{{ $talent['short_description'] }}</p>
                                                 </div>
                                             @endif
@@ -711,24 +708,24 @@
                                             <!-- Обзор таланта (только для полного тарифа) -->
                                             @if (!empty($talent['description']) && $this->isFullPlan)
                                                 <div class="mb-3">
-                                                    <h4 class="text-xs text-white font-semibold mb-1">Обзор</h4>
+                                                    <h4 class="text-xs text-white font-semibold mb-1">{{ __('all.test_result.talents.review') }}</h4>
                                                     <p class="text-xs text-white leading-tight">{{ $talent['description'] }}</p>
                                                 </div>
                                             @endif
 
                                             <!-- Советы (только для полного тарифа) -->
                                             @if ($this->isFullPlan)
-                                                <div class="pt-2 border-t border-gray-100">
-                                                    <h4 class="text-xs font-semibold text-white mb-1">Советы</h4>
-                                                    <div class="text-xs text-white leading-tight space-y-2">
-                                                        @foreach ($this->getTalentAdvice($talent['name']) as $advice)
-                                                            <div>
-                                                                <strong>{{ $advice['name'] }}</strong><br>
-                                                                {{ $advice['description'] }}
-                                                            </div>
-                                                        @endforeach
-                                                    </div>
-                                                </div>
+{{--                                                <div class="pt-2 border-t border-gray-100">--}}
+{{--                                                    <h4 class="text-xs font-semibold text-white mb-1">Советы</h4>--}}
+{{--                                                    <div class="text-xs text-white leading-tight space-y-2">--}}
+{{--                                                        @foreach ($this->getTalentAdvice($talent['name']) as $advice)--}}
+{{--                                                            <div>--}}
+{{--                                                                <strong>{{ $advice['name'] }}</strong><br>--}}
+{{--                                                                {{ $advice['description'] }}--}}
+{{--                                                            </div>--}}
+{{--                                                        @endforeach--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
                                             @endif
                                         </div>
                                     </div>
@@ -791,7 +788,7 @@
 
                                                 <!-- Краткое описание для остальных талантов -->
                                                 <div class="mb-3">
-                                                    <h4 class="text-xs font-semibold text-gray-900 mb-1">Краткое описание</h4>
+                                                    <h4 class="text-xs font-semibold text-gray-900 mb-1">{{ __('all.test_result.talents.short_desc') }}</h4>
                                                     <p class="text-xs text-gray-700 leading-tight">{{ $talent['short_description'] }}</p>
                                                 </div>
                                             </div>
@@ -806,9 +803,8 @@
                 <!-- Важно блок -->
                 <div class="mt-8 text-left">
                     <p class="text-sm text-gray-600">
-                        <span class="font-bold">*Важно</span><br>
-                        Ваши результаты уникальны и не подлежат сравнению с другими. Они отражают ваши сильные стороны и
-                        помогают раскрыть ваш путь к успеху.
+                        <span class="font-bold">{{ __('all.test_result.talents.attention') }}</span><br>
+                        {{ __('all.test_result.talents.attention_desc') }}
                     </p>
                 </div>
 
@@ -816,10 +812,9 @@
 
             <div id="spheres-section" x-show="activeTab === 'spheres'" x-transition:enter="transition ease-out duration-200"
                 x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
-                <h2 class="text-lg md:text-xl font-semibold mb-3 md:mb-4">Рекомендации по сферам деятельности</h2>
+                <h2 class="text-lg md:text-xl font-semibold mb-3 md:mb-4">{{ __('all.test_result.spheres.recommendation_title') }}</h2>
                 <p class="text-sm md:text-sm text-gray-600 mb-6 leading-relaxed">
-                    Сферы деятельности, которые лучше всего подходят вашим талантам и где вы сможете реализовать себя
-                    наиболее эффективно.
+                    {{ __('all.test_result.spheres.recommendation_desc') }}
                 </p>
 
                 @php
@@ -884,7 +879,7 @@
                                                     <!-- Accordion Arrow -->
                                                     @if (count($sphereData['professions']) > 0)
                                                         <div class="text-gray-400 transition-transform duration-200"
-                                                             :class="expandedSpheres.includes({{ $sphereData['sphere']['id']}}) ? 'rotate-90' : ''">
+                                                             :class="open ? 'rotate-90' : ''">
                                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                                                                       d="M9 5l7 7-7 7" />
@@ -1040,7 +1035,7 @@
 
             <div id="professions-section" x-show="activeTab === 'professions'" x-transition:enter="transition ease-out duration-200"
                 x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
-                <h2 class="text-lg md:text-xl font-bold mb-4">Все профессии</h2>
+                <h2 class="text-lg md:text-xl font-bold mb-4">{{ __('all.test_result.professions.all_title') }}</h2>
                 <p class="text-xs md:text-sm text-gray-600 mb-6 leading-relaxed">
                     {{ __('all.result.professions.desc') }}
                 </p>
@@ -1061,7 +1056,7 @@
                                 <path
                                     d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                             </svg>
-                            <h3 class="text-lg font-semibold text-gray-900">Топ рекомендуемые профессии</h3>
+                            <h3 class="text-lg font-semibold text-gray-900">{{ __('all.test_result.professions.recommendation') }}</h3>
                         </div>
                         <!-- Desktop Table View -->
                         <div class="hidden md:block space-y-2">

@@ -7,7 +7,11 @@
         <div class="bg-gray-100 p-3 md:p-4">
             <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2">
                 <span class="text-sm font-medium text-gray-700 mb-2 sm:mb-0">
-                    Вопрос <span x-text="currentQuestionIndex + 1"></span> из {{ $totalQuestions }}
+                    @if(app()->getLocale() === 'ru')
+                        {{ __('all.test.question') }} <span x-text="currentQuestionIndex + 1"></span> {{ __('all.test.from') }} {{ $totalQuestions }}
+                    @else
+                        <span x-text="currentQuestionIndex + 1"></span>/{{ $totalQuestions }} {{ __('all.test.question') }}
+                    @endif
                 </span>
                 <div class="flex items-center justify-between sm:justify-end">
                     <!-- Timer Display -->
@@ -59,13 +63,13 @@
                         <button @click="previousQuestion()"
                                 :disabled="currentQuestionIndex === 0"
                                 class="w-full sm:w-auto px-4 md:px-6 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm md:text-base">
-                            Назад
+                            {{ __('all.test.back') }}
                         </button>
 
                         <template x-if="currentQuestionIndex === allQuestions.length - 1">
                             <button @click="submitTest()"
                                 class="w-full sm:w-auto px-4 md:px-6 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors text-sm md:text-base">
-                                Завершить тест
+                                {{ __('all.test.end') }}
                             </button>
                         </template>
 
@@ -74,7 +78,7 @@
                                 <svg class="w-3 h-3 md:w-4 md:h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.122 2.122"></path>
                                 </svg>
-                                Выберите ответ для перехода
+                                {{ __('all.test.choose') }}
                             </div>
                         </template>
                     </div>
@@ -83,7 +87,7 @@
 
             <template x-if="!currentQuestion">
                 <div class="text-center py-12">
-                    <p class="text-gray-600">Вопросы не найдены.</p>
+                    <p class="text-gray-600">{{ __('all.test.no_found') }}</p>
                 </div>
             </template>
         </div>
@@ -99,8 +103,8 @@
         <div class="bg-white rounded-lg p-6 max-w-sm mx-4">
             <div class="text-center">
                 <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                <h3 class="text-lg font-semibold text-gray-900 mb-2">Обработка результатов</h3>
-                <p class="text-gray-600">Пожалуйста, подождите...</p>
+                <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ __('all.test.accepting') }}</h3>
+                <p class="text-gray-600">{{ __('all.test.wait') }}</p>
             </div>
         </div>
     </div>

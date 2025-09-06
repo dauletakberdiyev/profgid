@@ -2,16 +2,13 @@
 
 namespace App\Livewire\Pages;
 
+use App\Models\Profession;
 use App\Models\Sphere;
 use Livewire\Component;
 use App\Models\Answer;
 use App\Models\Talent;
-use App\Models\UserAnswer;
 use App\Models\TestSession;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
-use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Http\Request;
 
 class TalentTestResults extends Component
 {
@@ -25,6 +22,8 @@ class TalentTestResults extends Component
     public $totalTimeSpent = 0;
     public $testDate = null;
     public $answersCount = 0;
+    public $localizedDomains = [];
+    public $domainsDescription = [];
 
     public function mount($sessionId = null)
     {
@@ -86,12 +85,51 @@ class TalentTestResults extends Component
         $userAnswers = $this->testSession->userAnswers;
 
         // Get all talents with their domains, ordered by ID for consistency
+        /** @var Talent[] $talents */
         $talents = Talent::with("domain")->orderBy("id")->get();
 
         // Get all answers with their talent relationships
         $answers = Answer::with("talent.domain")->orderBy("id")->get();
 
         // Define the domains with exact names from database
+        $this->localizedDomains = [
+            'ru' => [
+                "executing" => "ИСПОЛНЕНИЕ",
+                "influencing" => "ВЛИЯНИЕ",
+                "relationship" => "ОТНОШЕНИЯ",
+                "strategic" => "МЫШЛЕНИЕ",
+            ],
+            'kk' => [
+                "executing" => "ОРЫНДАУ",
+                "influencing" => "ЫҚПАЛ ЕТУ",
+                "relationship" => "ҚАРЫМ-ҚАТЫНАС",
+                "strategic" => "СТРАТЕГИЯЛЫҚ ОЙЛАУ",
+            ]
+        ];
+
+        $this->domainsDescription = [
+            'ru' => [
+                "executing" => "Вы умеете доводить дела до конца, брать на себя ответственность и организовывать процесс.
+                    Ваши таланты из блока Исполнение помогают превращать планы в конкретные результаты и достигать поставленных целей.",
+                "influencing" => "Вы умеете брать на себя инициативу, уверенно выражать свои мысли и вдохновлять других на действия.
+                    Ваши таланты из блока Влияние помогают мотивировать окружающих, убеждать их и добиваться значимых изменений.",
+                "relationship" => "Вы умеете строить доверие, ценить искренние связи и объединять людей вокруг себя.
+                    Ваши таланты из блока Отношения помогают укреплять командный дух, создавать атмосферу поддержки и формировать прочные связи.",
+                "strategic" => "Вы умеете анализировать информацию, видеть картину целиком и предлагать нестандартные решения.
+                    Ваши таланты из блока Мышление помогают находить стратегии, строить прогнозы и двигаться к будущему с ясным видением.",
+            ],
+            'kk' => [
+                "executing" => "Сіз істерді соңына дейін жеткізіп, жауапкершілікті өз мойныңызға алып, процесті ұйымдастыра аласыз.
+                    Сіздің Орындау блогындағы таланттарыңыз жоспарларды нақты нәтижеге айналдыруға және қойылған мақсаттарға жетуге көмектеседі.",
+                "influencing" => "Сіз бастамашыл болып, ойыңызды нық жеткізіп, өзгелерді әрекетке шабыттандыра аласыз.
+                    Сіздің Ықпал ету блогындағы таланттарыңыз айналаңыздағы адамдарды жігерлендіруге, оларды сендіруге және маңызды өзгерістерге қол жеткізуге көмектеседі.",
+                "relationship" => "Сіз сенім орнатып, шынайы қарым-қатынастарды бағалап, адамдарды өзіңізге топтастыра аласыз.
+                    Сіздің Қарым-қатынас блогындағы таланттарыңыз командалық рухты нығайтуға, қолдау атмосферасын қалыптастыруға және берік байланыстар орнатуға көмектеседі.",
+                "strategic" => "Сіз ақпаратты талдап, жалпы көріністі көре аласыз және өзгеше шешімдер ұсына аласыз.
+                    Сіздің Ойлау блогындағы таланттарыңыз стратегияларды табуға, болашақты болжауға және айқын көзқараспен алға жылжуға көмектеседі.",
+            ]
+        ];
+
         $this->domains = [
             "executing" => "ИСПОЛНЕНИЕ",
             "influencing" => "ВЛИЯНИЕ",
@@ -140,9 +178,9 @@ class TalentTestResults extends Component
 
             $this->userResults[] = [
                 "id" => $talent->id,
-                "name" => $talent->name,
-                "description" => $talent->description ?? "",
-                "short_description" => $talent->short_description ?? "",
+                "name" => $talent->localizedName,
+                "description" => $talent->localizedDescription ?? "",
+                "short_description" => $talent->localizedShortDescription ?? "",
                 "advice" => $talent->advice ?? "",
                 "domain" => $domainKey, // Используем стандартный ключ
                 "score" => $score,
@@ -243,6 +281,7 @@ class TalentTestResults extends Component
         $maxUserScore = max($maxUserScore, 1); // Избегаем деления на 0
 
         // Получаем все сферы с профессиями и талантами
+        /** @var Sphere[] $allSpheres */
         $allSpheres = Sphere::query()->with([
             "professions.talents"
         ])->get();
@@ -324,8 +363,8 @@ class TalentTestResults extends Component
 
             $spheresData->push([
                 "id" => $sphere->id,
-                "name" => $sphere->name,
-                "description" => $sphere->description ?? "",
+                "name" => $sphere->localizedName,
+                "description" => $sphere->localizedDescription ?? "",
                 "is_top" => false, // Будет установлено после сортировки
                 "relevance_score" => 999,
                 "compatibility_percentage" => round(
@@ -360,7 +399,8 @@ class TalentTestResults extends Component
         $maxUserScore = max($maxUserScore, 1); // Избегаем деления на 0
 
         // Получаем все профессии с их талантами
-        $allProfessions = \App\Models\Profession::with([
+        /** @var Profession[] $allProfessions */
+        $allProfessions = Profession::with([
             "talents",
             "sphere",
         ])->get();
@@ -413,8 +453,8 @@ class TalentTestResults extends Component
 
             $professionsData->push([
                 "id" => $profession->id,
-                "name" => $profession->name,
-                "description" => $profession->description ?? "",
+                "name" => $profession->localizedName,
+                "description" => $profession->localizedDescription ?? "",
                 "sphere_id" => $profession->sphere
                     ? $profession->sphere->id
                     : null,

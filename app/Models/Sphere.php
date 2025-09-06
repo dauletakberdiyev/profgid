@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
+ * @property-read string $localizedName
+ * @property-read string $localizedDescription
  * @property-read Profession[]|Collection $professions
  */
 class Sphere extends Model

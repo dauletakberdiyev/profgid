@@ -10,7 +10,7 @@
             border: 2px solid #ffffff;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-        
+
         .slider::-moz-range-thumb {
             width: 20px;
             height: 20px;
@@ -20,49 +20,49 @@
             border: 2px solid #ffffff;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
-        
+
         .slider::-webkit-slider-track {
             background: #e5e7eb;
             height: 8px;
             border-radius: 4px;
         }
-        
+
         .slider::-moz-range-track {
             background: #e5e7eb;
             height: 8px;
             border-radius: 4px;
         }
     </style>
-    
+
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Header -->
         <div class="text-center mb-8">
             <h1 class="text-4xl font-bold text-gray-900 mb-4">
-                Анализ грантов по предметам ЕНТ
+                {{ __('all.grant_analyze.title') }}
             </h1>
             <p class="text-xl text-gray-600">
-                Выберите предметы ЕНТ и получите список подходящих специальностей и университетов
+                {{ __('all.grant_analyze.desc') }}
             </p>
         </div>
 
         <!-- Filters Section -->
         <div class="bg-white rounded-lg border border-gray-200 p-6 mb-8">
-            <h2 class="text-2xl font-semibold text-gray-800 mb-6">Фильтры поиска</h2>
-            
+            <h2 class="text-2xl font-semibold text-gray-800 mb-6">{{ __('all.grant_analyze.filters.title') }}</h2>
+
             <!-- Subject Selection -->
             <div class="mb-6">
                 <label class="block text-sm font-medium text-gray-700 mb-3">
-                    Выберите предметы ЕНТ
+                    {{ __('all.grant_analyze.filters.choose') }}
                 </label>
-                
+
                 <!-- Individual Subjects -->
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                     @foreach($availableSubjects as $subject)
                         @if(!in_array($subject->name, ['Ауыл квотасы', 'Көпбалалы отбасы', 'Толық емес отбасы', 'Серпін', 'Мүгедектігі бар адамдар', 'Мүгедектігі бар отбасынан', 'Жетім балалар', 'Дерексіз дұрыс енгіздім']))
                             <label class="flex items-center">
-                                <input 
-                                    type="checkbox" 
-                                    wire:model.live="selectedSubjects" 
+                                <input
+                                    type="checkbox"
+                                    wire:model.live="selectedSubjects"
                                     value="{{ $subject->name }}"
                                     class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                                 >
@@ -76,16 +76,16 @@
             <!-- Social Benefits Section -->
             <div class="mb-6">
                 <label class="block text-sm font-medium text-gray-700 mb-3">
-                    Льготы и квоты
+                    {{ __('all.grant_analyze.filters.discount') }}
                 </label>
-                
+
                 <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                     @foreach($availableSubjects as $subject)
                         @if(in_array($subject->name, ['Ауыл квотасы', 'Көпбалалы отбасы', 'Толық емес отбасы', 'Серпін', 'Мүгедектігі бар адамдар', 'Мүгедектігі бар отбасынан', 'Жетім балалар', 'Дерексіз дұрыс енгіздім']))
                             <label class="flex items-center">
-                                <input 
-                                    type="checkbox" 
-                                    wire:model.live="selectedSubjects" 
+                                <input
+                                    type="checkbox"
+                                    wire:model.live="selectedSubjects"
                                     value="{{ $subject->name }}"
                                     class="rounded border-gray-300 text-green-600 focus:ring-green-500"
                                 >
@@ -99,14 +99,14 @@
             <!-- Score Range Slider -->
             <div class="mb-6">
                 <label class="block text-sm font-medium text-gray-700 mb-3">
-                    Проходной балл: <span class="text-blue-600 font-semibold">{{ $minScore }}</span>
+                    {{ __('all.grant_analyze.filters.score') }}<span class="text-blue-600 font-semibold">{{ $minScore }}</span>
                 </label>
                 <div>
-                    <input 
-                        type="range" 
-                        wire:model.live="minScore" 
-                        min="70" 
-                        max="140" 
+                    <input
+                        type="range"
+                        wire:model.live="minScore"
+                        min="70"
+                        max="140"
                         class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
                     >
                     <div class="flex justify-between text-xs text-gray-500 mt-1">
@@ -118,17 +118,17 @@
 
             <!-- Action Buttons -->
             <div class="flex gap-4">
-                <button 
+                <button
                     wire:click="analyzeGrants"
                     class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors font-medium"
                 >
-                    Анализировать гранты
+                    {{ __('all.grant_analyze.filters.btn_analyze') }}
                 </button>
-                <button 
+                <button
                     wire:click="resetFilters"
                     class="bg-gray-100 text-gray-800 px-6 py-3 rounded-lg hover:bg-gray-200 transition-colors font-medium border border-gray-200"
                 >
-                    Сбросить фильтры
+                    {{ __('all.grant_analyze.filters.btn_reset') }}
                 </button>
             </div>
         </div>
@@ -137,17 +137,17 @@
         @if($analysisPerformed)
             <div class="bg-white rounded-lg border border-gray-200 p-6">
                 <h2 class="text-2xl font-semibold text-gray-800 mb-6">
-                    Результаты анализа
+                    {{ __('all.grant_analyze.analyze.title') }}
                     <span class="text-lg font-normal text-gray-600">
-                        ({{ $matchingSpecialities->flatten()->count() }} специальностей найдено)
+                        ({{ $matchingSpecialities->flatten()->count() }} {{ __('all.grant_analyze.analyze.find') }})
                     </span>
                 </h2>
 
                 @if($matchingSpecialities->isEmpty())
                     <div class="text-center py-12">
                         <div class="text-gray-400 text-6xl mb-4">📚</div>
-                        <h3 class="text-xl font-medium text-gray-900 mb-2">Специальности не найдены</h3>
-                        <p class="text-gray-600">Попробуйте изменить критерии поиска или выбрать другие предметы</p>
+                        <h3 class="text-xl font-medium text-gray-900 mb-2">{{ __('all.grant_analyze.analyze.not_found') }}</h3>
+                        <p class="text-gray-600">{{ __('all.grant_analyze.analyze.not_found_desc') }}</p>
                     </div>
                 @else
                     <div class="space-y-6">
@@ -167,10 +167,10 @@
                                                 </div>
                                                 <div class="text-right">
                                                     <div class="text-lg font-semibold text-green-600">
-                                                        {{ $speciality['grant_count'] }} грантов
+                                                        {{ $speciality['grant_count'] }} {{ __('all.grant_analyze.analyze.grants') }}
                                                     </div>
                                                     <div class="text-sm text-gray-600">
-                                                        Проходной балл: {{ $speciality['passing_score'] }}
+                                                        {{ __('all.grant_analyze.analyze.score') }} {{ $speciality['passing_score'] }}
                                                     </div>
                                                 </div>
                                             </div>
@@ -194,10 +194,10 @@
 
                                             <div class="flex justify-between items-center text-sm text-gray-600">
                                                 <div>
-                                                    <span class="font-medium">Срок обучения:</span> {{ $speciality['duration_years'] }} лет
+                                                    <span class="font-medium">{{ __('all.grant_analyze.analyze.learn_year') }}</span> {{ $speciality['duration_years'] }} {{ __('all.grant_analyze.analyze.year') }}
                                                 </div>
                                                 <div>
-                                                    <span class="font-medium">Код:</span> {{ $speciality['code'] }}
+                                                    <span class="font-medium">{{ __('all.grant_analyze.analyze.code') }}</span> {{ $speciality['code'] }}
                                                 </div>
                                             </div>
 

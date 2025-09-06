@@ -11,8 +11,6 @@ class GoogleController extends Controller
 {
     /**
      * Redirect the user to the Google authentication page.
-     *
-     * @return \Illuminate\Http\Response
      */
     public function redirectToGoogle()
     {
@@ -21,20 +19,18 @@ class GoogleController extends Controller
 
     /**
      * Obtain the user information from Google.
-     *
-     * @return \Illuminate\Http\Response
      */
     public function handleGoogleCallback()
     {
         try {
             $googleUser = Socialite::driver('google')->user();
-            
+
             $user = User::where('google_id', $googleUser->id)->first();
 
             if (!$user) {
                 // Check if user with this email already exists
                 $existingUser = User::where('email', $googleUser->email)->first();
-                
+
                 if ($existingUser) {
                     // Update existing user with Google ID
                     $existingUser->update([
@@ -53,11 +49,11 @@ class GoogleController extends Controller
                     ]);
                 }
             }
-            
+
             Auth::login($user);
-            
+
             return redirect()->intended(route('home'));
-            
+
         } catch (\Exception $e) {
             return redirect()->route('login')
                 ->with('error', 'Google authentication failed: ' . $e->getMessage());

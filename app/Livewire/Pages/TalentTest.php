@@ -29,7 +29,7 @@ class TalentTest extends Component
         foreach ($answers as $index => $answer) {
             $this->allQuestions[] = [
                 'id' => $answer->id,
-                'question' => $answer->question,
+                'question' => $answer->localizedQuestion,
                 'talent_name' => $answer->talent ? $answer->talent->name : 'Unknown',
                 'talent_id' => $answer->talent ? $answer->talent_id : null,
                 'question_number' => $index + 1,

@@ -8,6 +8,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * @property int $id
+ * @property string $name
+ * @property string $name_kz
+ * @property string $description
+ * @property string $description_kz
+ * @property-read string $localizedName
+ * @property-read string $localizedDescription
  */
 class Profession extends Model
 {
@@ -59,7 +65,6 @@ class Profession extends Model
 
         return match($locale) {
             'kk' => $this->name_kz ?? $this->name,
-            'en' => $this->name_en ?? $this->name,
             default => $this->name
         };
     }
@@ -73,7 +78,6 @@ class Profession extends Model
 
         return match($locale) {
             'kk' => $this->description_kz ?? $this->description,
-            'en' => $this->description_en ?? $this->description,
             default => $this->description
         };
     }
