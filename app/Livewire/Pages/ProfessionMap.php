@@ -3,6 +3,7 @@
 namespace App\Livewire\Pages;
 
 use App\Models\Profession;
+use App\Models\User;
 use Livewire\Component;
 use App\Models\Sphere;
 use Illuminate\Support\Facades\Auth;
@@ -92,51 +93,27 @@ class ProfessionMap extends Component
 
     public function likeSphere($sphereId)
     {
+        /** @var User $user */
         $user = Auth::user();
-        if (!$user) {
-            return;
-        }
+        if (!$user) return;
 
-        $favoriteSpheres = $user->favorite_spheres ?? [];
-
-        if (!in_array($sphereId, $favoriteSpheres)) {
-            $favoriteSpheres[] = $sphereId;
-            $user->update(['favorite_spheres' => $favoriteSpheres]);
-
-            session()->flash('sphere-added', 'Сфера добавлена в избранное!');
+        if ($user->favouriteSpheres()->where('sphere_id', $sphereId)->exists()) {
+            $user->favouriteSpheres()->detach($sphereId); // remove
         } else {
-            // Удаляем из избранного
-            $favoriteSpheres = array_filter($favoriteSpheres, function($id) use ($sphereId) {
-                return $id != $sphereId;
-            });
-            $user->update(['favorite_spheres' => array_values($favoriteSpheres)]);
-
-            session()->flash('sphere-added', 'Сфера удалена из избранного!');
+            $user->favouriteSpheres()->attach($sphereId); // add
         }
     }
 
     public function likeProfession($professionId): void
     {
+        /** @var User $user */
         $user = Auth::user();
-        if (!$user) {
-            return;
-        }
+        if (!$user) return;
 
-        $favoriteProfessions = $user->favorite_professions ?? [];
-
-        if (!in_array($professionId, $favoriteProfessions)) {
-            $favoriteProfessions[] = $professionId;
-            $user->update(['favorite_professions' => $favoriteProfessions]);
-
-            session()->flash('profession-added', __('messages.session.add.profession'));
+        if ($user->favouriteProfessions()->where('profession_id', $professionId)->exists()) {
+            $user->favouriteProfessions()->detach($professionId); // remove
         } else {
-            // Удаляем из избранного
-            $favoriteSpheres = array_filter($favoriteProfessions, function($id) use ($professionId) {
-                return $id != $professionId;
-            });
-            $user->update(['favorite_professions' => array_values($favoriteSpheres)]);
-
-            session()->flash('profession-added', __('messages.session.remove.profession'));
+            $user->favouriteProfessions()->attach($professionId); // add
         }
     }
 
@@ -186,8 +163,8 @@ class ProfessionMap extends Component
         $spheres = $query->get();
 
         // Получаем избранные сферы пользователя
-        $userFavoriteSpheres = Auth::check() ? (Auth::user()->favorite_spheres ?? []) : [];
-        $userFavoriteProfessions = Auth::check() ? (Auth::user()->favorite_professions ?? []) : [];
+        $userFavoriteSpheres = Auth::check() ? (Auth::user()->favouriteSpheres()->pluck('spheres.id')->toArray() ?? []) : [];
+        $userFavoriteProfessions = Auth::check() ? (Auth::user()->favouriteProfessions()->pluck('professions.id')->toArray() ?? []) : [];
 
         // Добавляем информацию об избранности
         $spheres = $spheres->map(function(Sphere $sphere) use ($userFavoriteSpheres, $userFavoriteProfessions) {

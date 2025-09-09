@@ -2,11 +2,16 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+/**
+ * @property-read Sphere[]|Collection $favouriteSpheres
+ * @property-read Profession[]|Collection $favouriteProfessions
+ */
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
@@ -69,5 +74,15 @@ class User extends Authenticatable
     public function testSessions()
     {
         return $this->hasMany(TestSession::class);
+    }
+
+    public function favouriteSpheres(): BelongsToMany
+    {
+        return $this->belongsToMany(Sphere::class, FavoriteSphereUser::class);
+    }
+
+    public function favouriteProfessions(): BelongsToMany
+    {
+        return $this->belongsToMany(Profession::class, FavoriteProfessionUser::class);
     }
 }

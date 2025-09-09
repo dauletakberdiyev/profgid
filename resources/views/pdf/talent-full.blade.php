@@ -13,7 +13,7 @@
 
         <h1>PROFGID</h1>
 
-        <h1><b>{{ auth()->user()->name }}</b> | 12324</h1>
+        <h1><b>{{ auth()->user()->name }}</b> | {{ $testDate }}</h1>
 
     </div>
 
@@ -22,7 +22,7 @@
 
 <div id="talents-section">
     <!-- Domain Bar Chart -->
-    <div class="mb-4 md:mb-6 mt-20" id="talents-section-p$df">
+    <div class="mb-6 mt-20" id="talents-section-p$df">
         @php
             $domainColors = [
                 'executing' => '#702B7C',
@@ -53,41 +53,61 @@
                 'Мышление' => 'bg-[#429162]',
                 'Влияние' => 'bg-[#DA782D]',
             ];
+
+            $percentages = [40, 30, 20, 10];
+            $i = 0;
+            $j = 0;
         @endphp
 
+        <div>
+            <h1 class="text-2xl font-medium text-gray-900 mb-4 leading-relaxed">
+                {{ __('all.test_result.talents.lead') }} <span class="font-extrabold">{{ $localizedDomains[app()->getLocale()][$topDomain] }}</span> {{ __('all.test_result.talents.theme') }}.
+            </h1>
+        </div>
+
         <!-- Single horizontal bar -->
-        <div class="flex gap-1 w-full h-6 md:h-8 overflow-hidden mb-3 md:mb-4">
-            @foreach ($domains as $domain => $name)
-                <div class="{{ $domainBgColors[$domain] ?? 'bg-gray-400' }} flex items-center justify-center text-white font-bold text-xs md:text-sm"
-                    style="width: 25%">
+        <div class="flex w-full h-8 overflow-hidden mb-4 bg-gray-200 rounded">
+            @foreach ($domainScores as $domain => $score)
+                @php
+                    $percentage = $percentages[$i] ?? 10; // default to 10 if more domains
+                    $i++;
+                @endphp
+                <div class="{{ $domainBgColors[$domain] ?? 'bg-gray-400' }} flex items-center justify-center text-white font-bold text-xs md:text-sm flex-shrink-0"
+                     style="width: {{ $percentage }}%; min-width: 10%;">
+
                 </div>
             @endforeach
         </div>
 
-        <!-- Domain labels -->
+        <!-- Domain labels with scores and percentages -->
         <div class="flex w-full">
-            @foreach ($domains as $domain => $name)
-                <div class="text-left" style="width: 25%">
-                    <div class="text-xs md:text-sm font-medium text-gray-700">{{ $name }}</div>
+            @foreach ($domainScores as $domain => $score)
+                @php
+                    $percentage = $percentages[$j] ?? 10; // default to 10 if more domains
+                    $j++;
+                @endphp
+                <div class="text-left flex-shrink-0" style="width: {{ $percentage }}%; min-width: 10%;">
+                    <div class="text-sm font-medium text-gray-700 truncate">
+                        {{ $localizedDomains[app()->getLocale()][$domain] ?? $domain }}
+                    </div>
+
                 </div>
             @endforeach
         </div>
     </div>
 
-    <p class="text-xs md:text-sm text-gray-600 mb-6 md:mb-8 leading-relaxed">
-        Вы умеете брать на себя инициативу, уверенно выражать свои мысли и вдохновлять других на действия.
-        Ваши таланты из блока
-        Влияние помогают мотивировать окружающих, убеждать их и добиваться значимых изменений
+    <p class="text-sm text-gray-600 mb-6 md:mb-8 leading-relaxed">
+        {{ $domainsDescription[app()->getLocale()][$topDomain] }}
     </p>
 
-    <h2 class="text-lg md:text-xl font-bold mb-3 md:mb-4">Ваши таланты по доменам</h2>
+    <h2 class="text-xl font-bold mb-4">{{ __('all.test_result.talents.by_domains') }}</h2>
 
-    <div class="grid grid-cols-4 gap-3 md:gap-1 mb-6 md:mb-8">
+    <div class="grid grid-cols-4 gap-1 mb-8">
         @foreach ($domains as $domain => $name)
-            <div class="mb-4 md:mb-0">
+            <div class="mb-0">
                 <div class="text-center font-semibold uppercase text-sm mb-2 md:mb-3 pb-1 md:pb-2 text-gray-800 p-1 md:p-2 border-b-4 md:border-b-8"
                     style="border-color: {{ $domainColors[$domain] }}">
-                    {{ $name }}
+                    {{ $localizedDomains[app()->getLocale()][$domain] }}
                 </div>
 
                 @php
@@ -134,21 +154,18 @@
     </div>
 
     <div class="space-y-5">
-        <h2 class="text-lg md:text-xl font-bold mb-3 md:mb-4">Цифры в профиле показывают, какие таланты у
-            тебя выражены сильнее всего:</h2>
+        <h2 class="text-lg md:text-xl font-bold mb-3 md:mb-4">{{ __('all.test_result.talents.desc_title') }}</h2>
 
         <span class="block">
-            Топ-8 талантов: Они выделены ярким цветом, чтобы показать их важность. Это твои главные сильные
-            стороны, которые ты чаще
-            всего используешь
+            {{ __('all.test_result.talents.desc_1') }}
         </span>
 
         <span class="block">
-            9–16: Эти таланты тоже заметны, но немного меньше.
+            {{ __('all.test_result.talents.desc_2') }}
         </span>
 
         <span class="block">
-            17–24: Эти таланты менее выражены, но это не слабости, просто ты используешь их реже.
+            {{ __('all.test_result.talents.desc_3') }}
         </span>
     </div>
 
@@ -156,7 +173,7 @@
 
     <!-- Таланты блок -->
     <div class="mt-20 space-y-6" x-data="{ expandedTalents: [] }">
-        <h2 class="text-lg md:text-xl font-bold text-center">Описание ваших талантов</h2>
+        <h2 class="text-lg md:text-xl font-bold text-center">{{ __('all.test_result.talents.content') }}</h2>
 
         @php
             $topTenTalents = collect($userResults)->take(10)->toArray();
@@ -178,8 +195,7 @@
                         <div class="border-gray-200 p-1.5 transition-all hover:bg-blue-100 bg-blue-50"
                             style="border-left: 4px solid {{ $talentDomainColor }}">
                             <!-- Заголовок таланта -->
-                            <div class="flex items-center justify-between cursor-pointer"
-                                @click="expandedTalents.includes('{{ $talentId }}') ? expandedTalents.splice(expandedTalents.indexOf('{{ $talentId }}'), 1) : expandedTalents.push('{{ $talentId }}')">
+                            <div class="flex items-center justify-between cursor-pointer">
                                 <div class="flex items-center flex-1 min-w-0">
                                     <div class="w-5 h-5 rounded-full flex items-center justify-center text-white text-xs font-bold mr-2"
                                         style="background-color: {{ $talentDomainColor }}">
@@ -254,7 +270,7 @@
 
                                     <!-- Краткое описание для остальных талантов -->
                                     <div class="mb-1">
-                                        <p class="text-xs text-gray-700 leading-tight">{{ $talent['short_description'] }}</p> 
+                                        <p class="text-xs text-gray-700 leading-tight">{{ $talent['short_description'] }}</p>
                                     </div>
                                 </div>
                             @endif
@@ -268,9 +284,8 @@
     <!-- Важно блок -->
     <div class="mt-8 text-left">
         <p class="text-sm text-gray-600">
-            <span class="font-bold">*Важно</span><br>
-            Ваши результаты уникальны и не подлежат сравнению с другими. Они отражают ваши сильные стороны и
-            помогают раскрыть ваш путь к успеху.
+            <span class="font-bold">{{ __('all.test_result.talents.attention') }}</span><br>
+            {{ __('all.test_result.talents.attention_desc') }}
         </p>
     </div>
 
@@ -290,14 +305,14 @@
             <!-- Краткое описание -->
             <div class="mb-6">
                 <p class="text-sm text-gray-600 leading-relaxed">
-                    Ниже представлены ваши пять самых сильных талантов, которые определяют ваш уникальный профиль и потенциал для достижения выдающихся результатов.
+                    {{ __('all.test_pdf.title') }}
                 </p>
             </div>
 
             <!-- Обзорный текст -->
             <div class="mb-8">
                 <p class="text-sm text-gray-700 leading-relaxed">
-                    Эти таланты представляют собой ваши основные сильные стороны и являются ключом к вашему профессиональному и личностному развитию. Сосредоточьтесь на их развитии и применении в повседневной деятельности.
+                    {{ __('all.test_pdf.desc') }}
                 </p>
             </div>
 
@@ -325,11 +340,11 @@
                         <!-- Название и балл таланта -->
                         <div class="flex-1">
                             <h1 class="text-2xl font-bold text-gray-900 mb-2">
-                                Обзор таланта {{ $talent['name'] }}
+                                {{ __('all.test_pdf.talents.review') }} {{ $talent['name'] }}
                             </h1>
                             <div class="flex items-center space-x-4">
                                 <div class="text-sm text-gray-600 px-3 py-1 bg-gray-100 rounded">
-                                    Домен: {{ $domains[$talent['domain']] ?? $talent['domain'] }}
+                                    {{ __('all.test_pdf.talents.domain') }} {{ $localizedDomains[app()->getLocale()][$talent['domain']] ?? $talent['domain'] }}
                                 </div>
                             </div>
                         </div>
@@ -338,7 +353,7 @@
                     <!-- Краткое описание -->
                     @if(!empty($talent['short_description']))
                         <div class="bg-blue-50 p-6 border-l-4" style="border-left-color: {{ $talentDomainColor }}">
-                            <h3 class="text-lg font-semibold mb-3 text-gray-900">Краткое описание</h3>
+                            <h3 class="text-lg font-semibold mb-3 text-gray-900">{{ __('all.test_pdf.talents.short') }}</h3>
                             <p class="text-sm text-gray-700 leading-relaxed">
                                 {{ $talent['short_description'] }}
                             </p>
@@ -347,7 +362,7 @@
 
                     <!-- Обзор таланта -->
                     <div class="bg-gray-50 p-6 rounded-lg">
-                        <h3 class="text-lg font-semibold mb-4 text-gray-900">Обзор</h3>
+                        <h3 class="text-lg font-semibold mb-4 text-gray-900">{{ __('all.test_pdf.talents.review_short') }}</h3>
                         <div class="space-y-3 text-sm text-gray-700 leading-relaxed">
                             @if(!empty($talent['description']))
                                 <p>{{ $talent['description'] }}</p>
@@ -364,13 +379,13 @@
 
                     <!-- Советы для развития таланта -->
                     <div class="bg-white border border-gray-200 p-6 rounded-lg">
-                        <h3 class="text-lg font-semibold mb-4 text-gray-900">Советы для развития таланта "{{ $talent['name'] }}"</h3>
+                        <h3 class="text-lg font-semibold mb-4 text-gray-900">{{ __('all.test_pdf.talents.advice') }} "{{ $talent['name'] }}"</h3>
                         <div class="space-y-4">
                             @if(isset($talentAdvice[$talent['name']]) && !empty($talentAdvice[$talent['name']]))
                                 @php
                                     // Проверяем тип данных advice
                                     $adviceData = $talentAdvice[$talent['name']];
-                                    
+
                                     // Если это строка, пытаемся декодировать JSON
                                     if (is_string($adviceData)) {
                                         $decodedData = json_decode($adviceData, true);
@@ -379,7 +394,7 @@
                                         }
                                     }
                                 @endphp
-                                
+
                                 @if(is_array($adviceData))
                                     {{-- Если advice - это JSON массив с объектами --}}
                                     @foreach($adviceData as $tipIndex => $adviceItem)
@@ -389,8 +404,13 @@
                                             </div>
                                             <div class="flex-1">
                                                 @if(is_array($adviceItem) && isset($adviceItem['name']))
-                                                    <h4 class="text-sm font-semibold text-gray-800 mb-1">{{ $adviceItem['name'] }}</h4>
-                                                    <p class="text-sm text-gray-700 leading-relaxed">{{ $adviceItem['description'] ?? '' }}</p>
+                                                    @if(app()->getLocale() === 'ru')
+                                                        <h4 class="text-sm font-semibold text-gray-800 mb-1">{{ $adviceItem['name'] }}</h4>
+                                                        <p class="text-sm text-gray-700 leading-relaxed">{{ $adviceItem['description'] ?? '' }}</p>
+                                                    @else
+                                                        <h4 class="text-sm font-semibold text-gray-800 mb-1">{{ $adviceItem['name_kz'] }}</h4>
+                                                        <p class="text-sm text-gray-700 leading-relaxed">{{ $adviceItem['description_kz'] ?? '' }}</p>
+                                                    @endif
                                                 @else
                                                     <p class="text-sm text-gray-700 leading-relaxed">{{ is_string($adviceItem) ? $adviceItem : '' }}</p>
                                                 @endif

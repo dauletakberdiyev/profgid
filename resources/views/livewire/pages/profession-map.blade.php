@@ -60,15 +60,6 @@
                         </div>
 
                         <div class="flex items-center space-x-1">
-                            <!-- Info Button -->
-{{--                            <button wire:click.stop="showSphereInfo({{ $sphere->id }})"--}}
-{{--                                    class="p-1 text-gray-400 hover:text-blue-500 transition-colors flex-shrink-0 mr-1"--}}
-{{--                                    title="Показать информацию о сфере">--}}
-{{--                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">--}}
-{{--                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>--}}
-{{--                                </svg>--}}
-{{--                            </button>--}}
-
                             <!-- Like Button -->
                             @auth
                                 <button wire:click.stop="likeSphere({{ $sphere->id }})"

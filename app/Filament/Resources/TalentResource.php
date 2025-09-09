@@ -58,8 +58,16 @@ class TalentResource extends Resource
                             ->label('Название совета')
                             ->required()
                             ->maxLength(255),
+                        Forms\Components\TextInput::make('name_kz')
+                            ->label('Название совета на казахском')
+                            ->required()
+                            ->maxLength(255),
                         Forms\Components\Textarea::make('description')
                             ->label('Описание совета')
+                            ->required()
+                            ->maxLength(65535),
+                        Forms\Components\Textarea::make('description_kz')
+                            ->label('Описание совета на казахском')
                             ->required()
                             ->maxLength(65535),
                     ])

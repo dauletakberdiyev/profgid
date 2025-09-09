@@ -17,9 +17,11 @@
             <!-- Spheres List -->
             <div class="space-y-2">
                 @foreach($favoriteSpheres as $sphere)
-                    <div class="bg-white border border-gray-200 rounded-lg overflow-hidden transition-all duration-200 hover:border-gray-300">
+                    <div class="bg-white border border-gray-200 rounded-lg overflow-hidden transition-all duration-200 hover:border-gray-300"
+                         x-data="{ open: false }"
+                    >
                         <!-- Sphere Header -->
-                        <div class="p-3 cursor-pointer" wire:click="toggleExpanded({{ $sphere->id }})">
+                        <div class="p-3 cursor-pointer" @click="open = !open">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center space-x-2">
                                     <div class="w-6 h-6 text-gray-500">{{ svg($sphere->icon ?? 'heroicon-o-home') }}</div>
@@ -42,45 +44,31 @@
                             </div>
                         </div>
 
-                        <!-- Expanded Content -->
-                        @if(in_array($sphere->id, $expandedSpheres))
-                            <div class="border-t border-gray-100 bg-gray-50">
-                                <!-- Description -->
-                                @if($sphere->localized_description)
-                                    <div class="p-3 border-b border-gray-200">
-                                        <p class="text-xs text-gray-700 leading-relaxed">{{ $sphere->localized_description }}</p>
-                                    </div>
-                                @endif
+                        <div x-show="open"
+                             x-transition
+                             class="text-xs border-t border-gray-100 bg-gray-50"
+                             style="display: none;"
+                        >
+                            @if($sphere->localized_description)
+                                <div class="p-3 border-b border-gray-200">
+                                    <p class="text-xs text-gray-700 leading-relaxed">{{ $sphere->localized_description }}</p>
+                                </div>
+                            @endif
 
-                                <!-- Professions List -->
-                                @if($sphere->professions->count() > 0)
-                                    <div class="p-3">
-                                        <h4 class="text-xs font-medium text-gray-900 mb-2">{{ __('all.my_spheres.professions.title') }}</h4>
-                                        <div class="grid grid-cols-1 gap-1">
-                                            @foreach($sphere->professions as $profession)
-                                                <div class="bg-white border border-gray-200 rounded px-2 py-1 text-xs text-gray-700 hover:bg-gray-50 transition-colors">
-                                                    {{ $profession->localized_name }}
-                                                </div>
-                                            @endforeach
-                                        </div>
+                            <!-- Professions List -->
+                            @if($sphere->professions->count() > 0)
+                                <div class="p-3">
+                                    <h4 class="text-xs font-medium text-gray-900 mb-2">{{ __('all.my_spheres.professions.title') }}</h4>
+                                    <div class="grid grid-cols-1 gap-1">
+                                        @foreach($sphere->professions as $profession)
+                                            <div class="bg-white border border-gray-200 rounded px-2 py-1 text-xs text-gray-700 hover:bg-gray-50 transition-colors">
+                                                {{ $profession->localized_name }}
+                                            </div>
+                                        @endforeach
                                     </div>
-                                @endif
-
-                                <!-- Top Talents -->
-                                @if($sphere->talents->count() > 0)
-                                    <div class="p-3 border-t border-gray-200">
-                                        <h4 class="text-xs font-medium text-gray-900 mb-2">Ключевые таланты:</h4>
-                                        <div class="flex flex-wrap gap-1">
-                                            @foreach($sphere->talents->sortByDesc('pivot.coefficient')->take(6) as $talent)
-                                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-blue-100 text-blue-800">
-                                                    {{ $talent->name }}
-                                                </span>
-                                            @endforeach
-                                        </div>
-                                    </div>
-                                @endif
-                            </div>
-                        @endif
+                                </div>
+                            @endif
+                        </div>
                     </div>
                 @endforeach
             </div>

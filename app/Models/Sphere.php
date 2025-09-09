@@ -101,4 +101,9 @@ class Sphere extends Model
             default => $this->description
         };
     }
+
+    public function favouritedBy(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, FavoriteSphereUser::class);
+    }
 }

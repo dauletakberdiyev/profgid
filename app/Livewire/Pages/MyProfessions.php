@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Pages;
 
+use App\Models\User;
 use Livewire\Component;
 use App\Models\Profession;
 use Illuminate\Support\Facades\Auth;
@@ -29,24 +30,18 @@ class MyProfessions extends Component
 
     public function loadFavoriteProfessions()
     {
+        /** @var User $user */
         $user = Auth::user();
-        $professionIds = $user->favorite_professions ?? [];
-        $this->favoriteProfessions = Profession::with('talents')->whereIn('id', $professionIds)->get();
+
+        $this->favoriteProfessions = $user->favouriteProfessions->load('talents');
     }
 
     public function removeProfession($professionId)
     {
+        /** @var User $user */
         $user = Auth::user();
-        $favoriteProfessions = $user->favorite_professions ?? [];
-
-        $favoriteProfessions = array_filter($favoriteProfessions, function($id) use ($professionId) {
-            return $id != $professionId;
-        });
-
-        $user->update(['favorite_professions' => array_values($favoriteProfessions)]);
+        $user->favouriteProfessions()->detach($professionId);
         $this->loadFavoriteProfessions();
-
-        session()->flash('message', 'Профессия удалена из избранного!');
     }
 
     public function render()

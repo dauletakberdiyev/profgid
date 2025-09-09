@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Pages;
 
+use App\Models\User;
 use Livewire\Component;
 use App\Models\Sphere;
 use Illuminate\Support\Facades\Auth;
@@ -29,26 +30,18 @@ class MySpheres extends Component
 
     public function loadFavoriteSpheres()
     {
+        /** @var User $user */
         $user = Auth::user();
-        $sphereIds = $user->favorite_spheres ?? [];
-        $this->favoriteSpheres = Sphere::with(relations: ['talents', 'professions' => function($query) {
-            $query->where('is_active', true)->orderBy('name');
-        }])->whereIn('id', $sphereIds)->get();
+
+        $this->favoriteSpheres = $user->favouriteSpheres->load(['talents', 'professions']);
     }
 
     public function removeSphere($sphereId)
     {
+        /** @var User $user */
         $user = Auth::user();
-        $favoriteSpheres = $user->favorite_spheres ?? [];
-        
-        $favoriteSpheres = array_filter($favoriteSpheres, function($id) use ($sphereId) {
-            return $id != $sphereId;
-        });
-        
-        $user->update(['favorite_spheres' => array_values($favoriteSpheres)]);
+        $user->favouriteSpheres()->detach($sphereId);
         $this->loadFavoriteSpheres();
-        
-        session()->flash('message', 'Сфера удалена из избранного!');
     }
 
     public function render()

@@ -17,9 +17,11 @@
             <!-- Professions List -->
             <div class="space-y-2">
                 @foreach($favoriteProfessions as $profession)
-                    <div class="bg-white border border-gray-200 rounded-lg overflow-hidden transition-all duration-200 hover:border-gray-300">
+                    <div class="bg-white border border-gray-200 rounded-lg overflow-hidden transition-all duration-200 hover:border-gray-300"
+                         x-data="{ open: false }"
+                    >
                         <!-- Profession Header -->
-                        <div class="p-3 cursor-pointer" wire:click="toggleExpanded({{ $profession->id }})">
+                        <div class="p-3 cursor-pointer" @click="open = !open">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center space-x-2 flex-1 min-w-0">
                                     <h3 class="text-base font-medium text-gray-900 truncate">{{ $profession->localized_name }}</h3>
@@ -33,7 +35,9 @@
                                     </button>
 
                                     @if($profession->description)
-                                        <div class="text-gray-400 transition-transform duration-200 {{ in_array($profession->id, $expandedProfessions) ? 'rotate-90' : '' }}">
+                                        <div class="text-gray-400 transition-transform duration-200"
+                                             :class="open ? 'rotate-90' : ''"
+                                        >
                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7" />
                                             </svg>
@@ -43,15 +47,16 @@
                             </div>
                         </div>
 
-                        <!-- Expanded Content -->
-                        @if(in_array($profession->id, $expandedProfessions) && $profession->description)
-                            <div class="border-t border-gray-100 bg-gray-50">
-                                <div class="p-3">
-                                    <h4 class="text-xs font-medium text-gray-900 mb-2">{{ __('all.profession_map.professions.desc') }}</h4>
-                                    <p class="text-xs text-gray-700 leading-relaxed">{{ $profession->localized_description }}</p>
-                                </div>
+                        <div x-show="open"
+                             x-transition
+                             class="text-xs md:text-sm border-t border-gray-100 bg-gray-50"
+                             style="display: none;"
+                        >
+                            <div class="p-3">
+                                <h4 class="text-xs font-medium text-gray-900 mb-2">{{ __('all.profession_map.professions.desc') }}</h4>
+                                <p class="text-xs text-gray-700 leading-relaxed">{{ $profession->localized_description }}</p>
                             </div>
-                        @endif
+                        </div>
                     </div>
                 @endforeach
             </div>
