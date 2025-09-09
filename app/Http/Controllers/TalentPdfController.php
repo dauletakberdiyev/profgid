@@ -201,8 +201,8 @@ class TalentPdfController extends Controller
             ])->render();
 
             $pdf = Browsershot::html($html)
-                ->setNodeBinary('/Users/dauletakberdiyev/.nvm/versions/node/v20.15.0/bin/node')
-                ->setNpmBinary('/Users/dauletakberdiyev/.nvm/versions/node/v20.15.0/bin/npm')
+                ->setNodeBinary(env('NODE_PATH'))
+                ->setNpmBinary(env('NPM_PATH'))
                 ->noSandbox()
                 ->showBackground()
                 ->format("A4")
@@ -258,8 +258,8 @@ class TalentPdfController extends Controller
             $html = $talentsHtml . '<div style="page-break-before: always;"></div>' . $spheresHtml;
 
             $pdf = Browsershot::html($html)
-                ->setNodeBinary('/Users/dauletakberdiyev/.nvm/versions/node/v20.15.0/bin/node')
-                ->setNpmBinary('/Users/dauletakberdiyev/.nvm/versions/node/v20.15.0/bin/npm')
+                ->setNodeBinary(env('NODE_PATH'))
+                ->setNpmBinary(env('NPM_PATH'))
                 ->noSandbox()
                 ->showBackground()
                 ->format("A4")
@@ -326,8 +326,8 @@ class TalentPdfController extends Controller
                 $professionsHtml;
 
             $pdf = Browsershot::html($html)
-                ->setNodeBinary('/Users/dauletakberdiyev/.nvm/versions/node/v20.15.0/bin/node')
-                ->setNpmBinary('/Users/dauletakberdiyev/.nvm/versions/node/v20.15.0/bin/npm')
+                ->setNodeBinary(env('NODE_PATH'))
+                ->setNpmBinary(env('NPM_PATH'))
                 ->noSandbox()
                 ->showBackground()
                 ->format("A4")
