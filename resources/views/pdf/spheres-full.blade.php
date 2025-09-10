@@ -212,8 +212,7 @@
 
                         <div class="grid grid-cols-3 gap-5 mt-20">
                             @php
-
-                                $sphereData = $professionsGroupedBySphere[17];
+                                $sphereData = end($professionsGroupedBySphere);
                                 $sphere = $sphereData['sphere'];
                                 $professions = $sphereData['professions'];
                                 $hasProfessions = !empty($professions);
