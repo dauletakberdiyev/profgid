@@ -215,7 +215,7 @@ class TalentPdfController extends Controller
                 ->header("Content-Type", "application/pdf")
                 ->header(
                     "Content-Disposition",
-                    'attachment; filename="отчет-' .
+                    'attachment; filename="' .
                     $userName .
                     "_" .
                     now()->format("Y-m-d") .
@@ -272,7 +272,7 @@ class TalentPdfController extends Controller
                 ->header("Content-Type", "application/pdf")
                 ->header(
                     "Content-Disposition",
-                    'attachment; filename="отчет-' .
+                    'attachment; filename="'.
                     $userName .
                     "_" .
                     now()->format("Y-m-d") .
@@ -340,7 +340,7 @@ class TalentPdfController extends Controller
                 ->header("Content-Type", "application/pdf")
                 ->header(
                     "Content-Disposition",
-                    'attachment; filename="отчет-' .
+                    'attachment; filename="' .
                     $userName .
                     "_" .
                     now()->format("Y-m-d") .

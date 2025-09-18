@@ -2,11 +2,13 @@
 
 namespace App\Livewire\Pages;
 
+use App\Jobs\UpdateUserFavoriteJob;
 use App\Models\Profession;
 use App\Models\User;
 use Livewire\Component;
 use App\Models\Sphere;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class ProfessionMap extends Component
 {
@@ -14,107 +16,71 @@ class ProfessionMap extends Component
     public $sortBy = 'sort_order';
     public $sortDirection = 'asc';
     public $showInactive = false;
-    public $showModal = false;
-    public $selectedSphere = null;
-    public $expandedProfessions = []; // Массив ID раскрытых профессий в модалке
-    public $expandedSpheres = []; // Массив ID раскрытых сфер в аккордеоне
-    public $showProfessionModal = false;
-    public $selectedProfession = null;
 
-    public function updatedSearch()
+    public function mount()
     {
-        // This will trigger a re-render when search is updated
+        // Pre-load cache if needed
+        $this->loadUserFavorites();
     }
 
-    public function showSphereInfo($sphereId)
+    private function loadUserFavorites()
     {
-        $sphere = Sphere::with(['professions' => function($query) {
-            if (!$this->showInactive) {
-                $query->where('is_active', true);
-            }
-            $query->orderBy('name');
-        }])->find($sphereId);
+        if (Auth::check()) {
+            $user = Auth::user();
 
-        if ($sphere) {
-            $sphere->loadedProfessions = $sphere->professions;
-            $this->selectedSphere = $sphere;
-            $this->showModal = true;
+            // Cache the favorites for better performance
+            Cache::remember(
+                "user_{$user->id}_favorite_spheres",
+                300, // 5 minutes
+                fn() => $user->favouriteSpheres()->pluck('spheres.id')->toArray()
+            );
+
+            Cache::remember(
+                "user_{$user->id}_favorite_professions",
+                300, // 5 minutes
+                fn() => $user->favouriteProfessions()->pluck('professions.id')->toArray()
+            );
         }
     }
 
-    public function closeModal()
-    {
-        $this->showModal = false;
-        $this->selectedSphere = null;
-        $this->expandedProfessions = []; // Сбрасываем раскрытые профессии при закрытии модалки
-    }
-
-    public function showProfessionInfo($professionId)
-    {
-        $profession = \App\Models\Profession::find($professionId);
-
-        if ($profession) {
-            $this->selectedProfession = $profession;
-            $this->showProfessionModal = true;
-        }
-    }
-
-    public function closeProfessionModal()
-    {
-        $this->showProfessionModal = false;
-        $this->selectedProfession = null;
-    }
-
-    public function toggleSphere($sphereId)
-    {
-        if (in_array($sphereId, $this->expandedSpheres)) {
-            // Закрываем аккордеон сферы
-            $this->expandedSpheres = array_filter($this->expandedSpheres, function($id) use ($sphereId) {
-                return $id !== $sphereId;
-            });
-        } else {
-            // Открываем аккордеон сферы
-            $this->expandedSpheres[] = $sphereId;
-        }
-    }
-
-    public function toggleProfessionDescription($professionId)
-    {
-        if (in_array($professionId, $this->expandedProfessions)) {
-            // Закрываем описание профессии
-            $this->expandedProfessions = array_filter($this->expandedProfessions, function($id) use ($professionId) {
-                return $id !== $professionId;
-            });
-        } else {
-            // Открываем описание профессии
-            $this->expandedProfessions[] = $professionId;
-        }
-    }
-
-    public function likeSphere($sphereId)
+    public function likeSphere($sphereId, $isAdding = true)
     {
         /** @var User $user */
         $user = Auth::user();
         if (!$user) return;
 
-        if ($user->favouriteSpheres()->where('sphere_id', $sphereId)->exists()) {
-            $user->favouriteSpheres()->detach($sphereId); // remove
-        } else {
-            $user->favouriteSpheres()->attach($sphereId); // add
-        }
+        // Dispatch job to update database
+        UpdateUserFavoriteJob::dispatch($user->id, 'sphere', $sphereId, $isAdding);
+
+        // Clear cache to ensure fresh data on next load
+        Cache::forget("user_{$user->id}_favorite_spheres");
+
+        // Optionally dispatch browser event for confirmation
+        $this->dispatch('favoriteUpdated', [
+            'type' => 'sphere',
+            'id' => $sphereId,
+            'action' => $isAdding ? 'added' : 'removed'
+        ]);
     }
 
-    public function likeProfession($professionId): void
+    public function likeProfession($professionId, $isAdding = true): void
     {
         /** @var User $user */
         $user = Auth::user();
         if (!$user) return;
 
-        if ($user->favouriteProfessions()->where('profession_id', $professionId)->exists()) {
-            $user->favouriteProfessions()->detach($professionId); // remove
-        } else {
-            $user->favouriteProfessions()->attach($professionId); // add
-        }
+        // Dispatch job to update database
+        UpdateUserFavoriteJob::dispatch($user->id, 'profession', $professionId, $isAdding);
+
+        // Clear cache to ensure fresh data on next load
+        Cache::forget("user_{$user->id}_favorite_professions");
+
+        // Optionally dispatch browser event for confirmation
+        $this->dispatch('favoriteUpdated', [
+            'type' => 'profession',
+            'id' => $professionId,
+            'action' => $isAdding ? 'added' : 'removed'
+        ]);
     }
 
     public function sortBy($field)
@@ -146,9 +112,9 @@ class ProfessionMap extends Component
         if ($this->search) {
             $query->where(function($q) {
                 $q->where('name', 'like', '%' . $this->search . '%')
-                  ->orWhere('name_kz', 'like', '%' . $this->search . '%')
-                  ->orWhere('name_en', 'like', '%' . $this->search . '%')
-                  ->orWhere('description', 'like', '%' . $this->search . '%');
+                    ->orWhere('name_kz', 'like', '%' . $this->search . '%')
+                    ->orWhere('name_en', 'like', '%' . $this->search . '%')
+                    ->orWhere('description', 'like', '%' . $this->search . '%');
             });
         }
 
@@ -162,11 +128,17 @@ class ProfessionMap extends Component
         /** @var Sphere $spheres */
         $spheres = $query->get();
 
-        // Получаем избранные сферы пользователя
-        $userFavoriteSpheres = Auth::check() ? (Auth::user()->favouriteSpheres()->pluck('spheres.id')->toArray() ?? []) : [];
-        $userFavoriteProfessions = Auth::check() ? (Auth::user()->favouriteProfessions()->pluck('professions.id')->toArray() ?? []) : [];
+        // Get user favorites from cache
+        $userFavoriteSpheres = [];
+        $userFavoriteProfessions = [];
 
-        // Добавляем информацию об избранности
+        if (Auth::check()) {
+            $user = Auth::user();
+            $userFavoriteSpheres = Cache::get("user_{$user->id}_favorite_spheres", []);
+            $userFavoriteProfessions = Cache::get("user_{$user->id}_favorite_professions", []);
+        }
+
+        // Add favorite information
         $spheres = $spheres->map(function(Sphere $sphere) use ($userFavoriteSpheres, $userFavoriteProfessions) {
             $sphere->is_favorite = in_array($sphere->id, $userFavoriteSpheres);
             $sphere->professions->map(function(Profession $profession) use ($userFavoriteProfessions) {

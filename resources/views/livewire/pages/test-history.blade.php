@@ -96,29 +96,9 @@
                                 </td>
                                 <td class="px-4 py-3">
                                     <div class="text-sm text-gray-600">{{ $test['school'] }}</div>
-{{--                                    @if ($test['status'] === 'completed')--}}
-{{--                                        <span class="inline-flex px-2 py-1 text-xs font-medium rounded-lg bg-green-100 text-green-700">Завершен</span>--}}
-{{--                                    @elseif ($test['status'] === 'in_progress')--}}
-{{--                                        <span class="inline-flex px-2 py-1 text-xs font-medium rounded-lg bg-yellow-100 text-yellow-700">В процессе</span>--}}
-{{--                                    @elseif ($test['status'] === 'started')--}}
-{{--                                        <span class="inline-flex px-2 py-1 text-xs font-medium rounded-lg bg-blue-100 text-blue-700">Начат</span>--}}
-{{--                                    @else--}}
-{{--                                        <span class="inline-flex px-2 py-1 text-xs font-medium rounded-lg bg-red-100 text-red-700">Прерван</span>--}}
-{{--                                    @endif--}}
                                 </td>
                                 <td class="px-4 py-3">
                                     <div class="text-sm text-gray-600">{{ $test['class'] }}</div>
-{{--                                    @if($test['status'] === 'completed')--}}
-{{--                                        <div class="w-20 bg-gray-200 rounded-full h-1 mt-1">--}}
-{{--                                            <div class="bg-green-500 h-1 rounded-full" style="width: {{ $test['completion_percentage'] }}%"></div>--}}
-{{--                                        </div>--}}
-{{--                                        <div class="text-xs text-gray-500 mt-1">{{ round($test['completion_percentage'], 1) }}%</div>--}}
-{{--                                    @elseif(in_array($test['status'], ['started', 'in_progress']))--}}
-{{--                                        <div class="w-20 bg-gray-200 rounded-full h-1 mt-1">--}}
-{{--                                            <div class="bg-blue-500 h-1 rounded-full" style="width: {{ $test['completion_percentage'] }}%"></div>--}}
-{{--                                        </div>--}}
-{{--                                        <div class="text-xs text-gray-500 mt-1">{{ round($test['completion_percentage'], 1) }}%</div>--}}
-{{--                                    @endif--}}
                                 </td>
                                 <td class="px-4 py-3">
                                     @if($test['selected_plan'])
@@ -145,7 +125,7 @@
                                             {{ $test['action_text'] }}
                                         </a>
                                     @endif
-                                    @if($test['payment_status'] !== 'completed')
+                                    @if($test['selected_plan'] !== 'talents_spheres_professions' && $test['payment_status'] === 'completed')
                                         <span class="text-sm text-gray-600">|</span>
                                         <a href="{{route('payment', ['sessionId' => $test['session_id']])}}"
                                            class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors">
@@ -184,34 +164,7 @@
                                 <div class="text-xs text-gray-500">{{ $test['date'] }}</div>
                             </div>
                         </div>
-{{--                        <div class="text-right">--}}
-{{--                            @if ($test['status'] === 'completed')--}}
-{{--                                <span class="inline-flex px-2 py-1 text-xs font-medium rounded-lg bg-green-100 text-green-700">Завершен</span>--}}
-{{--                            @elseif ($test['status'] === 'in_progress')--}}
-{{--                                <span class="inline-flex px-2 py-1 text-xs font-medium rounded-lg bg-yellow-100 text-yellow-700">В процессе</span>--}}
-{{--                            @elseif ($test['status'] === 'started')--}}
-{{--                                <span class="inline-flex px-2 py-1 text-xs font-medium rounded-lg bg-blue-100 text-blue-700">Начат</span>--}}
-{{--                            @else--}}
-{{--                                <span class="inline-flex px-2 py-1 text-xs font-medium rounded-lg bg-red-100 text-red-700">Прерван</span>--}}
-{{--                            @endif--}}
-{{--                        </div>--}}
                     </div>
-
-{{--                    @if($test['status'] === 'completed' || in_array($test['status'], ['started', 'in_progress']))--}}
-{{--                        <div class="mb-3">--}}
-{{--                            <div class="flex justify-between text-xs text-gray-600 mb-1">--}}
-{{--                                <span>Прогресс</span>--}}
-{{--                                <span>{{ round($test['completion_percentage'], 1) }}%</span>--}}
-{{--                            </div>--}}
-{{--                            <div class="w-full bg-gray-200 rounded-full h-1">--}}
-{{--                                @if($test['status'] === 'completed')--}}
-{{--                                    <div class="bg-green-500 h-1 rounded-full" style="width: {{ $test['completion_percentage'] }}%"></div>--}}
-{{--                                @else--}}
-{{--                                    <div class="bg-blue-500 h-1 rounded-full" style="width: {{ $test['completion_percentage'] }}%"></div>--}}
-{{--                                @endif--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
-{{--                    @endif--}}
 
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         <div class="flex items-center gap-4 text-xs text-gray-600">
@@ -228,21 +181,6 @@
                                 @endif
                             @endif
 
-{{--                            @if ($test['is_paid'])--}}
-{{--                                <div class="flex items-center text-green-600">--}}
-{{--                                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">--}}
-{{--                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>--}}
-{{--                                    </svg>--}}
-{{--                                    Оплачен--}}
-{{--                                </div>--}}
-{{--                            @else--}}
-{{--                                <div class="flex items-center text-red-600">--}}
-{{--                                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">--}}
-{{--                                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>--}}
-{{--                                    </svg>--}}
-{{--                                    Не оплачен--}}
-{{--                                </div>--}}
-{{--                            @endif--}}
                         </div>
 
                         <div class="flex w-full justify-between items-center">
@@ -250,7 +188,7 @@
                                class="inline-flex w-full items-center justify-center px-3 py-1.5 text-xs font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors">
                                 {{ $test['action_text'] }}
                             </a>
-                            @if($test['payment_status'] !== 'completed')
+                            @if($test['selected_plan'] !== 'talents_spheres_professions' && $test['payment_status'] === 'completed')
                                 <a href="{{route('payment', ['sessionId' => $test['session_id']])}}"
                                    class="inline-flex w-full items-center justify-center px-3 py-1.5 text-xs font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors">
                                     {{ __('all.test_history.actions.change_tariff') }}

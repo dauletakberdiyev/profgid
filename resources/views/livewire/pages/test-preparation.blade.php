@@ -1,5 +1,5 @@
-<div class="bg-white flex items-center justify-center px-4 py-12">
-    <div class="max-w-4xl mx-auto text-center">
+<div class="bg-white flex items-center justify-center px-4 py-24 md:py-12">
+    <div class="max-w-4xl mx-auto text-center my-4">
 
         <!-- Заголовок -->
         <div class="mb-4 md:mb-12">

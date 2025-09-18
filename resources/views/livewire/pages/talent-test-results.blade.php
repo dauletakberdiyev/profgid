@@ -413,7 +413,7 @@
                         $topDomainName = $localizedDomains[app()->getLocale()][$topDomain] ?? 'EXECUTING';
                     @endphp
                     <h1 class="text-sm md:text-2xl font-medium text-gray-900 mb-2 md:mb-4 leading-relaxed">
-                        {{ __('all.test_result.talents.lead') }} <span class="font-extrabold">{{ $topDomainName }}</span> {{ __('all.test_result.talents.theme') }}.
+                        {{ __('all.test_result.talents.lead') }} <span class="font-extrabold">{{ $topDomainName }}</span>.
                     </h1>
                 </div>
 
@@ -652,80 +652,53 @@
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <!-- Левая колонка - Топ 10 талантов -->
                         <div>
-                            <div class="space-y-1">
+                            <div class="space-y-1" x-data="{ openTalent: null }">
                                 @foreach ($topTenTalents as $index => $talent)
                                     @php
                                         // Получаем цвет домена для таланта
                                         $talentDomainColor = $domainColors[$talent['domain']] ?? '#6B7280';
+                                        $mutedDomainColor = $mutedBgColors[$talent['domain']];
                                         // Вычисляем процент
                                         $percentage = round(($talent['score'] / $maxScore) * 100);
                                         $talentId = 'talent_' . $talent['id'];
                                     @endphp
 
                                     <!-- Все топ 10 талантов с аккордеоном -->
-                                    <div class="border-gray-200 p-3 transition-all hover:bg-blue-100 bg-blue-50"
-                                        style="background-color: {{$talentDomainColor}}">
+                                    <div class="border-gray-200 transition-all overflow-hidden">
                                         <!-- Заголовок таланта -->
-                                        <div class="flex items-center justify-between cursor-pointer"
-                                            @click="expandedTalents.includes('{{ $talentId }}') ? expandedTalents.splice(expandedTalents.indexOf('{{ $talentId }}'), 1) : expandedTalents.push('{{ $talentId }}')">
+                                        <div class="flex items-center p-3 justify-between cursor-pointer"
+                                             style="background-color: {{$talentDomainColor}}"
+                                             @click="openTalent === '{{ $index }}' ? openTalent = null : openTalent = '{{ $index }}'">
                                             <div class="flex items-center flex-1 min-w-0">
-                                                <div class="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-semibold mr-2"
-                                                    style="background-color: {{ $talentDomainColor }}">
+                                                <div class="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-semibold mr-2">
                                                     {{ $talent['rank'] }}
                                                 </div>
                                                 <div class="flex-1 min-w-0">
-                                                    <h3 class="text-sm text-white font-semibold text-gray-900 truncate">{{ $talent['name'] }}</h3>
-{{--                                                    <span class="text-xs text-gray-500 truncate block">{{ $domains[$talent['domain']] ?? '' }}</span>--}}
+                                                    <h3 class="text-sm text-white font-semibold text-gray-900 truncate">
+                                                        {{ $talent['name'] }}
+                                                    </h3>
                                                 </div>
                                             </div>
-                                            <!-- Стрелка аккордеона -->
+                                            <!-- Стрелка -->
                                             <div class="text-white transition-transform duration-200"
-                                                :class="expandedTalents.includes('{{ $talentId }}') ? 'rotate-180' : ''">
+                                                 :class="openTalent === '{{ $index }}' ? 'rotate-180' : ''">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                                 </svg>
                                             </div>
                                         </div>
 
-                                        <!-- Аккордеон для обзора и советов -->
-                                        <div class="overflow-hidden mt-2"
-                                            x-show="expandedTalents.includes('{{ $talentId }}')"
-                                            x-transition:enter="transition ease-out duration-200"
-                                            x-transition:enter-start="opacity-0 max-h-0"
-                                            x-transition:enter-end="opacity-100 max-h-96"
-                                            x-transition:leave="transition ease-in duration-150"
-                                            x-transition:leave-start="opacity-100 max-h-96"
-                                            x-transition:leave-end="opacity-0 max-h-0">
-
-                                            <!-- Краткое описание - показывается в аккордеоне -->
-                                            @if (!empty($talent['short_description']))
+                                        <!-- Аккордеон -->
+                                        <div class="p-3 {{$mutedDomainColor}}"
+                                             x-show="openTalent === '{{ $index }}'"
+                                             x-transition
+                                             style="display: none"
+                                        >
+                                            @if (!empty($talent['description']))
                                                 <div class="mb-3">
-                                                    <h4 class="text-xs text-white font-semibold mb-1">{{ __('all.test_result.talents.short_desc') }}</h4>
-                                                    <p class="text-xs text-white leading-tight">{{ $talent['short_description'] }}</p>
+                                                    <h4 class="text-xs text-gray-950 font-semibold mb-1">{{ __('all.test_result.talents.review') }}</h4>
+                                                    <p class="text-xs text-gray-950 leading-tight">{{ $talent['description'] }}</p>
                                                 </div>
-                                            @endif
-
-                                            <!-- Обзор таланта (только для полного тарифа) -->
-                                            @if (!empty($talent['description']) && $this->isFullPlan)
-                                                <div class="mb-3">
-                                                    <h4 class="text-xs text-white font-semibold mb-1">{{ __('all.test_result.talents.review') }}</h4>
-                                                    <p class="text-xs text-white leading-tight">{{ $talent['description'] }}</p>
-                                                </div>
-                                            @endif
-
-                                            <!-- Советы (только для полного тарифа) -->
-                                            @if ($this->isFullPlan)
-{{--                                                <div class="pt-2 border-t border-gray-100">--}}
-{{--                                                    <h4 class="text-xs font-semibold text-white mb-1">Советы</h4>--}}
-{{--                                                    <div class="text-xs text-white leading-tight space-y-2">--}}
-{{--                                                        @foreach ($this->getTalentAdvice($talent['name']) as $advice)--}}
-{{--                                                            <div>--}}
-{{--                                                                <strong>{{ $advice['name'] }}</strong><br>--}}
-{{--                                                                {{ $advice['description'] }}--}}
-{{--                                                            </div>--}}
-{{--                                                        @endforeach--}}
-{{--                                                    </div>--}}
-{{--                                                </div>--}}
                                             @endif
                                         </div>
                                     </div>
@@ -735,61 +708,54 @@
 
                         <!-- Правая колонка - Остальные таланты -->
                         <div>
-                            <div class="space-y-1">
-                                @foreach ($remainingTalents as $talent)
+                            <div class="space-y-1" x-data="{ openRemainTalent: null }">
+                                @foreach ($remainingTalents as $ind => $remTalent)
                                     @php
                                         // Получаем цвет домена для таланта
-                                        $talentDomainColor = $domainColors[$talent['domain']] ?? '#6B7280';
+                                        $talentDomainColor = $domainColors[$remTalent['domain']] ?? '#6B7280';
                                         // Вычисляем процент
-                                        $percentage = round(($talent['score'] / $maxScore) * 100);
-                                        $remainingTalentId = 'remaining_talent_' . $talent['id'];
+                                        $percentage = round(($remTalent['score'] / $maxScore) * 100);
+                                        $remainingTalentId = 'remaining_talent_' . $remTalent['id'];
                                     @endphp
 
                                     <!-- Остальные таланты - с аккордеоном для краткого описания -->
-                                    <div class="bg-gray-50 p-3 transition-all hover:bg-gray-100"
-                                        style="border: 1px solid {{ $talentDomainColor }}">
-
-                                        <!-- Заголовок таланта с аккордеоном -->
+                                    <div
+                                        class="bg-gray-50 p-3 transition-all hover:bg-gray-100"
+                                        style="border: 1px solid {{ $talentDomainColor }}"
+                                    >
+                                        <!-- Заголовок -->
                                         <div class="flex items-center justify-between cursor-pointer"
-                                            @click="expandedTalents.includes('{{ $remainingTalentId }}') ? expandedTalents.splice(expandedTalents.indexOf('{{ $remainingTalentId }}'), 1) : expandedTalents.push('{{ $remainingTalentId }}')">
+                                             @click="openRemainTalent = (openRemainTalent === {{ $ind }}) ? null : {{ $ind }}">
                                             <div class="flex items-center flex-1 min-w-0">
                                                 <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold mr-2"
-                                                    style="color: {{ $talentDomainColor }}">
-                                                    {{ $talent['rank'] }}
+                                                     style="color: {{ $talentDomainColor }}">
+                                                    {{ $remTalent['rank'] }}
                                                 </div>
                                                 <div class="flex-1 min-w-0">
                                                     <h3 class="text-sm font-semibold truncate"
-                                                        style="color: {{ $talentDomainColor }}"
-                                                    >{{ $talent['name'] }}</h3>
-{{--                                                    <span class="text-xs text-gray-500 truncate block">{{ $domains[$talent['domain']] ?? '' }}</span>--}}
+                                                        style="color: {{ $talentDomainColor }}">
+                                                        {{ $remTalent['name'] }}
+                                                    </h3>
                                                 </div>
                                             </div>
-                                            <!-- Стрелка аккордеона -->
+                                            <!-- Стрелка -->
                                             <div class="transition-transform duration-200"
-                                                :class="expandedTalents.includes('{{ $remainingTalentId }}') ? 'rotate-180' : ''"
-                                                 style="color: {{ $talentDomainColor }}"
-                                            >
+                                                 :class="openRemainTalent === {{ $ind }} ? 'rotate-180' : ''"
+                                                 style="color: {{ $talentDomainColor }}">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                                                 </svg>
                                             </div>
                                         </div>
 
-                                        <!-- Аккордеон для краткого описания -->
+                                        <!-- Контент -->
                                         @if (!empty($talent['short_description']))
                                             <div class="overflow-hidden mt-2"
-                                                x-show="expandedTalents.includes('{{ $remainingTalentId }}')"
-                                                x-transition:enter="transition ease-out duration-200"
-                                                x-transition:enter-start="opacity-0 max-h-0"
-                                                x-transition:enter-end="opacity-100 max-h-96"
-                                                x-transition:leave="transition ease-in duration-150"
-                                                x-transition:leave-start="opacity-100 max-h-96"
-                                                x-transition:leave-end="opacity-0 max-h-0">
-
-                                                <!-- Краткое описание для остальных талантов -->
+                                                 x-show="openRemainTalent === {{ $ind }}"
+                                            >
                                                 <div class="mb-3">
                                                     <h4 class="text-xs font-semibold text-gray-900 mb-1">{{ __('all.test_result.talents.short_desc') }}</h4>
-                                                    <p class="text-xs text-gray-700 leading-tight">{{ $talent['short_description'] }}</p>
+                                                    <p class="text-xs text-gray-700 leading-tight">{{ $remTalent['short_description'] }}</p>
                                                 </div>
                                             </div>
                                         @endif
@@ -1035,10 +1001,6 @@
 
             <div id="professions-section" x-show="activeTab === 'professions'" x-transition:enter="transition ease-out duration-200"
                 x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
-                <h2 class="text-lg md:text-xl font-bold mb-4">{{ __('all.test_result.professions.all_title') }}</h2>
-                <p class="text-xs md:text-sm text-gray-600 mb-6 leading-relaxed">
-                    {{ __('all.result.professions.desc') }}
-                </p>
 
                 @php
                     $topThirtyProfessions = collect($topProfessions)->take(30)->toArray();
@@ -1048,22 +1010,25 @@
                     $professionColor = '#8B5CF6';
                 @endphp
 
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- Топ 30 профессий на полную ширину -->
                 @if (count($topThirtyProfessions) > 0)
                     <div class="mb-8">
-                        <div class="flex items-center mb-4">
-                            <svg class="w-5 h-5 text-yellow-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path
-                                    d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                            </svg>
+                        <div class="flex flex-col items-start">
                             <h3 class="text-lg font-semibold text-gray-900">{{ __('all.test_result.professions.recommendation') }}</h3>
+                            <p class="text-xs md:text-sm text-gray-600 leading-relaxed">
+                                {{ __('all.result.professions.desc') }}
+                            </p>
                         </div>
                         <!-- Desktop Table View -->
-                        <div class="hidden md:block space-y-2">
+                        <div class="hidden md:block space-y-2" style="margin-top: 1.8rem">
                             @foreach ($topThirtyProfessions as $index => $profession)
-                                <div class="bg-white px-4 py-1 transition-all border border-gray-200 rounded-lg" x-data="{ open: false }">
+                                <div class="bg-white px-4 py-2 transition-all border border-gray-200 rounded-lg" x-data="{ open: false }">
                                     <div class="flex items-center justify-between" @click="open = !open">
-                                        <span class="text-sm font-medium text-gray-900">{{ $profession['name'] }}</span>
+                                        <div class="flex align-middle space-x-2">
+                                            <span class="text-sm font-medium text-gray-900">{{ $index + 1 }}</span>
+                                            <span class="text-sm font-medium text-gray-900">{{ $profession['name'] }}</span>
+                                        </div>
                                         <div class="flex items-center space-x-2">
                                             <div class="w-12 bg-gray-200 rounded-full h-1">
                                                 <div class="h-1 rounded-full transition-all duration-500 bg-blue-500"
@@ -1081,7 +1046,7 @@
                                     </div>
                                     <div x-show="open"
                                          x-transition
-                                         class="py-4 text-sm"
+                                         class="py-4 pb-2 text-sm"
                                          style="display: none;">
                                         {{$profession['description']}}
                                     </div>
@@ -1089,7 +1054,7 @@
                             @endforeach
                         </div>
                         <!-- Mobile Card View -->
-                        <div class="md:hidden space-y-2">
+                        <div class="md:hidden space-y-2 mt-2">
                             @foreach ($topThirtyProfessions as $index => $profession)
                                 <div class="bg-white px-3 py-2 transition-all border border-gray-200 rounded-lg" x-data="{ open: false }">
                                     <div class="flex items-center justify-between space-x-1" @click="open = !open">
@@ -1098,7 +1063,7 @@
                                         <span class="text-xs font-medium text-gray-900 inline-block leading-none">{{ $profession['name'] }}</span>
                                         </div>
                                         <div class="flex space-x-1">
-                                            <span class="text-xs text-blue-600 font-semibold">{{ round($profession['compatibility_percentage']) }}%</span>
+                                            <span class="text-xs text-blue-600 font-base">{{ round($profession['compatibility_percentage']) }}%</span>
                                             <div class="text-gray-400 transition-transform duration-200"
                                                  :class="open ? 'rotate-90' : ''">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1123,19 +1088,15 @@
 
                 <!-- Следующие 10 профессий (31-40) - отдельный блок с предупреждением -->
                 @if (count($nextTenProfessions) > 0)
-                    <div class="mt-12">
-                        <div class="flex items-center mb-4">
-                            <svg class="w-5 h-5 text-orange-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd"
-                                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                                    clip-rule="evenodd" />
-                            </svg>
+                    <div class="">
+                        <div class="flex flex-col items-start">
                             <h3 class="text-lg font-semibold text-black">{{ __('all.result.professions.least.title') }}</h3>
+                            <p class="text-xs md:text-sm text-gray-600 leading-relaxed">
+                                {{ __('all.result.professions.least.desc') }}
+                            </p>
                         </div>
-                        <p class="text-sm text-black mb-4">
-                            {{ __('all.result.professions.least.desc') }}
-                        </p>
-                        <div class="space-y-2">
+
+                        <div class="mt-2 space-y-2">
 
                             @php
                                 // Устанавливаем индекс для нумерации профессий
@@ -1143,12 +1104,12 @@
                             @endphp
 
                             @foreach ($nextTenProfessions as $index => $profession)
-                                <div class="bg-white border border-red-400 p-2 rounded opacity-60">
+                                <div class="bg-white border border-red-400 px-4 py-2 rounded-lg opacity-60">
                                     <div class="flex items-center justify-between">
                                         <div class="flex-1">
                                             <div class="flex items-center space-x-2">
-                                                <span class="text-xs font-medium text-red-600">{{ $professionIndex = $professionIndex + 1 }}</span>
-                                                <h4 class="text-xs text-gray-950 truncate">{{ $profession['name'] }}</h4>
+                                                <span class="text-xs md:text-sm font-medium text-red-600">{{ $professionIndex = $professionIndex + 1 }}</span>
+                                                <h4 class="text-xs md:text-sm text-gray-900">{{ $profession['name'] }}</h4>
                                             </div>
                                         </div>
                                         <div class="flex items-center space-x-2">
@@ -1161,18 +1122,9 @@
                                                 </div>
                                             </div>
                                             <!-- Процент совместимости -->
-                                            <span class="text-xs px-1.5 py-0.5 bg-red-100 text-red-600 rounded">
+                                            <span class="text-xs px-1.5 py-0.5 text-red-600 rounded">
                                                 {{ round($profession['compatibility_percentage']) }}%
                                             </span>
-                                            <!-- Кнопка информации -->
-{{--                                            <button @click="openProfessionModal({{ json_encode($profession) }})"--}}
-{{--                                                class="text-orange-400 hover:text-orange-600 transition-colors duration-200 p-1"--}}
-{{--                                                title="Показать описание">--}}
-{{--                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">--}}
-{{--                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"--}}
-{{--                                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />--}}
-{{--                                                </svg>--}}
-{{--                                            </button>--}}
                                         </div>
                                     </div>
                                 </div>
@@ -1180,6 +1132,7 @@
                         </div>
                     </div>
                 @endif
+                </div>
 
                 <!-- Modal for Profession Description -->
                 <div x-show="modalProfession" x-transition:enter="transition ease-out duration-300"

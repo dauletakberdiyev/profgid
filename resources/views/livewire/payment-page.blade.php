@@ -4,7 +4,6 @@
         <div class="text-center mb-12 md:mb-16">
             <h1 class="text-2xl md:text-3xl lg:text-4xl font-light text-gray-900 mb-4">{{ __('all.payment.top.title') }}</h1>
             @if($testSession)
-                <p class="text-lg md:text-xl text-gray-600 font-light">{{ __('all.payment.top.desc') }}</p>
             @else
                 <p class="text-lg md:text-xl text-gray-600 font-light">{{ __('all.payment.top.info_title') }}</p>
                 <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg inline-block">

@@ -1,4 +1,7 @@
-<div class="min-h-screen bg-white py-4 md:py-8 px-4">
+<div class="min-h-screen bg-white py-4 md:py-8 px-4"
+     x-data="professionMap()"
+     @favorite-updated.window="handleFavoriteUpdate($event.detail)">
+
     <div class="max-w-4xl mx-auto">
         <!-- Header -->
         <div class="text-center mb-8 md:mb-12">
@@ -6,236 +9,204 @@
             <p class="text-base md:text-lg text-gray-600 font-light">{{ __('all.profession_map.desc') }}</p>
         </div>
 
-{{--        <!-- Flash Messages -->--}}
-{{--        @if(session('sphere-added'))--}}
-{{--            <div class="mb-6 mx-auto max-w-md">--}}
-{{--                <div class="bg-green-50 border border-green-200 rounded-lg p-4">--}}
-{{--                    <div class="flex items-center">--}}
-{{--                        <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">--}}
-{{--                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>--}}
-{{--                        </svg>--}}
-{{--                        <p class="text-green-800 font-medium">{{ session('sphere-added') }}</p>--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--            </div>--}}
-{{--        @endif--}}
-{{--        @if(session('profession-added'))--}}
-{{--            <div class="mb-6 mx-auto max-w-md">--}}
-{{--                <div class="bg-green-50 border border-green-200 rounded-lg p-4">--}}
-{{--                    <div class="flex items-center">--}}
-{{--                        <svg class="w-5 h-5 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">--}}
-{{--                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>--}}
-{{--                        </svg>--}}
-{{--                        <p class="text-green-800 font-medium">{{ session('profession-added') }}</p>--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--            </div>--}}
-{{--        @endif--}}
-
-{{--        @if(session('sphere-exists'))--}}
-{{--            <div class="mb-6 mx-auto max-w-md">--}}
-{{--                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">--}}
-{{--                    <div class="flex items-center">--}}
-{{--                        <svg class="w-5 h-5 text-blue-500 mr-3" fill="currentColor" viewBox="0 0 20 20">--}}
-{{--                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>--}}
-{{--                        </svg>--}}
-{{--                        <p class="text-blue-800 font-medium">{{ session('sphere-exists') }}</p>--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--            </div>--}}
-{{--        @endif--}}
-
-
-        <!-- Spheres Table -->
-        @foreach($spheres as $sphere)
-            <div class="bg-white border border-gray-200 rounded-lg overflow-hidden transition-all duration-200 hover:border-gray-300 mb-3"
-                 x-data="{ open: false }"
-            >
-                <!-- Sphere Header -->
-                <div class="p-3 cursor-pointer" @click="open = !open">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center space-x-2">
-                            <div class="w-6 h-6 text-gray-500">{{ svg($sphere->icon ?? 'heroicon-o-home') }}</div>
-                            <h3 class="text-base font-medium text-gray-900">{{ $sphere->localized_name }}</h3>
-                        </div>
-
-                        <div class="flex items-center space-x-1">
-                            <!-- Like Button -->
-                            @auth
-                                <button wire:click.stop="likeSphere({{ $sphere->id }})"
-                                        class="p-1 {{ $sphere->is_favorite ? 'text-red-500 hover:text-red-600' : 'text-gray-400 hover:text-red-500' }} transition-colors flex-shrink-0"
-                                        title="{{ $sphere->is_favorite ? 'Убрать из избранного' : 'Добавить в избранное' }}">
-                                    @if($sphere->is_favorite)
-                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                                        </svg>
-                                    @else
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                                        </svg>
-                                    @endif
-                                </button>
-                            @endauth
-
-                            <div class="text-gray-400 transition-transform duration-200"
-                                 :class="open ? 'rotate-90' : ''"
-                            >
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7" />
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div x-show="open"
-                     x-transition
-                     class="text-xs"
-                     style="display: none;"
-                >
-                    @if($sphere->localized_description)
-                        <div class="p-3 border-b border-gray-200">
-                            <p class="text-sm text-gray-700 leading-relaxed">{{ $sphere->localized_description }}</p>
-                        </div>
-                    @endif
-                    @if($sphere->professions->count() > 0)
-                        <div class="p-3">
-                            <h4 class="text-sm font-medium text-gray-900 mb-2">{{ __('all.profession_map.professions.into') }}</h4>
-                            <div class="grid grid-cols-1 gap-1">
-                                @foreach($sphere->professions as $profession)
-                                    <div class="bg-white border flex justify-between items-center border-gray-200 rounded px-2 py-1 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                                        {{ $profession->localized_name }}
-
-                                        <div class="flex">
-                                            @if($profession->localized_description)
-                                                <button wire:click.stop="showProfessionInfo({{ $profession->id }})"
-                                                        class="ml-2 p-1 text-gray-400 hover:text-blue-500 transition-colors flex-shrink-0"
-                                                        title="Показать описание профессии">
-                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                                                    </svg>
-                                                </button>
-                                            @endif
-
-                                            @auth
-                                                <button wire:click.stop="likeProfession({{ $profession->id }})"
-                                                        class="p-1 {{ $profession->is_favourite ? 'text-red-500 hover:text-red-600' : 'text-gray-400 hover:text-red-500' }} transition-colors flex-shrink-0"
-                                                        title="{{ $profession->is_favourite ? 'Убрать из избранного' : 'Добавить в избранное' }}">
-                                                    @if($profession->is_favourite)
-                                                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
-                                                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                                                        </svg>
-                                                    @else
-                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                                                        </svg>
-                                                    @endif
-                                                </button>
-                                            @endauth
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endif
-                </div>
-            </div>
-
-            @if($spheres->isEmpty())
-                <div class="text-center py-12 md:py-16 px-4">
-                    <div class="text-gray-400 mb-3">
-                        <svg class="w-8 h-8 md:w-12 md:h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-2.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 009.586 13H7"/>
-                        </svg>
-                    </div>
-                    <h3 class="text-base md:text-lg font-medium text-gray-900 mb-2">Нет доступных сфер</h3>
-                    <p class="text-sm md:text-base text-gray-500">Сферы профессий пока не созданы.</p>
-                </div>
-            @endif
-        @endforeach
-
-        <!-- Modal for Profession Info -->
-        @if($showProfessionModal && $selectedProfession)
-            <div class="fixed inset-0 bg-gray-500/75 flex items-center justify-center z-50" wire:click="closeProfessionModal">
-                <div class="bg-white rounded-lg max-w-2xl w-full mx-4 max-h-[90vh] overflow-hidden" wire:click.stop>
-                    <!-- Modal Header -->
-                    <div class="px-4 py-3 border-b border-gray-200">
+        <div x-data="{ openId: null }">
+            @foreach($spheres as $sphere)
+                <div class="bg-white border border-gray-200 rounded-lg overflow-hidden transition-all duration-200 hover:border-gray-300 mb-3">
+                    <!-- Sphere Header -->
+                    <div class="p-3 cursor-pointer"
+                         @click="openId === {{ $sphere->id }} ? openId = null : openId = {{ $sphere->id }}">
                         <div class="flex items-center justify-between">
-                            <h3 class="text-base font-medium text-gray-900">
-                                {{ $selectedProfession->localized_name }}
-                            </h3>
-                            <button wire:click="closeProfessionModal" class="text-gray-400 hover:text-gray-600">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Modal Body -->
-                    <div class="px-4 py-3 overflow-y-auto max-h-[calc(90vh-120px)]">
-                        @if($selectedProfession->localized_description)
-                            <div class="mb-4">
-                                <h4 class="text-sm font-medium text-gray-900 mb-2">{{ __('all.profession_map.professions.desc') }}</h4>
-                                <p class="text-sm text-gray-700 leading-relaxed">{{ $selectedProfession->localized_description }}</p>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-6 h-6 text-gray-500">{{ svg($sphere->icon ?? 'heroicon-o-home') }}</div>
+                                <h3 class="text-base font-medium text-gray-900">{{ $sphere->localized_name }}</h3>
                             </div>
-                        @else
-                            <div class="text-center py-6">
-                                <div class="text-gray-400 mb-2">
-                                    <svg class="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-2.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 009.586 13H7"/>
+
+                            <div class="flex items-center space-x-1">
+                                <!-- Like Button -->
+                                @auth
+                                    <button @click.stop="toggleSphereLike({{ $sphere->id }})"
+                                            :class="getSphereButtonClass({{ $sphere->id }})"
+                                            class="p-1 transition-colors flex-shrink-0"
+                                            :title="isFavoriteSphere({{ $sphere->id }}) ? 'Убрать из избранного' : 'Добавить в избранное'">
+                                        <template x-if="isFavoriteSphere({{ $sphere->id }})">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                            </svg>
+                                        </template>
+                                        <template x-if="!isFavoriteSphere({{ $sphere->id }})">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                            </svg>
+                                        </template>
+                                    </button>
+                                @endauth
+
+                                <div class="text-gray-400 transition-transform duration-200"
+                                     :class="openId === {{ $sphere->id }} ? 'rotate-90' : ''">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7" />
                                     </svg>
                                 </div>
-                                <p class="text-sm text-gray-500">Описание для этой профессии пока не добавлено</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div x-show="openId === {{ $sphere->id }}"
+                         x-transition
+                         class="text-xs border-t border-gray-100"
+                         style="display: none; background-color: #f5f9ff">
+                        @if($sphere->localized_description)
+                            <div class="p-3 border-b border-gray-200">
+                                <p class="text-sm text-gray-700 leading-relaxed">{{ $sphere->localized_description }}</p>
+                            </div>
+                        @endif
+                        @if($sphere->professions->count() > 0)
+                            <div class="p-3">
+                                <h4 class="text-sm font-medium text-gray-900 mb-2">{{ __('all.profession_map.professions.into') }}</h4>
+                                <div class="grid grid-cols-1 gap-1">
+                                    @foreach($sphere->professions as $profession)
+                                        <div
+                                            class="bg-white border flex flex-col border-gray-200 rounded text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                                            x-data="{ open: false }"
+                                        >
+                                            <!-- Header -->
+                                            <div class="flex justify-between items-center px-2 py-1">
+                                                {{ $profession->localized_name }}
+
+                                                <div class="flex">
+                                                    @if($profession->localized_description)
+                                                        <button
+                                                            @click="open = !open"
+                                                            class="ml-2 p-1 text-gray-400 hover:text-blue-500 transition-colors flex-shrink-0"
+                                                            title="Показать описание профессии"
+                                                        >
+                                                            <svg class="w-4 h-4"
+                                                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                            </svg>
+                                                        </button>
+                                                    @endif
+
+                                                    @auth
+                                                        <button
+                                                            @click.stop="toggleProfessionLike({{ $profession->id }})"
+                                                            :class="getProfessionButtonClass({{ $profession->id }})"
+                                                            class="p-1 transition-colors flex-shrink-0"
+                                                            :title="isFavoriteProfession({{ $profession->id }}) ? 'Убрать из избранного' : 'Добавить в избранное'"
+                                                        >
+                                                            <template x-if="isFavoriteProfession({{ $profession->id }})">
+                                                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                                                </svg>
+                                                            </template>
+                                                            <template x-if="!isFavoriteProfession({{ $profession->id }})">
+                                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                                                </svg>
+                                                            </template>
+                                                        </button>
+                                                    @endauth
+                                                </div>
+                                            </div>
+
+                                            <!-- Accordion Content -->
+                                            <div
+                                                x-show="open"
+                                                x-transition
+                                                class="border-t border-gray-100 bg-gray-50 px-2 py-2 text-xs text-gray-700 leading-relaxed"
+                                                style="display: none;"
+                                            >
+                                                {{ $profession->localized_description }}
+                                            </div>
+                                        </div>
+
+                                    @endforeach
+                                </div>
                             </div>
                         @endif
                     </div>
                 </div>
-            </div>
-        @endif
-
+            @endforeach
+        </div>
     </div>
 
     <script>
-        // Handle sphere liked event
-        window.addEventListener('sphere-liked', event => {
-            const sphereId = event.detail.sphereId;
-            showNotification('Сфера добавлена в избранное!', 'success');
-        });
+        function professionMap() {
+            return {
+                favoriteSpheres: @json(Auth::check() ? (Auth::user()->favouriteSpheres()->pluck('spheres.id')->toArray() ?? []) : []),
+                favoriteProfessions: @json(Auth::check() ? (Auth::user()->favouriteProfessions()->pluck('professions.id')->toArray() ?? []) : []),
 
-        function addToFavorites(professionId) {
-            fetch('/profession/add-to-favorites', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                init() {
+                    console.log('Initialized with favorites:', {
+                        spheres: this.favoriteSpheres,
+                        professions: this.favoriteProfessions
+                    });
                 },
-                body: JSON.stringify({ profession_id: professionId })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showNotification('Профессия добавлена в избранное!', 'success');
-                } else {
-                    showNotification(data.message || 'Ошибка при добавлении в избранное', 'error');
+
+                loadFavorites(data) {
+                    // This method can be called if you want to update favorites from Livewire events
+                    this.favoriteSpheres = data.spheres || [];
+                    this.favoriteProfessions = data.professions || [];
+                    console.log('Updated favorites from event:', data);
+                },
+
+                isFavoriteSphere(sphereId) {
+                    return this.favoriteSpheres.includes(sphereId);
+                },
+
+                isFavoriteProfession(professionId) {
+                    return this.favoriteProfessions.includes(professionId);
+                },
+
+                getSphereButtonClass(sphereId) {
+                    return this.isFavoriteSphere(sphereId)
+                        ? 'text-red-500 hover:text-red-600'
+                        : 'text-gray-400 hover:text-red-500';
+                },
+
+                getProfessionButtonClass(professionId) {
+                    return this.isFavoriteProfession(professionId)
+                        ? 'text-red-500 hover:text-red-600'
+                        : 'text-gray-400 hover:text-red-500';
+                },
+
+                toggleSphereLike(sphereId) {
+                    const isCurrentlyFavorite = this.isFavoriteSphere(sphereId);
+
+                    // Update UI immediately
+                    if (isCurrentlyFavorite) {
+                        this.favoriteSpheres = this.favoriteSpheres.filter(id => id !== sphereId);
+                    } else {
+                        this.favoriteSpheres.push(sphereId);
+                    }
+
+                    // Update database via Livewire
+                @this.call('likeSphere', sphereId, !isCurrentlyFavorite);
+                },
+
+                toggleProfessionLike(professionId) {
+                    const isCurrentlyFavorite = this.isFavoriteProfession(professionId);
+
+                    // Update UI immediately
+                    if (isCurrentlyFavorite) {
+                        this.favoriteProfessions = this.favoriteProfessions.filter(id => id !== professionId);
+                    } else {
+                        this.favoriteProfessions.push(professionId);
+                    }
+
+                    // Update database via Livewire
+                @this.call('likeProfession', professionId, !isCurrentlyFavorite);
+                },
+
+                handleFavoriteUpdate(data) {
+                    // Optional: Show success message or handle errors
+                    console.log(`Favorite ${data.type} ${data.action}:`, data.id);
+
+                    // You could show a toast notification here
+                    // this.showToast(`${data.type} ${data.action} to favorites!`);
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showNotification('Произошла ошибка', 'error');
-            });
-        }
-
-        function showNotification(message, type) {
-            const notification = document.createElement('div');
-            notification.className = `fixed top-4 right-4 p-4 rounded-lg text-white z-50 ${type === 'success' ? 'bg-green-500' : 'bg-red-500'}`;
-            notification.textContent = message;
-
-            document.body.appendChild(notification);
-
-            setTimeout(() => {
-                notification.remove();
-            }, 3000);
+            }
         }
     </script>
 </div>

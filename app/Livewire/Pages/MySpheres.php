@@ -2,50 +2,129 @@
 
 namespace App\Livewire\Pages;
 
+use App\Jobs\UpdateUserFavoriteJob;
+use App\Models\Profession;
+use App\Models\Sphere;
 use App\Models\User;
 use Livewire\Component;
-use App\Models\Sphere;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class MySpheres extends Component
 {
-    public $favoriteSpheres = [];
-    public $expandedSpheres = [];
+    public $showInactive = false;
 
     public function mount()
     {
-        $this->loadFavoriteSpheres();
+        $this->loadUserFavorites();
     }
 
-    public function toggleExpanded($sphereId)
+    private function loadUserFavorites()
     {
-        if (in_array($sphereId, $this->expandedSpheres)) {
-            $this->expandedSpheres = array_filter($this->expandedSpheres, function($id) use ($sphereId) {
-                return $id !== $sphereId;
-            });
-        } else {
-            $this->expandedSpheres[] = $sphereId;
+        if (Auth::check()) {
+            $user = Auth::user();
+
+            // Cache the favorites for better performance
+            Cache::remember(
+                "user_{$user->id}_favorite_spheres",
+                300, // 5 minutes
+                fn() => $user->favouriteSpheres()->pluck('spheres.id')->toArray()
+            );
+
+            Cache::remember(
+                "user_{$user->id}_favorite_professions",
+                300, // 5 minutes
+                fn() => $user->favouriteProfessions()->pluck('professions.id')->toArray()
+            );
         }
     }
 
-    public function loadFavoriteSpheres()
+    public function likeSphere($sphereId, $isAdding = true)
     {
         /** @var User $user */
         $user = Auth::user();
+        if (!$user) return;
 
-        $this->favoriteSpheres = $user->favouriteSpheres->load(['talents', 'professions']);
+        // Dispatch job to update database
+        UpdateUserFavoriteJob::dispatch($user->id, 'sphere', $sphereId, $isAdding);
+
+        // Clear cache to ensure fresh data on next load
+        Cache::forget("user_{$user->id}_favorite_spheres");
+
+        // Optionally dispatch browser event for confirmation
+        $this->dispatch('favoriteUpdated', [
+            'type' => 'sphere',
+            'id' => $sphereId,
+            'action' => $isAdding ? 'added' : 'removed'
+        ]);
     }
 
-    public function removeSphere($sphereId)
+    public function likeProfession($professionId, $isAdding = true): void
     {
         /** @var User $user */
         $user = Auth::user();
-        $user->favouriteSpheres()->detach($sphereId);
-        $this->loadFavoriteSpheres();
+        if (!$user) return;
+
+        // Dispatch job to update database
+        UpdateUserFavoriteJob::dispatch($user->id, 'profession', $professionId, $isAdding);
+
+        // Clear cache to ensure fresh data on next load
+        Cache::forget("user_{$user->id}_favorite_professions");
+
+        // Optionally dispatch browser event for confirmation
+        $this->dispatch('favoriteUpdated', [
+            'type' => 'profession',
+            'id' => $professionId,
+            'action' => $isAdding ? 'added' : 'removed'
+        ]);
+    }
+
+    // Keep the old method for backward compatibility if needed
+    public function removeSphere($sphereId)
+    {
+        $this->toggleSphereLike($sphereId, false);
     }
 
     public function render()
     {
-        return view('livewire.pages.my-spheres');
+        /** @var User $user */
+        $user = Auth::user();
+        $spheres = $user->favouriteSpheres()
+            ->with(['professions' => function($q) {
+                if (!$this->showInactive) {
+                    $q->where('is_active', true);
+                }
+                $q->orderBy('name');
+            }])
+            ->withCount(['professions' => function($q) {
+                if (!$this->showInactive) {
+                    $q->where('is_active', true);
+                }
+            }])
+            ->where('is_active', true)
+            ->get();
+
+        // Get user favorites from cache
+        $userFavoriteSpheres = [];
+        $userFavoriteProfessions = [];
+
+        if (Auth::check()) {
+            $user = Auth::user();
+            $userFavoriteSpheres = Cache::get("user_{$user->id}_favorite_spheres", []);
+            $userFavoriteProfessions = Cache::get("user_{$user->id}_favorite_professions", []);
+        }
+
+        // Add favorite information
+        $spheres = $spheres->map(function(Sphere $sphere) use ($userFavoriteSpheres, $userFavoriteProfessions) {
+            $sphere->is_favorite = in_array($sphere->id, $userFavoriteSpheres);
+            $sphere->professions->map(function(Profession $profession) use ($userFavoriteProfessions) {
+                $profession->is_favourite = in_array($profession->id, $userFavoriteProfessions);
+            });
+            return $sphere;
+        });
+
+        return view('livewire.pages.my-spheres', [
+            'spheres' => $spheres
+        ]);
     }
 }
