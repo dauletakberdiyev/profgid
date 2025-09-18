@@ -111,14 +111,11 @@
                 </div>
 
                 @php
-                    $domainTalents = array_filter($userResults, function ($talent) use ($domain) {
+                    $domainTalents = array_filter($userResultsCopy, function ($talent) use ($domain) {
                         return $talent['domain'] === $domain;
                     });
-                    usort($domainTalents, function ($a, $b) {
-                        return $a['rank'] <=> $b['rank'];
-                    });
 
-                    $topTalentsByScore = collect($userResults)->sortByDesc('score')->take(10);
+                    $topTalentsByScore = collect($userResultsCopy)->sortByDesc('score')->take(10);
                     $topTalentIds = $topTalentsByScore->pluck('id')->toArray();
                 @endphp
 

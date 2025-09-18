@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 class TalentTestResults extends Component
 {
     public $userResults = [];
+    public $userResultsCopy = [];
     public $domains = [];
     public $domainScores = [];
     public $topStrengths = [];
@@ -193,10 +194,29 @@ class TalentTestResults extends Component
             }
         }
 
+        $this->userResultsCopy = $this->userResults;
         // Sort results by score (descending)
         usort($this->userResults, function ($a, $b) {
             return $b["score"] <=> $a["score"];
         });
+
+        $scorePositions = [];
+        foreach ($this->userResultsCopy as $index => $result) {
+            $score = $result['score'];
+            if (!isset($scorePositions[$score])) {
+                $scorePositions[$score] = [];
+            }
+            $scorePositions[$score][] = $index;
+        }
+
+        krsort($scorePositions);
+
+        $currentRank = 1;
+        foreach ($scorePositions as $score => $indices) {
+            foreach ($indices as $index) {
+                $this->userResultsCopy[$index]['rank'] = $currentRank++;
+            }
+        }
 
         // Assign ranks
         for ($i = 0; $i < count($this->userResults); $i++) {

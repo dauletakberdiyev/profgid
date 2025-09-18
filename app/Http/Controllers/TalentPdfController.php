@@ -39,6 +39,8 @@ class TalentPdfController extends Controller
         }
         // Общие данные
         $userResults = [];
+        $userResultsCopy = [];
+
         $domainScores = [
             "executing" => 0,
             "influencing" => 0,
@@ -148,9 +150,28 @@ class TalentPdfController extends Controller
             }
         }
 
+        $userResultsCopy = $userResults;
         usort($userResults, function ($a, $b) {
             return $b["score"] <=> $a["score"];
         });
+
+        $scorePositions = [];
+        foreach ($userResultsCopy as $index => $result) {
+            $score = $result['score'];
+            if (!isset($scorePositions[$score])) {
+                $scorePositions[$score] = [];
+            }
+            $scorePositions[$score][] = $index;
+        }
+
+        krsort($scorePositions);
+
+        $currentRank = 1;
+        foreach ($scorePositions as $score => $indices) {
+            foreach ($indices as $index) {
+                $userResultsCopy[$index]['rank'] = $currentRank++;
+            }
+        }
 
         for ($i = 0; $i < count($userResults); $i++) {
             $userResults[$i]["rank"] = $i + 1;
@@ -189,6 +210,7 @@ class TalentPdfController extends Controller
         if ($plan === "talents") {
             $html = view("pdf.talent-full", [
                 "userResults" => $userResults,
+                "userResultsCopy" => $userResultsCopy,
                 "domains" => $allDomains,
                 "domainScores" => $domainScores,
                 "testDate" => $testDate,
@@ -224,6 +246,7 @@ class TalentPdfController extends Controller
         } elseif ($plan === "talents_spheres") {
             $talentsHtml = view("pdf.talent-full", [
                 "userResults" => $userResults,
+                "userResultsCopy" => $userResultsCopy,
                 "domains" => $allDomains,
                 "domainScores" => $domainScores,
                 "testDate" => $testDate,
@@ -283,6 +306,7 @@ class TalentPdfController extends Controller
             // Сначала генерируем HTML для талантов
             $talentsHtml = view("pdf.talent-full", [
                 "userResults" => $userResults,
+                "userResultsCopy" => $userResultsCopy,
                 "domains" => $allDomains,
                 "domainScores" => $domainScores,
                 "testDate" => $testDate,
