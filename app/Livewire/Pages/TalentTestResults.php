@@ -325,7 +325,7 @@ class TalentTestResults extends Component
     {
         $grouped = $professions->groupBy('sphere_id');
 
-        return $grouped->map(function ($items, $sphereId) {
+        $spheres = $grouped->map(function ($items, $sphereId) {
             $sphereName = $items->first()['sphere_name'];
             $sphere = Sphere::query()->find($sphereId);
 
@@ -341,6 +341,8 @@ class TalentTestResults extends Component
                 "compatibility_percentage" => round($avgCompatibility, 1),
             ];
         });
+
+        return $spheres->sortByDesc('compatibility_percentage')->values();
     }
 
     public function getTopProfessions()

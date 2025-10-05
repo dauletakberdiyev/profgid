@@ -468,7 +468,7 @@ class TalentPdfController extends Controller
     {
         $grouped = $professions->groupBy('sphere_id');
 
-        return $grouped->map(function ($items, $sphereId) {
+        $spheres = $grouped->map(function ($items, $sphereId) {
             $sphereName = $items->first()['sphere_name'];
             $sphere = Sphere::query()->find($sphereId);
 
@@ -484,6 +484,8 @@ class TalentPdfController extends Controller
                 "compatibility_percentage" => round($avgCompatibility, 1),
             ];
         });
+
+        return $spheres->sortByDesc('compatibility_percentage')->values();
     }
 
     private function getTopSphereProfessions($maxUserScore, $maxUserIntellectScore): Collection
