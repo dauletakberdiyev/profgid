@@ -321,201 +321,26 @@ class TalentTestResults extends Component
         return $percentages;
     }
 
-    public function getTopSpheres()
+    public function getTopSpheres($professions)
     {
-        // Создаем массив с очками пользователя по талантам
-        $userTalentScores = [];
-        foreach ($this->userResults as $result) {
-            $userTalentScores[$result["id"]] = $result["score"];
-        }
+        $grouped = $professions->groupBy('sphere_id');
 
-        $userIntellectScore = [];
-        foreach ($this->userIntellectResults as $result) {
-            $userIntellectScore[$result["id"]] = $result["score"];
-        }
+        return $grouped->map(function ($items, $sphereId) {
+            $sphereName = $items->first()['sphere_name'];
+            $sphere = Sphere::query()->find($sphereId);
 
-        // Находим максимальный возможный балл для нормализации
-        $maxUserScore = collect($this->userResults)->max("score");
-        $maxUserScore = max($maxUserScore, 1); // Избегаем деления на 0
+            // average compatibility
+            $avgCompatibility = $items->avg('compatibility_percentage');
 
-        $maxUserIntellectScore = collect($this->userIntellectResults)->max("score");
-        $maxUserIntellectScore = max($maxUserIntellectScore, 1); // Избегаем деления на 0
-
-        // Получаем все сферы с профессиями и талантами
-        /** @var Sphere[] $allSpheres */
-        $allSpheres = Sphere::query()->with([
-            "professions.talents",
-            "professions.intellects",
-        ])->get();
-        $spheresData = collect();
-
-        foreach ($allSpheres as $sphere) {
-            $compatibilityPercentage = 0;
-            $compatibilityIntellectPercentage = 0;
-
-            // Собираем все уникальные таланты сферы через профессии
-            $sphereTalents = collect();
-            $sphereIntellects = collect();
-            foreach ($sphere->professions as $profession) {
-                foreach ($profession->talents as $talent) {
-                    // Избегаем дубликатов, но сохраняем самый высокий коэффициент
-                    $existingTalent = $sphereTalents->firstWhere(
-                        "id",
-                        $talent->id
-                    );
-                    if (
-                        !$existingTalent ||
-                        $talent->pivot->coefficient >
-                            $existingTalent->coefficient
-                    ) {
-                        $sphereTalents = $sphereTalents->reject(function (
-                            $t
-                        ) use ($talent) {
-                            return $t->id === $talent->id;
-                        });
-                        $sphereTalents->push(
-                            (object) [
-                                "id" => $talent->id,
-                                "name" => $talent->name,
-                                "coefficient" => $talent->pivot->coefficient,
-                            ]
-                        );
-                    }
-                }
-
-                foreach ($profession->intellects as $intellect) {
-                    // Избегаем дубликатов, но сохраняем самый высокий коэффициент
-                    $existingIntellect = $sphereIntellects->firstWhere(
-                        "id",
-                        $intellect->id
-                    );
-                    if (
-                        !$existingIntellect ||
-                        $intellect->pivot->coefficient >
-                        $existingIntellect->coefficient
-                    ) {
-                        $sphereIntellects = $sphereIntellects->reject(function (
-                            $t
-                        ) use ($intellect) {
-                            return $t->id === $intellect->id;
-                        });
-                        $sphereIntellects->push(
-                            (object) [
-                                "id" => $intellect->id,
-                                "name" => $intellect->name,
-                                "coefficient" => $intellect->pivot->coefficient,
-                            ]
-                        );
-                    }
-                }
-            }
-
-            // Вычисляем процент совместимости на основе талантов сферы
-            if ($sphereTalents->count() > 0) {
-                $totalWeightedScore = 0;
-                $totalWeight = 0;
-                $matchingTalentsCount = 0;
-
-                foreach ($sphereTalents as $talent) {
-                    $userScore = $userTalentScores[$talent->id] ?? 0;
-                    $coefficient = $talent->coefficient ?? 0.5;
-
-                    // Нормализуем очки пользователя относительно максимального балла
-                    $normalizedScore = $userScore / $maxUserScore;
-
-                    // Взвешиваем по коэффициенту важности таланта для сферы
-                    $weightedScore = $normalizedScore * $coefficient;
-
-                    $totalWeightedScore += $weightedScore;
-                    $totalWeight += $coefficient;
-
-                    // Считаем количество "совпадающих" талантов (где есть хоть какие-то очки)
-                    if ($userScore > 0) {
-                        $matchingTalentsCount++;
-                    }
-                }
-
-                // Базовый процент совместимости
-                if ($totalWeight > 0) {
-                    $baseCompatibility =
-                        ($totalWeightedScore / $totalWeight) * 100;
-
-                    // Бонус за покрытие талантов (чем больше талантов сферы у пользователя, тем лучше)
-                    $coverageBonus =
-                        ($matchingTalentsCount / $sphereTalents->count()) * 10; // до 10% бонуса
-
-                    $compatibilityPercentage = min(
-                        $baseCompatibility + $coverageBonus,
-                        100
-                    ); // Ограничиваем 100%
-                }
-            }
-
-            if ($sphereIntellects->count() > 0) {
-                $totalWeightedScore = 0;
-                $totalWeight = 0;
-                $matchingTalentsCount = 0;
-
-                foreach ($sphereIntellects as $intellect) {
-                    $userScore = $userIntellectScore[$intellect->id] ?? 0;
-                    $coefficient = $intellect->pivot->coefficient ?? 1.0;
-
-                    // Нормализуем очки пользователя относительно максимального балла
-                    $normalizedScore = $userScore / $maxUserIntellectScore;
-
-                    // Взвешиваем по коэффициенту важности таланта для профессии
-                    $weightedScore = $normalizedScore * $coefficient;
-
-                    $totalWeightedScore += $weightedScore;
-                    $totalWeight += $coefficient;
-
-                    // Считаем количество "совпадающих" талантов (где есть хоть какие-то очки)
-                    if ($userScore > 0) {
-                        $matchingTalentsCount++;
-                    }
-                }
-
-                // Базовый процент совместимости
-                if ($totalWeight > 0) {
-                    $baseCompatibility =
-                        ($totalWeightedScore / $totalWeight) * 100;
-
-                    // Бонус за покрытие талантов (чем больше талантов профессии у пользователя, тем лучше)
-                    $coverageBonus =
-                        ($matchingTalentsCount /
-                            $sphereIntellects->count()) *
-                        10; // до 10% бонуса
-
-                    $compatibilityIntellectPercentage = min(
-                        $baseCompatibility + $coverageBonus,
-                        100
-                    ); // Ограничиваем 100%
-                }
-            }
-
-            $compatibilityPercentage = (round($compatibilityPercentage, 1)
-                + round($compatibilityIntellectPercentage, 1)) / 2;
-
-            $spheresData->push([
-                "id" => $sphere->id,
-                "name" => $sphere->localizedName,
+            return [
+                "id" => $sphereId,
+                "name" => $sphereName,
                 "description" => $sphere->localizedDescription ?? "",
-                "is_top" => false, // Будет установлено после сортировки
+                "is_top" => false,
                 "relevance_score" => 999,
-                "compatibility_percentage" => $compatibilityPercentage,
-            ]);
-        }
-
-        // Сортируем: сначала по проценту совместимости (убывание)
-        $sortedSpheres = $spheresData->sortByDesc("compatibility_percentage");
-
-        // Помечаем первые 8 как топовые
-        $topSpheres = $sortedSpheres->map(function ($sphere, $index) {
-            $sphere["is_top"] = $index < 8; // Только первые 8 сфер топовые
-            return $sphere;
+                "compatibility_percentage" => round($avgCompatibility, 1),
+            ];
         });
-
-        return $topSpheres;
     }
 
     public function getTopProfessions()
@@ -941,14 +766,14 @@ class TalentTestResults extends Component
 
     public function render()
     {
-        $spheres = $this->getTopSpheres();
-        $topSphereIds = $spheres->where("is_top", true)->pluck("id")->toArray();
-
         $professions = $this->getTopProfessions();
         $topProfessionIds = $professions
             ->where("is_top", true)
             ->pluck("id")
             ->toArray();
+
+        $spheres = $this->getTopSpheres($professions);
+        $topSphereIds = $spheres->where("is_top", true)->pluck("id")->toArray();
 
         return view("livewire.pages.talent-test-results", [
             "userResults" => $this->userResults,
