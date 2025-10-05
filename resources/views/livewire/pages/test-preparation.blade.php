@@ -2,7 +2,7 @@
     <div class="max-w-4xl mx-auto text-center my-4">
 
         <!-- Заголовок -->
-        <div class="mb-4 md:mb-12">
+        <div class="mb-12">
             <h1 class="text-xl md:text-4xl lg:text-5xl font-light text-gray-900 mb-2 md:mb-4">
                 {{ __('all.test-preparation.title') }}
             </h1>
@@ -12,7 +12,7 @@
         </div>
 
         <!-- Инструкции -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-8 mb-4 md:mb-16">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-8 mb-12">
             <!-- Время -->
             <div class="text-left">
                 <div class="flex items-center mb-1 md:mb-3">

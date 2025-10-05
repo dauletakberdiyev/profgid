@@ -9,6 +9,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 /**
+ * @property string $gender
  * @property-read Sphere[]|Collection $favouriteSpheres
  * @property-read Profession[]|Collection $favouriteProfessions
  */
@@ -32,7 +33,8 @@ class User extends Authenticatable
         'favorite_professions',
         'favorite_spheres',
         'school',
-        'class'
+        'class',
+        'gender'
     ];
 
     /**

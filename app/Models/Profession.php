@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Google\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -12,8 +13,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property string $name_kz
  * @property string $description
  * @property string $description_kz
+ * @property int $rating
+ * @property int $man
+ * @property int $woman
  * @property-read string $localizedName
  * @property-read string $localizedDescription
+ * @property-read Intellect[]|Collection $intellects
+ * @property-read Talent[]|Collection $talents
  */
 class Profession extends Model
 {
@@ -23,7 +29,10 @@ class Profession extends Model
         'description',
         'description_kz',
         'sphere_id',
-        'is_active'
+        'is_active',
+        'rating',
+        'man',
+        'woman'
     ];
 
     protected $casts = [
@@ -46,6 +55,16 @@ class Profession extends Model
         return $this->belongsToMany(Talent::class)
                     ->withPivot('coefficient')
                     ->withTimestamps();
+    }
+
+    public function intellects(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Intellect::class,
+            'profession_talent',
+        )
+            ->withPivot('coefficient')
+            ->withTimestamps();
     }
 
     /**

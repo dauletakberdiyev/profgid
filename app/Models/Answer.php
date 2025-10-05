@@ -11,9 +11,11 @@ use Illuminate\Support\Carbon;
  * @property string $question
  * @property string $question_kz
  * @property int $talent_id
+ * @property int $intellect_id
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property-read Talent $talent
+ * @property-read Intellect $intellect
  * @property-read string $localizedQuestion
  */
 class Answer extends Model
@@ -22,11 +24,17 @@ class Answer extends Model
         'question',
         'question_kz',
         'talent_id',
+        'intellect_id'
     ];
 
     public function talent(): BelongsTo
     {
         return $this->belongsTo(Talent::class);
+    }
+
+    public function intellect(): BelongsTo
+    {
+        return $this->belongsTo(Intellect::class);
     }
 
     public function getLocalizedQuestionAttribute(): string

@@ -37,14 +37,16 @@ class PromoCodeResource extends Resource
                             ->required()
                             ->length(6)
                             ->placeholder('123456')
-                            ->helperText('Код должен состоять из 6 цифр')
+                            ->helperText('Код должен состоять из 6 символов')
                             ->default(fn() => PromoCode::generateCode())
                             ->unique(ignoreRecord: true)
-                            ->rules(['regex:/^\d{6}$/'])
                             ->validationMessages([
-                                'regex' => 'Код должен состоять из 6 цифр',
                                 'length' => 'Код должен быть длиной 6 символов',
                             ]),
+                        Forms\Components\Select::make('type')
+                            ->label('Тип')
+                            ->reactive()
+                            ->options(['full' => 'Полная оплата', 'half' => 'Половина оплаты']),
 
                         Forms\Components\Textarea::make('description')
                             ->label('Описание')
@@ -72,7 +74,8 @@ class PromoCodeResource extends Resource
                             ->nullable()
                             ->helperText('Оставьте пустым для бессрочного промокода')
                             ->minDate(now()),
-                    ]),
+                    ])
+                    ->visible(fn (callable $get) => $get('type') === 'full'),
 
                 Forms\Components\Section::make('Статистика использования')
                     ->schema([
@@ -126,6 +129,16 @@ class PromoCodeResource extends Resource
                     ->searchable()
                     ->limit(50)
                     ->placeholder('Без описания'),
+
+                Tables\Columns\TextColumn::make('type')
+                    ->label('Тип')
+                    ->formatStateUsing(function (string $state): string {
+                        return match ($state) {
+                            'full' => 'Полная оплата',
+                            'half' => 'Половина оплаты',
+                            default => ucfirst($state),
+                        };
+                    }),
 
                 Tables\Columns\IconColumn::make('is_active')
                     ->label('Активен')
@@ -245,7 +258,7 @@ class PromoCodeResource extends Resource
                     ])
                     ->query(function (Builder $query, array $data) {
                         if (!$data['value']) return $query;
-                        
+
                         return match($data['value']) {
                             '1' => $query->where('max_uses', 1),
                             '2-10' => $query->whereBetween('max_uses', [2, 10]),
@@ -260,7 +273,7 @@ class PromoCodeResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
-                
+
                 Tables\Actions\Action::make('reset_usage')
                     ->label('Сбросить использования')
                     ->icon('heroicon-o-arrow-path')
@@ -278,7 +291,7 @@ class PromoCodeResource extends Resource
                     ->modalHeading('Сбросить использования')
                     ->modalDescription('Это действие удалит всю историю использования промокода. Продолжить?')
                     ->visible(fn ($record) => $record->current_uses > 0),
-                
+
                 Tables\Actions\Action::make('extend_expiry')
                     ->label('Продлить срок')
                     ->icon('heroicon-o-calendar-days')
@@ -293,7 +306,7 @@ class PromoCodeResource extends Resource
                         $record->update(['expires_at' => $data['new_expires_at']]);
                     })
                     ->visible(fn ($record) => $record->expires_at),
-                
+
                 Tables\Actions\DeleteAction::make(),
                 Tables\Actions\RestoreAction::make(),
                 Tables\Actions\ForceDeleteAction::make(),

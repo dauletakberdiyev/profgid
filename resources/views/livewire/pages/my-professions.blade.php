@@ -11,14 +11,15 @@
 
         @if($favoriteProfessions->count() > 0)
             <!-- Professions List -->
-            <div class="space-y-2" x-data="{ openId: null }">
+            <div class="space-y-2">
                 @foreach($favoriteProfessions as $profession)
                     <div class="bg-white border border-gray-200 rounded-lg overflow-hidden transition-all duration-200 hover:border-gray-300"
                          x-show="shouldShowProfession({{ $profession->id }})"
+                         x-data="{ open: false }"
                          x-transition>
                         <!-- Profession Header -->
                         <div class="p-3 cursor-pointer"
-                             @click="openId = (openId === {{ $profession->id }}) ? null : {{ $profession->id }}">
+                             @click="open = !open">
                             <div class="flex items-center justify-between">
                                 <div class="flex items-center space-x-2 flex-1 min-w-0">
                                     <div class="w-6 h-6 text-gray-500">{{ svg($profession->sphere->icon ?? 'heroicon-o-home') }}</div>
@@ -56,7 +57,7 @@
                         </div>
 
                         @if($profession->localized_description)
-                            <div x-show="openId === {{ $profession->id }}"
+                            <div x-show="open"
                                  x-transition
                                  class="text-xs md:text-sm border-t border-gray-100"
                                  style="display: none; background-color: #f5f9ff">

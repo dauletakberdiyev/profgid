@@ -20,6 +20,7 @@ class PromoCode extends Model
         'max_uses',
         'current_uses',
         'expires_at',
+        'type'
     ];
 
     protected $casts = [
@@ -83,7 +84,7 @@ class PromoCode extends Model
      */
     public function isAvailable()
     {
-        return $this->is_active && 
+        return $this->is_active &&
                ($this->expires_at === null || $this->expires_at > now()) &&
                ($this->current_uses < ($this->max_uses ?? 1));
     }
@@ -106,13 +107,15 @@ class PromoCode extends Model
             $this->users()->attach($userId, [
                 'used_at' => now(),
             ]);
-            
+
             // Increment current uses
             $this->increment('current_uses');
-            
+
             // Update legacy fields for backwards compatibility
             $this->update([
-                'is_used' => $this->current_uses >= ($this->max_uses ?? 1),
+                'is_used' => ($this->type !== 'half')
+                    ? $this->current_uses >= ($this->max_uses ?? 1)
+                    : 0,
                 'used_by' => $userId,
                 'used_at' => now(),
             ]);

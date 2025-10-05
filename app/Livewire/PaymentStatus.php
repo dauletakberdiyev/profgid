@@ -20,6 +20,7 @@ class PaymentStatus extends Component
     public $pin5;
     public $pin6;
     public $paymentConfirmed = false;
+    public $halfDiscount = false;
     public $showPromoCodeForm = false;
 
     public function processCardPayment()
@@ -279,16 +280,16 @@ class PaymentStatus extends Component
         // Validate PIN inputs
         $this->validate(
             [
-                "pin1" => "required|digits:1",
-                "pin2" => "required|digits:1",
-                "pin3" => "required|digits:1",
-                "pin4" => "required|digits:1",
-                "pin5" => "required|digits:1",
-                "pin6" => "required|digits:1",
+                "pin1" => "required|string|size:1",
+                "pin2" => "required|string|size:1",
+                "pin3" => "required|string|size:1",
+                "pin4" => "required|string|size:1",
+                "pin5" => "required|string|size:1",
+                "pin6" => "required|string|size:1",
             ],
             [
                 "pin*.required" => "Пожалуйста, заполните все поля промокода",
-                "pin*.digits" => "Каждое поле должно содержать одну цифру",
+                "pin*.size" => "Каждое поле должно содержать ровно один символ",
             ]
         );
 
@@ -302,12 +303,31 @@ class PaymentStatus extends Component
             $this->pin6;
 
         // Find the promo code in database
-        $promoCodeRecord = PromoCode::where("code", $promoCode)
+        $promoCodeRecord = PromoCode::query()->where("code", $promoCode)
             ->where("is_active", true)
             ->where("is_used", false)
             ->first();
 
         if ($promoCodeRecord) {
+            if ($promoCodeRecord->type === 'half') {
+                $this->plans[$this->plan]['price'] = $this->plans[$this->plan]['price'] / 2;
+
+                $promoCodeRecord->markAsUsed(auth()->id());
+                $this->testSession->update([
+                    "promo_code" => $promoCode,
+                    'payment_amount' => $this->plans[$this->plan]['price'],
+                ]);
+
+                $this->halfDiscount = true;
+
+//                session()->flash(
+//                    "success",
+//                    "Промокод принят! Скидка применена успешно."
+//                );
+
+                return;
+            }
+
             // Mark promo code as used
             $promoCodeRecord->markAsUsed(auth()->id());
 

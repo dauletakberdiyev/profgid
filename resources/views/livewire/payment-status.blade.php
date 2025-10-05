@@ -165,7 +165,7 @@
             <div class="bg-white border border-gray-100 rounded-2xl p-6 md:p-8 shadow-sm">
                 <h3 class="text-xl font-medium text-gray-900 mb-6">{{ __('all.payment_status.activation.title') }}</h3>
 
-                @if(!$paymentConfirmed && $testSession->payment_status != 'completed')
+                @if(!$paymentConfirmed && $testSession->payment_status != 'completed' && !$halfDiscount)
                     <form wire:submit.prevent="confirmPayment">
                         <!-- PIN Input Fields -->
                         <div class="mb-6" x-data="{
@@ -339,6 +339,17 @@
                                 class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm">
                             {{ __('all.payment_status.fail.contact_btn') }}
                         </button>
+                    </div>
+
+                @elseif($halfDiscount)
+                    <div class="text-center py-8">
+                        <div class="w-16 h-16 bg-green-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                            <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        </div>
+                        <h4 class="text-lg font-medium text-gray-900 mb-2">{{ __('all.payment_status.half_discount.title') }}</h4>
+                        <p class="text-gray-600 mb-4">{{ __('all.payment_status.half_discount.desc') }}</p>
                     </div>
                 @endif
             </div>

@@ -2,8 +2,11 @@
 
 namespace App\Livewire\Pages;
 
+use App\Models\Intellect;
 use App\Models\Profession;
 use App\Models\Sphere;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 use Livewire\Component;
 use App\Models\Answer;
 use App\Models\Talent;
@@ -13,6 +16,7 @@ use Illuminate\Support\Facades\Auth;
 class TalentTestResults extends Component
 {
     public $userResults = [];
+    public $userIntellectResults = [];
     public $userResultsCopy = [];
     public $domains = [];
     public $domainScores = [];
@@ -62,6 +66,7 @@ class TalentTestResults extends Component
         if (!$this->testSession || $this->testSession->userAnswers->isEmpty()) {
             // Если нет данных, показываем сообщение об отсутствии результатов
             $this->userResults = [];
+            $this->userIntellectResults = [];
             $this->domainScores = [];
             $this->topStrengths = [];
             return;
@@ -89,8 +94,12 @@ class TalentTestResults extends Component
         /** @var Talent[] $talents */
         $talents = Talent::with("domain")->orderBy("id")->get();
 
+        /** @var Intellect[] $intellects */
+        $intellects = Intellect::query()->orderBy("id")->get();
+
         // Get all answers with their talent relationships
-        $answers = Answer::with("talent.domain")->orderBy("id")->get();
+        /** @var Answer[]|Collection $answers */
+        $answers = Answer::with(["talent.domain", 'intellect'])->orderBy("id")->get();
 
         // Define the domains with exact names from database
         $this->localizedDomains = [
@@ -159,6 +168,11 @@ class TalentTestResults extends Component
             $talentScores[$talent->id] = 0;
         }
 
+        $intellectScores = [];
+        foreach ($intellects as $intellect) {
+            $intellectScores[$intellect->id] = 0;
+        }
+
         // Calculate scores for each talent by grouping answers to each talent
         foreach ($questionScores as $questionId => $score) {
             // Находим ответ (вопрос) по его ID
@@ -166,6 +180,9 @@ class TalentTestResults extends Component
             if ($answer && $answer->talent) {
                 // Add the score to the corresponding talent
                 $talentScores[$answer->talent->id] += $score;
+            }
+            elseif ($answer && $answer->intellect) {
+                $intellectScores[$answer->intellect->id] += $score;
             }
         }
 
@@ -194,9 +211,25 @@ class TalentTestResults extends Component
             }
         }
 
+        foreach ($intellects as $intellect) {
+            $score = $intellectScores[$intellect->id] ?? 0;
+
+            $this->userIntellectResults[] = [
+                "id" => $intellect->id,
+                "name" => $intellect->localizedName,
+                "description" => $intellect->localizedDescription ?? "",
+                "score" => $score,
+                "rank" => 0, // Will be set later
+            ];
+        }
+
         $this->userResultsCopy = $this->userResults;
         // Sort results by score (descending)
         usort($this->userResults, function ($a, $b) {
+            return $b["score"] <=> $a["score"];
+        });
+
+        usort($this->userIntellectResults, function ($a, $b) {
             return $b["score"] <=> $a["score"];
         });
 
@@ -296,22 +329,33 @@ class TalentTestResults extends Component
             $userTalentScores[$result["id"]] = $result["score"];
         }
 
+        $userIntellectScore = [];
+        foreach ($this->userIntellectResults as $result) {
+            $userIntellectScore[$result["id"]] = $result["score"];
+        }
+
         // Находим максимальный возможный балл для нормализации
         $maxUserScore = collect($this->userResults)->max("score");
         $maxUserScore = max($maxUserScore, 1); // Избегаем деления на 0
 
+        $maxUserIntellectScore = collect($this->userIntellectResults)->max("score");
+        $maxUserIntellectScore = max($maxUserIntellectScore, 1); // Избегаем деления на 0
+
         // Получаем все сферы с профессиями и талантами
         /** @var Sphere[] $allSpheres */
         $allSpheres = Sphere::query()->with([
-            "professions.talents"
+            "professions.talents",
+            "professions.intellects",
         ])->get();
         $spheresData = collect();
 
         foreach ($allSpheres as $sphere) {
             $compatibilityPercentage = 0;
+            $compatibilityIntellectPercentage = 0;
 
             // Собираем все уникальные таланты сферы через профессии
             $sphereTalents = collect();
+            $sphereIntellects = collect();
             foreach ($sphere->professions as $profession) {
                 foreach ($profession->talents as $talent) {
                     // Избегаем дубликатов, но сохраняем самый высокий коэффициент
@@ -334,6 +378,32 @@ class TalentTestResults extends Component
                                 "id" => $talent->id,
                                 "name" => $talent->name,
                                 "coefficient" => $talent->pivot->coefficient,
+                            ]
+                        );
+                    }
+                }
+
+                foreach ($profession->intellects as $intellect) {
+                    // Избегаем дубликатов, но сохраняем самый высокий коэффициент
+                    $existingIntellect = $sphereIntellects->firstWhere(
+                        "id",
+                        $intellect->id
+                    );
+                    if (
+                        !$existingIntellect ||
+                        $intellect->pivot->coefficient >
+                        $existingIntellect->coefficient
+                    ) {
+                        $sphereIntellects = $sphereIntellects->reject(function (
+                            $t
+                        ) use ($intellect) {
+                            return $t->id === $intellect->id;
+                        });
+                        $sphereIntellects->push(
+                            (object) [
+                                "id" => $intellect->id,
+                                "name" => $intellect->name,
+                                "coefficient" => $intellect->pivot->coefficient,
                             ]
                         );
                     }
@@ -381,16 +451,58 @@ class TalentTestResults extends Component
                 }
             }
 
+            if ($sphereIntellects->count() > 0) {
+                $totalWeightedScore = 0;
+                $totalWeight = 0;
+                $matchingTalentsCount = 0;
+
+                foreach ($sphereIntellects as $intellect) {
+                    $userScore = $userIntellectScore[$intellect->id] ?? 0;
+                    $coefficient = $intellect->pivot->coefficient ?? 1.0;
+
+                    // Нормализуем очки пользователя относительно максимального балла
+                    $normalizedScore = $userScore / $maxUserIntellectScore;
+
+                    // Взвешиваем по коэффициенту важности таланта для профессии
+                    $weightedScore = $normalizedScore * $coefficient;
+
+                    $totalWeightedScore += $weightedScore;
+                    $totalWeight += $coefficient;
+
+                    // Считаем количество "совпадающих" талантов (где есть хоть какие-то очки)
+                    if ($userScore > 0) {
+                        $matchingTalentsCount++;
+                    }
+                }
+
+                // Базовый процент совместимости
+                if ($totalWeight > 0) {
+                    $baseCompatibility =
+                        ($totalWeightedScore / $totalWeight) * 100;
+
+                    // Бонус за покрытие талантов (чем больше талантов профессии у пользователя, тем лучше)
+                    $coverageBonus =
+                        ($matchingTalentsCount /
+                            $sphereIntellects->count()) *
+                        10; // до 10% бонуса
+
+                    $compatibilityIntellectPercentage = min(
+                        $baseCompatibility + $coverageBonus,
+                        100
+                    ); // Ограничиваем 100%
+                }
+            }
+
+            $compatibilityPercentage = (round($compatibilityPercentage, 1)
+                + round($compatibilityIntellectPercentage, 1)) / 2;
+
             $spheresData->push([
                 "id" => $sphere->id,
                 "name" => $sphere->localizedName,
                 "description" => $sphere->localizedDescription ?? "",
                 "is_top" => false, // Будет установлено после сортировки
                 "relevance_score" => 999,
-                "compatibility_percentage" => round(
-                    $compatibilityPercentage,
-                    1
-                ),
+                "compatibility_percentage" => $compatibilityPercentage,
             ]);
         }
 
@@ -414,20 +526,30 @@ class TalentTestResults extends Component
             $userTalentScores[$result["id"]] = $result["score"];
         }
 
+        $userIntellectScore = [];
+        foreach ($this->userIntellectResults as $result) {
+            $userIntellectScore[$result["id"]] = $result["score"];
+        }
+
         // Находим максимальный возможный балл для нормализации
         $maxUserScore = collect($this->userResults)->max("score");
         $maxUserScore = max($maxUserScore, 1); // Избегаем деления на 0
+
+        $maxUserIntellectScore = collect($this->userIntellectResults)->max("score");
+        $maxUserIntellectScore = max($maxUserIntellectScore, 1); // Избегаем деления на 0
 
         // Получаем все профессии с их талантами
         /** @var Profession[] $allProfessions */
         $allProfessions = Profession::with([
             "talents",
             "sphere",
+            'intellects'
         ])->get();
         $professionsData = collect();
 
         foreach ($allProfessions as $profession) {
             $compatibilityPercentage = 0;
+            $compatibilityIntellectPercentage = 0;
 
             if ($profession->talents && $profession->talents->count() > 0) {
                 $totalWeightedScore = 0;
@@ -471,6 +593,63 @@ class TalentTestResults extends Component
                 }
             }
 
+            if ($profession->intellects && $profession->intellects->count() > 0) {
+                $totalWeightedScore = 0;
+                $totalWeight = 0;
+                $matchingTalentsCount = 0;
+
+                foreach ($profession->intellects as $intellect) {
+                    $userScore = $userIntellectScore[$intellect->id] ?? 0;
+                    $coefficient = $intellect->pivot->coefficient ?? 1.0;
+
+                    // Нормализуем очки пользователя относительно максимального балла
+                    $normalizedScore = $userScore / $maxUserIntellectScore;
+
+                    // Взвешиваем по коэффициенту важности таланта для профессии
+                    $weightedScore = $normalizedScore * $coefficient;
+
+                    $totalWeightedScore += $weightedScore;
+                    $totalWeight += $coefficient;
+
+                    // Считаем количество "совпадающих" талантов (где есть хоть какие-то очки)
+                    if ($userScore > 0) {
+                        $matchingTalentsCount++;
+                    }
+                }
+
+                // Базовый процент совместимости
+                if ($totalWeight > 0) {
+                    $baseCompatibility =
+                        ($totalWeightedScore / $totalWeight) * 100;
+
+                    // Бонус за покрытие талантов (чем больше талантов профессии у пользователя, тем лучше)
+                    $coverageBonus =
+                        ($matchingTalentsCount /
+                            $profession->intellects->count()) *
+                        10; // до 10% бонуса
+
+                    $compatibilityIntellectPercentage = min(
+                        $baseCompatibility + $coverageBonus,
+                        100
+                    ); // Ограничиваем 100%
+                }
+            }
+
+            $totalCompatabilityPercentage = (round($compatibilityPercentage, 1)
+                + round($compatibilityIntellectPercentage, 1)) / 2;
+
+            $remainScores = $profession->rating;
+
+            /** @var User $user */
+            $user = Auth::user();
+            $remainScores += ($user->gender === 'male')
+                ? $profession->man
+                : $profession->woman;
+
+            $remainScores = $remainScores * 100 / 200;
+
+            $totalCompatabilityPercentage = ($totalCompatabilityPercentage + $remainScores) / 2;
+
             $professionsData->push([
                 "id" => $profession->id,
                 "name" => $profession->localizedName,
@@ -483,10 +662,7 @@ class TalentTestResults extends Component
                     : "",
                 "is_top" => false, // Будет установлено после сортировки
                 "relevance_score" => 999,
-                "compatibility_percentage" => round(
-                    $compatibilityPercentage,
-                    1
-                ),
+                "compatibility_percentage" => $totalCompatabilityPercentage,
             ]);
         }
 

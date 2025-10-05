@@ -298,7 +298,74 @@
             <!-- Tabs Navigation -->
             <div class="mb-6 md:mb-8">
                 <div class="border-b border-gray-200">
-                    <div class="flex justify-between items-center">
+                    <div class="flex-col md:flex md:flex-row justify-between md:items-center">
+                        <div class="flex md:hidden mt-2 mb-2">
+                            @php
+                                $canDownloadTalents = true; // Таланты доступны всегда
+                                $canDownloadSpheres = $this->canViewSpheresTab;
+                                $canDownloadProfessions = $this->canViewProfessionsTab;
+                            @endphp
+
+                                <!-- Проверяем доступность скачивания для текущей вкладки -->
+                            <div x-data="{
+                                canDownload: function() {
+                                    // Проверяем тариф пользователя
+                                    const userPlan = '{{ $testSession->selected_plan ?? '' }}';
+                                    const isPaid = {{ $testSession && $testSession->isPaid() ? 'true' : 'false' }};
+
+                                    // Если не оплачено, скачивание недоступно
+                                    if (!isPaid) return false;
+
+                                    // Проверяем только тариф (без привязки к табам)
+                                    return ['talents', 'talents_spheres', 'talents_spheres_professions'].includes(userPlan);
+                                }
+                            }">
+                                <!-- Кнопка скачивания (активная) -->
+                                <a
+                                    x-show="canDownload()"
+                                    href="{{ route('talent.pdf.download', ['session_id' => $testSessionId ?? request()->get('session_id'), 'plan' => $testSession->selected_plan ?? '']) }}"
+                                    class="flex items-center gap-2 px-3 py-2 md:px-4 md:py-3 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors group"
+                                    title="Скачать результаты в PDF"
+                                    target="_blank"
+                                >
+                                    <svg class="w-5 h-5 md:w-6 md:h-6 text-gray-600 group-hover:text-gray-800" fill="none"
+                                         stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                        </path>
+                                    </svg>
+                                    <span class="text-sm text-gray-600 group-hover:text-gray-800 font-medium">
+                                        {{ __('all.test_result.download') }}
+                                    </span>
+                                </a>
+
+                                <!-- Кнопка скачивания (неактивная) - показывается когда скачивание недоступно -->
+                                <div x-show="!canDownload()" class="relative">
+                                    <button
+                                        class="flex items-center gap-2 px-3 py-2 md:px-4 md:py-3 bg-gray-300 rounded-lg cursor-not-allowed opacity-60"
+                                        title="Обновите тариф для скачивания этого раздела"
+                                        disabled
+                                    >
+                                        <svg class="w-5 h-5 md:w-6 md:h-6 text-gray-500" fill="none"
+                                             stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+                                            </path>
+                                        </svg>
+                                        <span class="text-sm md:text-base text-gray-500 font-medium">
+                                            {{ __('all.test_result.download') }}
+                                        </span>
+                                    </button>
+
+                                    <!-- Подсказка о необходимости обновления тарифа -->
+                                    <div class="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10">
+                                        <span>{{ __('all.test_result.update') }}</span>
+                                        <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-b-gray-800"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <nav class="-mb-px flex space-x-8" aria-label="Tabs">
                             <!-- Вкладка "Таланты" - всегда доступна -->
                             <button @click="setActiveTab('talents')"
@@ -330,7 +397,7 @@
                         </nav>
 
                         <!-- Кнопка скачать рядом с табами -->
-                        <div class="flex flex-col items-center">
+                        <div class="hidden md:flex flex-col items-center">
                             @php
                                 $canDownloadTalents = true; // Таланты доступны всегда
                                 $canDownloadSpheres = $this->canViewSpheresTab;
@@ -513,7 +580,7 @@
 
 
                     <!-- Single horizontal bar -->
-                    <div class="flex w-full h-6 md:h-8 overflow-hidden mb-3 md:mb-4 bg-gray-200 rounded hidden md:flex">
+                    <div class="flex gap-1 w-full h-6 md:h-8 overflow-hidden mb-3 md:mb-4 rounded hidden md:flex">
                         @foreach ($sortedForTop as $domain => $score)
                             @php
                                 $percentage = $percentages[$i] ?? 10; // default to 10 if more domains
@@ -521,13 +588,12 @@
                             @endphp
                             <div class="{{ $domainBgColors[$domain] ?? 'bg-gray-400' }} flex items-center justify-center text-white font-bold text-xs md:text-sm flex-shrink-0"
                                 style="width: {{ $percentage }}%; min-width: 10%;">
-
                             </div>
                         @endforeach
                     </div>
 
                     <!-- Domain labels with scores and percentages -->
-                    <div class="flex w-full hidden md:flex">
+                    <div class="flex gap-1 w-full hidden md:flex">
                         @foreach ($sortedForTop as $domain => $score)
                             @php
                                 $percentage = $percentages[$j] ?? 10; // default to 10 if more domains
@@ -649,7 +715,7 @@
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <!-- Левая колонка - Топ 10 талантов -->
                         <div>
-                            <div class="space-y-1" x-data="{ openTalent: null }">
+                            <div class="space-y-1">
                                 @foreach ($topTenTalents as $index => $talent)
                                     @php
                                         // Получаем цвет домена для таланта
@@ -661,11 +727,13 @@
                                     @endphp
 
                                     <!-- Все топ 10 талантов с аккордеоном -->
-                                    <div class="border-gray-200 transition-all overflow-hidden">
+                                    <div class="border-gray-200 transition-all overflow-hidden"
+                                         x-data="{ open: false }"
+                                    >
                                         <!-- Заголовок таланта -->
                                         <div class="flex items-center p-3 justify-between cursor-pointer"
                                              style="background-color: {{$talentDomainColor}}"
-                                             @click="openTalent === '{{ $index }}' ? openTalent = null : openTalent = '{{ $index }}'">
+                                             @click="open = !open">
                                             <div class="flex items-center flex-1 min-w-0">
                                                 <div class="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-semibold mr-2">
                                                     {{ $talent['rank'] }}
@@ -687,12 +755,13 @@
 
                                         <!-- Аккордеон -->
                                         <div class="p-3 {{$mutedDomainColor}}"
-                                             x-show="openTalent === '{{ $index }}'"
+                                             x-show="open"
                                              x-transition
                                              style="display: none"
                                         >
                                             @if (!empty($talent['description']))
                                                 <div class="mb-3">
+                                                    <p class="text-xs text-gray-950 leading-tight mb-2">{{ $talent['short_description'] }}</p>
                                                     <h4 class="text-xs text-gray-950 font-semibold mb-1">{{ __('all.test_result.talents.review') }}</h4>
                                                     <p class="text-xs text-gray-950 leading-tight">{{ $talent['description'] }}</p>
                                                 </div>
@@ -705,7 +774,7 @@
 
                         <!-- Правая колонка - Остальные таланты -->
                         <div>
-                            <div class="space-y-1" x-data="{ openRemainTalent: null }">
+                            <div class="space-y-1">
                                 @foreach ($remainingTalents as $ind => $remTalent)
                                     @php
                                         // Получаем цвет домена для таланта
@@ -719,10 +788,12 @@
                                     <div
                                         class="bg-gray-50 p-3 transition-all hover:bg-gray-100"
                                         style="border: 1px solid {{ $talentDomainColor }}"
+                                        x-data="{ open: false }"
                                     >
                                         <!-- Заголовок -->
                                         <div class="flex items-center justify-between cursor-pointer"
-                                             @click="openRemainTalent = (openRemainTalent === {{ $ind }}) ? null : {{ $ind }}">
+                                             @click="open = !open"
+                                        >
                                             <div class="flex items-center flex-1 min-w-0">
                                                 <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold mr-2"
                                                      style="color: {{ $talentDomainColor }}">
@@ -748,7 +819,7 @@
                                         <!-- Контент -->
                                         @if (!empty($talent['short_description']))
                                             <div class="overflow-hidden mt-2"
-                                                 x-show="openRemainTalent === {{ $ind }}"
+                                                 x-show="open"
                                             >
                                                 <div class="mb-3">
                                                     <h4 class="text-xs font-semibold text-gray-900 mb-1">{{ __('all.test_result.talents.short_desc') }}</h4>

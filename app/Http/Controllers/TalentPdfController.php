@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Intellect;
 use App\Models\Profession;
 use App\Models\Sphere;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\TestSession;
 use App\Models\Talent;
@@ -16,6 +18,7 @@ use Spatie\Browsershot\Exceptions\CouldNotTakeBrowsershot;
 class TalentPdfController extends Controller
 {
     private array $userTalentScores = [];
+    private array $userIntellectScores = [];
     /**
      * @throws CouldNotTakeBrowsershot
      */
@@ -39,6 +42,7 @@ class TalentPdfController extends Controller
         }
         // Общие данные
         $userResults = [];
+        $userIntellectResults = [];
         $userResultsCopy = [];
 
         $domainScores = [
@@ -96,7 +100,12 @@ class TalentPdfController extends Controller
 
         /** @var Talent[] $talents */
         $talents = Talent::with("domain")->orderBy("id")->get();
-        $answers = Answer::with("talent.domain")->orderBy("id")->get();
+
+        /** @var Answer[]|\Illuminate\Database\Eloquent\Collection $answers */
+        $answers = Answer::with(["talent.domain", 'intellect'])->orderBy("id")->get();
+
+        /** @var Intellect[] $intellects */
+        $intellects = Intellect::query()->orderBy("id")->get();
 
 
         // Убираем расчёты очков и процентов для доменов
@@ -119,12 +128,20 @@ class TalentPdfController extends Controller
             $talentScores[$talent->id] = 0;
         }
 
+        $intellectScores = [];
+        foreach ($intellects as $intellect) {
+            $intellectScores[$intellect->id] = 0;
+        }
+
         foreach ($questionScores as $questionId => $score) {
             // Находим ответ (вопрос) по его ID
             $answer = $answers->firstWhere('id', $questionId);
             if ($answer && $answer->talent) {
                 // Add the score to the corresponding talent
                 $talentScores[$answer->talent->id] += $score;
+            }
+            elseif ($answer && $answer->intellect) {
+                $intellectScores[$answer->intellect->id] += $score;
             }
         }
 
@@ -150,8 +167,24 @@ class TalentPdfController extends Controller
             }
         }
 
+        foreach ($intellects as $intellect) {
+            $score = $intellectScores[$intellect->id] ?? 0;
+
+            $userIntellectResults[] = [
+                "id" => $intellect->id,
+                "name" => $intellect->localizedName,
+                "description" => $intellect->localizedDescription ?? "",
+                "score" => $score,
+                "rank" => 0, // Will be set later
+            ];
+        }
+
         $userResultsCopy = $userResults;
         usort($userResults, function ($a, $b) {
+            return $b["score"] <=> $a["score"];
+        });
+
+        usort($userIntellectResults, function ($a, $b) {
             return $b["score"] <=> $a["score"];
         });
 
@@ -262,12 +295,19 @@ class TalentPdfController extends Controller
                 $this->userTalentScores[$result["id"]] = $result["score"];
             }
 
+            foreach ($userIntellectResults as $result) {
+                $this->userIntellectScores[$result["id"]] = $result["score"];
+            }
+
             $maxUserScore = max(array_column($userResults, "score"));
             $maxUserScore = max($maxUserScore, 1);
 
+            $maxUserIntellectScore = collect($userIntellectResults)->max("score");
+            $maxUserIntellectScore = max($maxUserIntellectScore, 1); // Избегаем деления на 0
+
             // Затем логика для сфер
-            $topSpheres = $this->getTopSpheres($userResults, $maxUserScore);
-            $sortedProfessions = $this->getTopSphereProfessions($topSpheres, $maxUserScore);
+            $topSpheres = $this->getTopSpheres($userResults, $maxUserScore, $maxUserIntellectScore);
+            $sortedProfessions = $this->getTopSphereProfessions($topSpheres, $maxUserScore, $maxUserIntellectScore);
 
             // Генерируем HTML для сфер
             $spheresHtml = view("pdf.spheres-full", [
@@ -323,11 +363,18 @@ class TalentPdfController extends Controller
                 $this->userTalentScores[$result["id"]] = $result["score"];
             }
 
+            foreach ($userIntellectResults as $result) {
+                $this->userIntellectScores[$result["id"]] = $result["score"];
+            }
+
             $maxUserScore = max(array_column($userResults, "score"));
             $maxUserScore = max($maxUserScore, 1);
 
-            $topSpheres = $this->getTopSpheres($userResults, $maxUserScore);
-            $sortedProfessions = $this->getTopSphereProfessions($topSpheres, $maxUserScore);
+            $maxUserIntellectScore = collect($userIntellectResults)->max("score");
+            $maxUserIntellectScore = max($maxUserIntellectScore, 1); // Избегаем деления на 0
+
+            $topSpheres = $this->getTopSpheres($userResults, $maxUserScore, $maxUserIntellectScore);
+            $sortedProfessions = $this->getTopSphereProfessions($topSpheres, $maxUserScore, $maxUserIntellectScore);
 
             // Генерируем HTML для сфер
             $spheresHtml = view("pdf.spheres-full", [
@@ -417,18 +464,21 @@ class TalentPdfController extends Controller
         return $mapping[$domainName] ?? 'executing'; // По умолчанию executing
     }
 
-    private function getTopSpheres(array $userResults, $maxUserScore): Collection
+    private function getTopSpheres(array $userResults, $maxUserScore, $maxUserIntellectScore): Collection
     {
         /** @var Sphere[] $allSpheres */
         $allSpheres = Sphere::with([
             "professions.talents",
+            "professions.intellects",
         ])->get();
         $spheresData = collect();
 
         foreach ($allSpheres as $sphere) {
             $compatibilityPercentage = 0;
+            $compatibilityIntellectPercentage = 0;
 
             $sphereTalents = collect();
+            $sphereIntellects = collect();
             foreach ($sphere->professions as $profession) {
                 foreach ($profession->talents as $talent) {
                     $existingTalent = $sphereTalents->firstWhere(
@@ -450,6 +500,32 @@ class TalentPdfController extends Controller
                                 "id" => $talent->id,
                                 "name" => $talent->name,
                                 "coefficient" => $talent->pivot->coefficient,
+                            ]
+                        );
+                    }
+                }
+
+                foreach ($profession->intellects as $intellect) {
+                    // Избегаем дубликатов, но сохраняем самый высокий коэффициент
+                    $existingIntellect = $sphereIntellects->firstWhere(
+                        "id",
+                        $intellect->id
+                    );
+                    if (
+                        !$existingIntellect ||
+                        $intellect->pivot->coefficient >
+                        $existingIntellect->coefficient
+                    ) {
+                        $sphereIntellects = $sphereIntellects->reject(function (
+                            $t
+                        ) use ($intellect) {
+                            return $t->id === $intellect->id;
+                        });
+                        $sphereIntellects->push(
+                            (object) [
+                                "id" => $intellect->id,
+                                "name" => $intellect->name,
+                                "coefficient" => $intellect->pivot->coefficient,
                             ]
                         );
                     }
@@ -490,16 +566,59 @@ class TalentPdfController extends Controller
                     );
                 }
             }
+
+            if ($sphereIntellects->count() > 0) {
+                $totalWeightedScore = 0;
+                $totalWeight = 0;
+                $matchingTalentsCount = 0;
+
+                foreach ($sphereIntellects as $intellect) {
+                    $userScore = $this->userIntellectScores[$intellect->id] ?? 0;
+                    $coefficient = $intellect->pivot->coefficient ?? 1.0;
+
+                    // Нормализуем очки пользователя относительно максимального балла
+                    $normalizedScore = $userScore / $maxUserIntellectScore;
+
+                    // Взвешиваем по коэффициенту важности таланта для профессии
+                    $weightedScore = $normalizedScore * $coefficient;
+
+                    $totalWeightedScore += $weightedScore;
+                    $totalWeight += $coefficient;
+
+                    // Считаем количество "совпадающих" талантов (где есть хоть какие-то очки)
+                    if ($userScore > 0) {
+                        $matchingTalentsCount++;
+                    }
+                }
+
+                // Базовый процент совместимости
+                if ($totalWeight > 0) {
+                    $baseCompatibility =
+                        ($totalWeightedScore / $totalWeight) * 100;
+
+                    // Бонус за покрытие талантов (чем больше талантов профессии у пользователя, тем лучше)
+                    $coverageBonus =
+                        ($matchingTalentsCount /
+                            $sphereIntellects->count()) *
+                        10; // до 10% бонуса
+
+                    $compatibilityIntellectPercentage = min(
+                        $baseCompatibility + $coverageBonus,
+                        100
+                    ); // Ограничиваем 100%
+                }
+            }
+
+            $compatibilityPercentage = (round($compatibilityPercentage, 1)
+                    + round($compatibilityIntellectPercentage, 1)) / 2;
+
             $spheresData->push([
                 "id" => $sphere->id,
                 "name" => $sphere->localizedName,
                 "description" => $sphere->localizedDescription ?? "",
                 "is_top" => false,
                 "relevance_score" => 999,
-                "compatibility_percentage" => round(
-                    $compatibilityPercentage,
-                    1
-                ),
+                "compatibility_percentage" => $compatibilityPercentage
             ]);
         }
         $sortedSpheres = $spheresData->sortByDesc("compatibility_percentage");
@@ -510,12 +629,13 @@ class TalentPdfController extends Controller
         });
     }
 
-    private function getTopSphereProfessions(Collection $topSpheres, $maxUserScore): Collection
+    private function getTopSphereProfessions(Collection $topSpheres, $maxUserScore, $maxUserIntellectScore): Collection
     {
         /** @var Profession[] $allProfessions */
         $allProfessions = Profession::with([
             "talents",
             "sphere",
+            'intellects'
         ])
 //            ->whereIn('sphere_id', $topSpheres->take(10)->pluck('id')->toArray())
             ->get();
@@ -523,6 +643,7 @@ class TalentPdfController extends Controller
 
         foreach ($allProfessions as $profession) {
             $compatibilityPercentage = 0;
+            $compatibilityIntellectPercentage = 0;
 
             if ($profession->talents && $profession->talents->count() > 0) {
                 $totalWeightedScore = 0;
@@ -559,6 +680,63 @@ class TalentPdfController extends Controller
                 }
             }
 
+            if ($profession->intellects && $profession->intellects->count() > 0) {
+                $totalWeightedScore = 0;
+                $totalWeight = 0;
+                $matchingTalentsCount = 0;
+
+                foreach ($profession->intellects as $intellect) {
+                    $userScore = $this->userIntellectScores[$intellect->id] ?? 0;
+                    $coefficient = $intellect->pivot->coefficient ?? 1.0;
+
+                    // Нормализуем очки пользователя относительно максимального балла
+                    $normalizedScore = $userScore / $maxUserIntellectScore;
+
+                    // Взвешиваем по коэффициенту важности таланта для профессии
+                    $weightedScore = $normalizedScore * $coefficient;
+
+                    $totalWeightedScore += $weightedScore;
+                    $totalWeight += $coefficient;
+
+                    // Считаем количество "совпадающих" талантов (где есть хоть какие-то очки)
+                    if ($userScore > 0) {
+                        $matchingTalentsCount++;
+                    }
+                }
+
+                // Базовый процент совместимости
+                if ($totalWeight > 0) {
+                    $baseCompatibility =
+                        ($totalWeightedScore / $totalWeight) * 100;
+
+                    // Бонус за покрытие талантов (чем больше талантов профессии у пользователя, тем лучше)
+                    $coverageBonus =
+                        ($matchingTalentsCount /
+                            $profession->intellects->count()) *
+                        10; // до 10% бонуса
+
+                    $compatibilityIntellectPercentage = min(
+                        $baseCompatibility + $coverageBonus,
+                        100
+                    ); // Ограничиваем 100%
+                }
+            }
+
+            $totalCompatabilityPercentage = (round($compatibilityPercentage, 1)
+                    + round($compatibilityIntellectPercentage, 1)) / 2;
+
+            $remainScores = $profession->rating;
+
+            /** @var User $user */
+            $user = Auth::user();
+            $remainScores += ($user->gender === 'male')
+                ? $profession->man
+                : $profession->woman;
+
+            $remainScores = $remainScores * 100 / 200;
+
+            $totalCompatabilityPercentage = ($totalCompatabilityPercentage + $remainScores) / 2;
+
             $professionsData->push([
                 "id" => $profession->id,
                 "name" => $profession->localizedName,
@@ -571,10 +749,7 @@ class TalentPdfController extends Controller
                     : "",
                 "is_top" => false,
                 "relevance_score" => 999,
-                "compatibility_percentage" => round(
-                    $compatibilityPercentage,
-                    1
-                ),
+                "compatibility_percentage" => $totalCompatabilityPercentage,
             ]);
         }
 

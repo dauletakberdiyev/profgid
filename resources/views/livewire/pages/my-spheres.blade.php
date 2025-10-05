@@ -9,12 +9,15 @@
             <p class="text-sm text-gray-600">{{ __('all.my_spheres.desc') }}</p>
         </div>
 
-        <div x-data="{ openId: null }">
+        <div>
             @foreach($spheres as $sphere)
-                <div class="bg-white border border-gray-200 rounded-lg overflow-hidden transition-all duration-200 hover:border-gray-300 mb-3">
+                <div class="bg-white border border-gray-200 rounded-lg overflow-hidden transition-all duration-200 hover:border-gray-300 mb-3"
+                     x-data="{ open: false }"
+                >
                     <!-- Sphere Header -->
                     <div class="p-3 cursor-pointer"
-                         @click="openId === {{ $sphere->id }} ? openId = null : openId = {{ $sphere->id }}">
+                         @click="open = !open"
+                    >
                         <div class="flex items-center justify-between">
                             <div class="flex items-center space-x-2">
                                 <div class="w-6 h-6 text-gray-500">{{ svg($sphere->icon ?? 'heroicon-o-home') }}</div>
@@ -52,7 +55,7 @@
                     </div>
 
                     <!-- Content -->
-                    <div x-show="openId === {{ $sphere->id }}"
+                    <div x-show="open"
                          x-transition
                          class="text-xs border-t border-gray-100"
                          style="display: none; background-color: #f5f9ff">
