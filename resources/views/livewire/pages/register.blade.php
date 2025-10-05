@@ -41,6 +41,19 @@
                     @enderror
                 </div>
                 <div>
+                    <label for="gender" class="sr-only">{{ __('all.registration.fields.gender') }}</label>
+                    <select wire:model="gender" id="gender" name="gender" required
+                            class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 text-gray-900 rounded-t-md focus:outline-none focus:ring-[#ff8b0d] focus:border-[#ff8b0d] focus:z-10 sm:text-sm">
+                        <option value="" disabled>{{ __('all.registration.fields.gender') }}</option>
+                        <option value="male">{{ __('all.registration.fields.male') }}</option>
+                        <option value="female">{{ __('all.registration.fields.female') }}</option>
+                    </select>
+                    @error('gender')
+                    <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div>
                     <label for="email-address" class="sr-only">{{ __('all.registration.fields.email') }}</label>
                     <input wire:model="email" id="email-address" name="email" type="email" autocomplete="email"
                         required

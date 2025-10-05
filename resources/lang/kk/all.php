@@ -280,6 +280,9 @@ return [
             'school' => 'Мектеп',
             'class' => 'Сынып',
             'name' => 'Аты',
+            'gender' => 'Жынысы',
+            'male' => 'Ұл',
+            'female' => 'Қыз',
             'email' => 'Email',
             'password' => 'Құпия сөз',
             'password_confirm' => 'Құпия сөз растау'

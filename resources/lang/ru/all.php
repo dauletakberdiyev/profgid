@@ -281,6 +281,9 @@ return [
             'school' => 'Школа',
             'class' => 'Класс',
             'name' => 'Имя',
+            'gender' => 'Пол',
+            'male' => 'Мальчик',
+            'female' => 'Девушка',
             'email' => 'Email',
             'password' => 'Пароль',
             'password_confirm' => 'Подтверждение пароля'
