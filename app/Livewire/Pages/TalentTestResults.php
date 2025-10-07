@@ -358,13 +358,6 @@ class TalentTestResults extends Component
             $userIntellectScore[$result["id"]] = $result["score"];
         }
 
-        // Находим максимальный возможный балл для нормализации
-        $maxUserScore = collect($this->userResults)->max("score");
-        $maxUserScore = max($maxUserScore, 1); // Избегаем деления на 0
-
-        $maxUserIntellectScore = collect($this->userIntellectResults)->max("score");
-        $maxUserIntellectScore = max($maxUserIntellectScore, 1); // Избегаем деления на 0
-
         // Получаем все профессии с их талантами
         /** @var Profession[] $allProfessions */
         $allProfessions = Profession::with([
@@ -380,102 +373,35 @@ class TalentTestResults extends Component
 
             if ($profession->talents && $profession->talents->count() > 0) {
                 $totalWeightedScore = 0;
-                $totalWeight = 0;
-                $matchingTalentsCount = 0;
 
                 foreach ($profession->talents as $talent) {
-                    $userScore = $userTalentScores[$talent->id] ?? 0;
-                    $coefficient = $talent->pivot->coefficient ?? 1.0;
-
-                    // Нормализуем очки пользователя относительно максимального балла
-                    $normalizedScore = $userScore / $maxUserScore;
-
-                    // Взвешиваем по коэффициенту важности таланта для профессии
-                    $weightedScore = $normalizedScore * $coefficient;
-
-                    $totalWeightedScore += $weightedScore;
-                    $totalWeight += $coefficient;
-
-                    // Считаем количество "совпадающих" талантов (где есть хоть какие-то очки)
-                    if ($userScore > 0) {
-                        $matchingTalentsCount++;
-                    }
+                    $totalWeightedScore += $userTalentScores[$talent->id] ?? 0;
                 }
 
-                // Базовый процент совместимости
-                if ($totalWeight > 0) {
-                    $baseCompatibility =
-                        ($totalWeightedScore / $totalWeight) * 100;
-
-                    // Бонус за покрытие талантов (чем больше талантов профессии у пользователя, тем лучше)
-                    $coverageBonus =
-                        ($matchingTalentsCount /
-                            $profession->talents->count()) *
-                        10; // до 10% бонуса
-
-                    $compatibilityPercentage = min(
-                        $baseCompatibility + $coverageBonus,
-                        100
-                    ); // Ограничиваем 100%
-                }
+                $compatibilityPercentage = $totalWeightedScore;
             }
 
             if ($profession->intellects && $profession->intellects->count() > 0) {
                 $totalWeightedScore = 0;
-                $totalWeight = 0;
-                $matchingTalentsCount = 0;
 
                 foreach ($profession->intellects as $intellect) {
-                    $userScore = $userIntellectScore[$intellect->id] ?? 0;
-                    $coefficient = $intellect->pivot->coefficient ?? 1.0;
-
-                    // Нормализуем очки пользователя относительно максимального балла
-                    $normalizedScore = $userScore / $maxUserIntellectScore;
-
-                    // Взвешиваем по коэффициенту важности таланта для профессии
-                    $weightedScore = $normalizedScore * $coefficient;
-
-                    $totalWeightedScore += $weightedScore;
-                    $totalWeight += $coefficient;
-
-                    // Считаем количество "совпадающих" талантов (где есть хоть какие-то очки)
-                    if ($userScore > 0) {
-                        $matchingTalentsCount++;
-                    }
+                    $totalWeightedScore += $userIntellectScore[$intellect->id] ?? 0;
                 }
 
-                // Базовый процент совместимости
-                if ($totalWeight > 0) {
-                    $baseCompatibility =
-                        ($totalWeightedScore / $totalWeight) * 100;
-
-                    // Бонус за покрытие талантов (чем больше талантов профессии у пользователя, тем лучше)
-                    $coverageBonus =
-                        ($matchingTalentsCount /
-                            $profession->intellects->count()) *
-                        10; // до 10% бонуса
-
-                    $compatibilityIntellectPercentage = min(
-                        $baseCompatibility + $coverageBonus,
-                        100
-                    ); // Ограничиваем 100%
-                }
+                $compatibilityIntellectPercentage = $totalWeightedScore;
             }
 
-            $totalCompatabilityPercentage = (round($compatibilityPercentage, 1)
-                + round($compatibilityIntellectPercentage, 1)) / 2;
+            $totalCompatabilityPercentage = ($compatibilityPercentage + $compatibilityIntellectPercentage) * 100 / 250;
 
-            $remainScores = $profession->rating;
+            $professionRating = $profession->rating;
 
             /** @var User $user */
             $user = Auth::user();
-            $remainScores += ($user->gender === 'male')
+            $genderRating = ($user->gender === 'male')
                 ? $profession->man
                 : $profession->woman;
 
-            $remainScores = $remainScores * 100 / 200;
-
-            $totalCompatabilityPercentage = ($totalCompatabilityPercentage + $remainScores) / 2;
+            $totalCompatabilityPercentage = $totalCompatabilityPercentage * ($professionRating/100) * ($genderRating/100);
 
             $professionsData->push([
                 "id" => $profession->id,

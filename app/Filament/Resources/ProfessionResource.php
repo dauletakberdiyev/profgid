@@ -48,6 +48,18 @@ class ProfessionResource extends Resource
                             ->maxLength(65535)
                             ->columnSpanFull(),
 
+                        Forms\Components\TextInput::make('rating')
+                            ->label('Рейтинг')
+                            ->numeric(),
+
+                        Forms\Components\TextInput::make('man')
+                            ->label('Мужчина')
+                            ->numeric(),
+
+                        Forms\Components\TextInput::make('woman')
+                            ->label('Женщина')
+                            ->numeric(),
+
                         Forms\Components\Toggle::make('is_active')
                             ->label('Активна')
                             ->default(true),

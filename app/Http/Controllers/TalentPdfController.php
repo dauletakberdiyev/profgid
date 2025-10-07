@@ -299,14 +299,8 @@ class TalentPdfController extends Controller
                 $this->userIntellectScores[$result["id"]] = $result["score"];
             }
 
-            $maxUserScore = max(array_column($userResults, "score"));
-            $maxUserScore = max($maxUserScore, 1);
-
-            $maxUserIntellectScore = collect($userIntellectResults)->max("score");
-            $maxUserIntellectScore = max($maxUserIntellectScore, 1); // Избегаем деления на 0
-
             // Затем логика для сфер
-            $sortedProfessions = $this->getTopSphereProfessions($maxUserScore, $maxUserIntellectScore);
+            $sortedProfessions = $this->getTopSphereProfessions();
             $topSpheres = $this->getTopSpheres($sortedProfessions);
 
             // Генерируем HTML для сфер
@@ -367,13 +361,7 @@ class TalentPdfController extends Controller
                 $this->userIntellectScores[$result["id"]] = $result["score"];
             }
 
-            $maxUserScore = max(array_column($userResults, "score"));
-            $maxUserScore = max($maxUserScore, 1);
-
-            $maxUserIntellectScore = collect($userIntellectResults)->max("score");
-            $maxUserIntellectScore = max($maxUserIntellectScore, 1); // Избегаем деления на 0
-
-            $sortedProfessions = $this->getTopSphereProfessions($maxUserScore, $maxUserIntellectScore);
+            $sortedProfessions = $this->getTopSphereProfessions();
             $topSpheres = $this->getTopSpheres($sortedProfessions);
 
             // Генерируем HTML для сфер
@@ -488,7 +476,7 @@ class TalentPdfController extends Controller
         return $spheres->sortByDesc('compatibility_percentage')->values();
     }
 
-    private function getTopSphereProfessions($maxUserScore, $maxUserIntellectScore): Collection
+    private function getTopSphereProfessions(): Collection
     {
         /** @var Profession[] $allProfessions */
         $allProfessions = Profession::with([
@@ -496,7 +484,6 @@ class TalentPdfController extends Controller
             "sphere",
             'intellects'
         ])
-//            ->whereIn('sphere_id', $topSpheres->take(10)->pluck('id')->toArray())
             ->get();
         $professionsData = collect();
 
@@ -506,95 +493,35 @@ class TalentPdfController extends Controller
 
             if ($profession->talents && $profession->talents->count() > 0) {
                 $totalWeightedScore = 0;
-                $totalWeight = 0;
-                $matchingTalentsCount = 0;
 
                 foreach ($profession->talents as $talent) {
-                    $userScore = $this->userTalentScores[$talent->id] ?? 0;
-                    $coefficient = $talent->pivot->coefficient ?? 1.0;
-
-                    $normalizedScore = $userScore / $maxUserScore;
-
-                    $weightedScore = $normalizedScore * $coefficient;
-
-                    $totalWeightedScore += $weightedScore;
-                    $totalWeight += $coefficient;
-
-                    if ($userScore > 0) {
-                        $matchingTalentsCount++;
-                    }
+                    $totalWeightedScore += $this->userTalentScores[$talent->id] ?? 0;
                 }
 
-                if ($totalWeight > 0) {
-                    $baseCompatibility =
-                        ($totalWeightedScore / $totalWeight) * 100;
-                    $coverageBonus =
-                        ($matchingTalentsCount /
-                            $profession->talents->count()) *
-                        10;
-                    $compatibilityPercentage = min(
-                        $baseCompatibility + $coverageBonus,
-                        100
-                    );
-                }
+                $compatibilityPercentage = $totalWeightedScore;
             }
 
             if ($profession->intellects && $profession->intellects->count() > 0) {
                 $totalWeightedScore = 0;
-                $totalWeight = 0;
-                $matchingTalentsCount = 0;
 
                 foreach ($profession->intellects as $intellect) {
-                    $userScore = $this->userIntellectScores[$intellect->id] ?? 0;
-                    $coefficient = $intellect->pivot->coefficient ?? 1.0;
-
-                    // Нормализуем очки пользователя относительно максимального балла
-                    $normalizedScore = $userScore / $maxUserIntellectScore;
-
-                    // Взвешиваем по коэффициенту важности таланта для профессии
-                    $weightedScore = $normalizedScore * $coefficient;
-
-                    $totalWeightedScore += $weightedScore;
-                    $totalWeight += $coefficient;
-
-                    // Считаем количество "совпадающих" талантов (где есть хоть какие-то очки)
-                    if ($userScore > 0) {
-                        $matchingTalentsCount++;
-                    }
+                    $totalWeightedScore += $this->userIntellectScores[$intellect->id] ?? 0;
                 }
 
-                // Базовый процент совместимости
-                if ($totalWeight > 0) {
-                    $baseCompatibility =
-                        ($totalWeightedScore / $totalWeight) * 100;
-
-                    // Бонус за покрытие талантов (чем больше талантов профессии у пользователя, тем лучше)
-                    $coverageBonus =
-                        ($matchingTalentsCount /
-                            $profession->intellects->count()) *
-                        10; // до 10% бонуса
-
-                    $compatibilityIntellectPercentage = min(
-                        $baseCompatibility + $coverageBonus,
-                        100
-                    ); // Ограничиваем 100%
-                }
+                $compatibilityIntellectPercentage = $totalWeightedScore;
             }
 
-            $totalCompatabilityPercentage = (round($compatibilityPercentage, 1)
-                    + round($compatibilityIntellectPercentage, 1)) / 2;
+            $totalCompatabilityPercentage = ($compatibilityPercentage + $compatibilityIntellectPercentage) * 100 / 250;
 
-            $remainScores = $profession->rating;
+            $professionRating = $profession->rating;
 
             /** @var User $user */
             $user = Auth::user();
-            $remainScores += ($user->gender === 'male')
+            $genderRating = ($user->gender === 'male')
                 ? $profession->man
                 : $profession->woman;
 
-            $remainScores = $remainScores * 100 / 200;
-
-            $totalCompatabilityPercentage = ($totalCompatabilityPercentage + $remainScores) / 2;
+            $totalCompatabilityPercentage = $totalCompatabilityPercentage * ($professionRating/100) * ($genderRating/100);
 
             $professionsData->push([
                 "id" => $profession->id,
