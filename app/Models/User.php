@@ -34,7 +34,9 @@ class User extends Authenticatable
         'favorite_spheres',
         'school',
         'class',
-        'gender'
+        'gender',
+        'phone',
+        'is_pupil'
     ];
 
     /**

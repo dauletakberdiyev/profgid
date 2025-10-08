@@ -12,38 +12,91 @@
             </p>
         </div>
         <form class="mt-8 space-y-6" wire:submit.prevent="register">
-            <div class="rounded-md shadow-sm -space-y-px">
+            <div class="space-y-2">
+                <div class="flex gap-2 justify-center" x-data="{ is_pupil: @entangle('is_pupil') }">
+                    <button
+                        type="button"
+                        @click="is_pupil = 1"
+                        class="px-4 py-2 text-sm rounded-lg transition-colors"
+                        :class="is_pupil == 1 ? 'bg-blue-700 text-white' : 'bg-gray-200 text-gray-700'">
+                        {{ __('all.registration.fields.pupil') }}
+                    </button>
+
+                    <button
+                        type="button"
+                        @click="is_pupil = 0"
+                        class="px-4 py-2 text-sm rounded-lg transition-colors"
+                        :class="is_pupil == 0 ? 'bg-blue-700 text-white' : 'bg-gray-200 text-gray-700'">
+                        {{ __('all.registration.fields.not_pupil') }}
+                    </button>
+                </div>
                 <div>
                     <label for="name" class="sr-only">{{ __('all.registration.fields.name') }}</label>
                     <input wire:model="name" id="name" name="name" type="text" autocomplete="name" required
-                        class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-[#ff8b0d] focus:border-[#ff8b0d] focus:z-10 sm:text-sm"
+                        class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-[#ff8b0d] focus:border-[#ff8b0d] focus:z-10 sm:text-sm"
                         placeholder="{{ __('all.registration.fields.name') }}">
                     @error('name')
                         <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
                     @enderror
                 </div>
                 <div>
-                    <label for="school" class="sr-only">{{ __('all.registration.fields.school') }}</label>
-                    <input wire:model="school" id="school" name="school" type="text" autocomplete="school"
-                           class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-[#ff8b0d] focus:border-[#ff8b0d] focus:z-10 sm:text-sm"
-                           placeholder="{{ __('all.registration.fields.school') }}">
-                    @error('school')
+                    <label for="surname" class="sr-only">{{ __('all.registration.fields.surname') }}</label>
+                    <input wire:model="surname" id="surname" name="surname" type="text" autocomplete="surname" required
+                           class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-[#ff8b0d] focus:border-[#ff8b0d] focus:z-10 sm:text-sm"
+                           placeholder="{{ __('all.registration.fields.surname') }}">
+                    @error('surname')
                     <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
                     @enderror
                 </div>
                 <div>
-                    <label for="class" class="sr-only">{{ __('all.registration.fields.class') }}</label>
-                    <input wire:model="class" id="class" name="class" type="text" autocomplete="class"
-                           class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-[#ff8b0d] focus:border-[#ff8b0d] focus:z-10 sm:text-sm"
-                           placeholder="{{ __('all.registration.fields.class') }}">
-                    @error('class')
+                    <label for="email-address" class="sr-only">{{ __('all.registration.fields.email') }}</label>
+                    <input wire:model="email" id="email-address" name="email" type="email" autocomplete="email"
+                           required
+                           class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-[#ff8b0d] focus:border-[#ff8b0d] focus:z-10 sm:text-sm"
+                           placeholder="{{ __('all.registration.fields.email') }}">
+                    @error('email')
                     <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
                     @enderror
+                </div>
+                <div>
+                    <label for="phone" class="sr-only">{{ __('all.registration.fields.phone') }}</label>
+                    <input wire:model.defer="phone"
+                           id="phone"
+                           name="phone"
+                           type="text"
+                           autocomplete="phone"
+                           required
+                           class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-[#ff8b0d] focus:border-[#ff8b0d] focus:z-10 sm:text-sm"
+                           placeholder="+7 (___) ___-__-__">
+                    @error('phone')
+                    <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div x-data="{ is_pupil: @entangle('is_pupil') }" class="space-y-2">
+                    <div x-show="is_pupil == 1" x-transition>
+                        <label for="school" class="sr-only">{{ __('all.registration.fields.school') }}</label>
+                        <input wire:model="school" id="school" name="school" type="text" autocomplete="school"
+                               class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-[#ff8b0d] focus:border-[#ff8b0d] focus:z-10 sm:text-sm"
+                               placeholder="{{ __('all.registration.fields.school') }}">
+                        @error('school')
+                        <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div x-show="is_pupil == 1" x-transition>
+                        <label for="class" class="sr-only">{{ __('all.registration.fields.class') }}</label>
+                        <input wire:model="class" id="class" name="class" type="text" autocomplete="class"
+                               class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-[#ff8b0d] focus:border-[#ff8b0d] focus:z-10 sm:text-sm"
+                               placeholder="{{ __('all.registration.fields.class') }}">
+                        @error('class')
+                        <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
+                        @enderror
+                    </div>
                 </div>
                 <div>
                     <label for="gender" class="sr-only">{{ __('all.registration.fields.gender') }}</label>
                     <select wire:model="gender" id="gender" name="gender" required
-                            class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 text-gray-900 rounded-t-md focus:outline-none focus:ring-[#ff8b0d] focus:border-[#ff8b0d] focus:z-10 sm:text-sm">
+                            class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 text-gray-900 focus:outline-none focus:ring-[#ff8b0d] focus:border-[#ff8b0d] focus:z-10 sm:text-sm">
                         <option value="" disabled>{{ __('all.registration.fields.gender') }}</option>
                         <option value="male">{{ __('all.registration.fields.male') }}</option>
                         <option value="female">{{ __('all.registration.fields.female') }}</option>
@@ -52,22 +105,11 @@
                     <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
                     @enderror
                 </div>
-
-                <div>
-                    <label for="email-address" class="sr-only">{{ __('all.registration.fields.email') }}</label>
-                    <input wire:model="email" id="email-address" name="email" type="email" autocomplete="email"
-                        required
-                        class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-[#ff8b0d] focus:border-[#ff8b0d] focus:z-10 sm:text-sm"
-                        placeholder="{{ __('all.registration.fields.email') }}">
-                    @error('email')
-                        <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
-                    @enderror
-                </div>
                 <div>
                     <label for="password" class="sr-only">{{ __('all.registration.fields.password') }}</label>
                     <input wire:model="password" id="password" name="password" type="password"
                         autocomplete="new-password" required
-                        class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-[#ff8b0d] focus:border-[#ff8b0d] focus:z-10 sm:text-sm"
+                        class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-[#ff8b0d] focus:border-[#ff8b0d] focus:z-10 sm:text-sm"
                         placeholder="{{ __('all.registration.fields.password') }}">
                     @error('password')
                         <span class="text-red-500 text-xs mt-1">{{ $message }}</span>
@@ -77,7 +119,7 @@
                     <label for="password_confirmation" class="sr-only">{{ __('all.registration.fields.password_confirm') }}</label>
                     <input wire:model="password_confirmation" id="password_confirmation" name="password_confirmation"
                         type="password" autocomplete="new-password" required
-                        class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-[#ff8b0d] focus:border-[#ff8b0d] focus:z-10 sm:text-sm"
+                        class="appearance-none rounded-md relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-[#ff8b0d] focus:border-[#ff8b0d] focus:z-10 sm:text-sm"
                         placeholder="{{ __('all.registration.fields.password_confirm') }}">
                 </div>
             </div>
@@ -126,3 +168,55 @@
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const phoneInput = document.getElementById('phone');
+
+        phoneInput.value = '+7 ';
+
+        phoneInput.addEventListener('input', function(e) {
+            let value = e.target.value;
+            let numbers = value.replace(/\D/g, '');
+
+            // Ensure it starts with 7
+            if (numbers[0] !== '7') {
+                numbers = '7' + numbers;
+            }
+
+            // Limit to 11 digits (7 + 10 digits)
+            numbers = numbers.substring(0, 11);
+
+            // Format the number
+            let formatted = '+7';
+
+            if (numbers.length > 1) {
+                formatted += ' (' + numbers.substring(1, 4);
+            }
+            if (numbers.length >= 5) {
+                formatted += ') ' + numbers.substring(4, 7);
+            }
+            if (numbers.length >= 8) {
+                formatted += '-' + numbers.substring(7, 9);
+            }
+            if (numbers.length >= 10) {
+                formatted += '-' + numbers.substring(9, 11);
+            }
+
+            e.target.value = formatted;
+        });
+
+        phoneInput.addEventListener('keydown', function(e) {
+            // Prevent deleting +7 prefix
+            if (e.key === 'Backspace' && e.target.selectionStart <= 3) {
+                e.preventDefault();
+            }
+        });
+
+        phoneInput.addEventListener('focus', function(e) {
+            if (e.target.value === '') {
+                e.target.value = '+7 ';
+            }
+        });
+    });
+</script>
+

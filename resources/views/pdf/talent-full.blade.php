@@ -66,7 +66,7 @@
         </div>
 
         <!-- Single horizontal bar -->
-        <div class="flex w-full h-8 overflow-hidden mb-4 bg-gray-200 rounded">
+        <div class="flex gap-1 w-full h-8 overflow-hidden mb-4 bg-gray-200 rounded">
             @foreach ($domainScores as $domain => $score)
                 @php
                     $percentage = $percentages[$i] ?? 10; // default to 10 if more domains
@@ -80,7 +80,7 @@
         </div>
 
         <!-- Domain labels with scores and percentages -->
-        <div class="flex w-full">
+        <div class="flex gap-1 w-full">
             @foreach ($domainScores as $domain => $score)
                 @php
                     $percentage = $percentages[$j] ?? 10; // default to 10 if more domains

@@ -75,13 +75,13 @@
                             <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
                             <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
                         </svg>
-                        <a href="mailto:zhangeldi.turarbek@gmail.com" class="text-sm text-gray-500 hover:text-blue-600 transition-colors">zhangeldi.turarbek@gmail.com</a>
+                        <a href="mailto:zhangeldi.turarbek@gmail.com" class="text-sm text-gray-500 hover:text-blue-600 transition-colors">profgidkz@gmail.com</a>
                     </li>
                     <li class="flex items-start">
                         <svg class="h-5 w-5 text-gray-400 mr-2 mt-0.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm14 1H4v8l8-4 8 4V6z" clip-rule="evenodd" />
                         </svg>
-                        <span class="text-sm text-gray-500">г. Алматы, ул. Примерная 123</span>
+                        <span class="text-sm text-gray-500">г. Астана, пр. Кабанбай батыра 53/11</span>
                     </li>
                     <li class="flex items-start">
                         <svg class="h-5 w-5 text-gray-400 mr-2 mt-0.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">

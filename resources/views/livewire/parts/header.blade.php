@@ -141,6 +141,21 @@
                     {{ __('messages.nav_take_test') }}
                 </a>
 
+                <div class="border-t border-gray-200 pt-3 mt-3">
+                    <div class="px-3 py-2">
+                        <div class="flex gap-2">
+                            <a href="{{ route('locale.set', 'kk') }}"
+                               class="flex-1 px-4 py-2 text-center text-sm font-medium rounded-md transition-colors {{ session()->get('locale') == 'kk' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
+                                {{ __('messages.language_kk') }}
+                            </a>
+                            <a href="{{ route('locale.set', 'ru') }}"
+                               class="flex-1 px-4 py-2 text-center text-sm font-medium rounded-md transition-colors {{ session()->get('locale') == 'ru' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}">
+                                {{ __('messages.language_ru') }}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
                 @auth
                     <!-- Mobile user menu -->
                     <div class="border-t border-gray-200 pt-4 pb-3">

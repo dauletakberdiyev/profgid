@@ -131,17 +131,22 @@
 
 
     <section class="py-8 md:py-12 bg-white">
-        <div class="mx-auto max-w-7xl py-8 md:py-12 text-blue-700 sm:py-16 lg:py-20">
-            <div class="mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-                <div class="mx-auto max-w-2xl text-center">
-                    <h2 class="mt-2 text-2xl md:text-3xl font-bold sm:text-4xl xl:text-4xl text-gray-900 uppercase">{{ __('all.home.middle.accordion_4.title') }}</h2>
-                </div>
+        <div class="mx-auto max-w-7xl py-8 md:py-12 text-blue-700 sm:py-16 lg:py-20 space-y-8">
+            <div class="mx-auto max-w-2xl text-center">
+                <h2 class="mt-2 text-2xl md:text-3xl font-bold sm:text-4xl xl:text-4xl text-gray-900 uppercase">{{ __('all.home.middle.accordion_4.title') }}</h2>
+            </div>
+            <div class="mx-auto px-4 sm:px-6 lg:px-8 space-y-8 md:flex align-middle items-center">
                 <div class="w-full">
-                    <div class="text-gray-600 text-lg">
+                    <div class="text-gray-600 text-md md:text-lg">
                         <ul>
                             {!! __('all.home.middle.accordion_4.desc') !!}
                         </ul>
                     </div>
+                </div>
+                <div>
+                    <img src="{{ asset('assets/images/screens.png') }}"
+                         class="w-full h-auto"
+                         alt="">
                 </div>
             </div>
         </div>

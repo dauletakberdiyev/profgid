@@ -280,10 +280,12 @@ return [
             'school' => 'Мектеп',
             'class' => 'Сынып',
             'name' => 'Аты',
+            'surname' => 'Жөні',
             'gender' => 'Жынысы',
             'male' => 'Ұл',
             'female' => 'Қыз',
             'email' => 'Email',
+            'phone' => 'Телефон',
             'password' => 'Құпия сөз',
             'password_confirm' => 'Құпия сөз растау'
         ],
