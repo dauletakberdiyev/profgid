@@ -10,7 +10,11 @@ use Livewire\Component;
 class Profile extends Component
 {
     public $name = '';
+    public $school = null;
+    public $class = null;
     public $email = '';
+    public $gender = null;
+    public $isPupil = true;
     public $current_password = '';
     public $password = '';
     public $password_confirmation = '';
@@ -19,20 +23,29 @@ class Profile extends Component
 
     protected $rules = [
         'name' => 'required|min:2',
+        'school' => 'nullable',
+        'class' => 'nullable',
+        'gender' => 'required|in:male,female',
         'email' => 'required|email',
     ];
 
     public function mount()
     {
+        /** @var User $user */
         $user = Auth::user();
         $this->name = $user->name;
+        $this->school = $user->school;
+        $this->class = $user->class;
         $this->email = $user->email;
+        $this->isPupil = (bool) $user->is_pupil;
+        $this->gender = $user->gender;
     }
 
     public function updateProfile()
     {
         $this->validate();
 
+        /** @var User $user */
         $user = Auth::user();
 
         // Check if email is changed and if it's unique
@@ -43,7 +56,10 @@ class Profile extends Component
         }
 
         $user->name = $this->name;
+        $user->school = $this->school;
+        $user->class = $this->class;
         $user->email = $this->email;
+        $user->gender = $this->gender;
         $user->save();
 
         session()->flash('message', 'Профиль успешно обновлен');
@@ -104,13 +120,13 @@ class Profile extends Component
         // Удаляем связанные данные пользователя
         $user->userAnswers()->delete();
         $user->testSessions()->delete();
-        
+
         // Удаляем самого пользователя
         $user->delete();
 
         // Выходим из системы и перенаправляем на главную
         Auth::logout();
-        
+
         return redirect('/')->with('message', 'Аккаунт успешно удален');
     }
 
