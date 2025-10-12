@@ -59,7 +59,7 @@ class GrantAnalysis extends Component
 
         // Тестовые данные для университетов и специальностей
         $testData = $this->getTestData();
-        
+
         // Фильтруем по выбранным предметам
         $filtered = collect($testData)->filter(function($university) {
             return collect($university['specialities'])->filter(function($speciality) {
@@ -70,7 +70,7 @@ class GrantAnalysis extends Component
                     $speciality['subject_4'] ?? null,
                     $speciality['subject_5'] ?? null,
                 ]);
-                
+
                 // Проверяем, совпадает ли хотя бы один предмет
                 foreach ($requiredSubjects as $subject) {
                     if (in_array($subject, $this->selectedSubjects)) {
@@ -92,7 +92,7 @@ class GrantAnalysis extends Component
                     $speciality['subject_4'] ?? null,
                     $speciality['subject_5'] ?? null,
                 ]);
-                
+
                 // Проверяем совпадение предметов
                 foreach ($requiredSubjects as $subject) {
                     if (in_array($subject, $this->selectedSubjects)) {
@@ -139,7 +139,8 @@ class GrantAnalysis extends Component
             'Льготные категории' => ['Серпін', 'Мүгедектігі бар адамдар', 'Жетім балалар'],
         ];
 
-        return view('livewire.grant-analysis', compact('cities', 'commonCombinations'));
+//        return view('livewire.grant-analysis', compact('cities', 'commonCombinations'));
+        return view('livewire.grant-analysis-in-process');
     }
 
     private function getTestData()

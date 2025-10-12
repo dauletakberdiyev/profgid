@@ -81,13 +81,13 @@
                         <svg class="h-5 w-5 text-gray-400 mr-2 mt-0.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm14 1H4v8l8-4 8 4V6z" clip-rule="evenodd" />
                         </svg>
-                        <span class="text-sm text-gray-500">г. Астана, пр. Кабанбай батыра 53/11</span>
+                        <span class="text-sm text-gray-500">г. Астана, пр. Кабанбай батыра 53/10</span>
                     </li>
                     <li class="flex items-start">
                         <svg class="h-5 w-5 text-gray-400 mr-2 mt-0.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                             <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
                         </svg>
-                        <a href="tel:+77072170555" class="text-sm text-gray-500 hover:text-blue-600 transition-colors">+7 705 394 0555</a>
+                        <a href="tel:+77072170555" class="text-sm text-gray-500 hover:text-blue-600 transition-colors">+7 777 394 0555</a>
                     </li>
                 </ul>
             </div>
