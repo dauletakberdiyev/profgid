@@ -44,7 +44,7 @@ class PaymentStatus extends Component
 
             // Make API request to ForteBank
             $response = Http::timeout(30)
-                ->withBasicAuth('TerminalSys/OMAROVA28000381', 'OMAROVA28000381@1498')
+                ->withBasicAuth('TerminalSys/PROFGID28000410', 'PROFGID28000410@0118')
                 ->withHeaders([
                     'Content-Type' => 'application/json',
                     'Accept' => 'application/json'

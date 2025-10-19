@@ -79,22 +79,6 @@
                         @enderror
                     </div>
                     @endif
-
-                    <div>
-                        <label for="gender" class="block text-sm font-medium text-gray-700 mb-2">{{ __('all.registration.fields.gender') }}</label>
-                        <select wire:model="gender"
-                                id="gender"
-                                name="gender"
-                                required
-                                class="w-full px-0 py-3 text-gray-900 border-0 border-b border-gray-200 focus:border-blue-500 focus:ring-0 bg-transparent appearance-none cursor-pointer transition-colors duration-200">
-                            <option value="" disabled>{{ __('all.registration.fields.gender') }}</option>
-                            <option value="male">{{ __('all.registration.fields.male') }}</option>
-                            <option value="female">{{ __('all.registration.fields.female') }}</option>
-                        </select>
-                        @error('gender')
-                        <p class="mt-2 text-sm text-red-500">{{ $message }}</p>
-                        @enderror
-                    </div>
                 </div>
 
                 <div class="pt-4">

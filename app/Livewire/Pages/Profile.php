@@ -13,7 +13,6 @@ class Profile extends Component
     public $school = null;
     public $class = null;
     public $email = '';
-    public $gender = null;
     public $isPupil = true;
     public $current_password = '';
     public $password = '';
@@ -25,7 +24,6 @@ class Profile extends Component
         'name' => 'required|min:2',
         'school' => 'nullable',
         'class' => 'nullable',
-        'gender' => 'required|in:male,female',
         'email' => 'required|email',
     ];
 
@@ -38,7 +36,6 @@ class Profile extends Component
         $this->class = $user->class;
         $this->email = $user->email;
         $this->isPupil = (bool) $user->is_pupil;
-        $this->gender = $user->gender;
     }
 
     public function updateProfile()
@@ -59,7 +56,6 @@ class Profile extends Component
         $user->school = $this->school;
         $user->class = $this->class;
         $user->email = $this->email;
-        $user->gender = $this->gender;
         $user->save();
 
         session()->flash('message', 'Профиль успешно обновлен');
