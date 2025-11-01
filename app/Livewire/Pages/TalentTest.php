@@ -107,7 +107,7 @@ class TalentTest extends Component
         session()->flash('message', 'Ваш тест завершен! Выберите тарифный план для получения результатов.');
         session()->put('last_test_session_id', $this->testSessionId);
 
-        return redirect()->route('payment', ['sessionId' => $this->testSessionId]);
+        return redirect()->route('payment-status', ['sessionId' => $this->testSessionId, 'plan' => 'talents_spheres_professions']);
     }
 
     public function render()

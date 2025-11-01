@@ -6,6 +6,7 @@ use App\Filament\Resources\PromoCodeResource\Pages;
 use App\Models\PromoCode;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -43,10 +44,14 @@ class PromoCodeResource extends Resource
                             ->validationMessages([
                                 'length' => 'Код должен быть длиной 6 символов',
                             ]),
-                        Forms\Components\Select::make('type')
-                            ->label('Тип')
-                            ->reactive()
-                            ->options(['full' => 'Полная оплата', 'half' => 'Половина оплаты']),
+//                        Forms\Components\Select::make('type')
+//                            ->label('Тип')
+//                            ->reactive()
+//                            ->options(['full' => 'Полная оплата', 'half' => 'Половина оплаты']),
+
+                        Forms\Components\TextInput::make('discount')
+                            ->label('Процент скидки')
+                            ->default(0),
 
                         Forms\Components\Textarea::make('description')
                             ->label('Описание')
@@ -61,21 +66,30 @@ class PromoCodeResource extends Resource
 
                 Forms\Components\Section::make('Настройки использования')
                     ->schema([
-                        Forms\Components\TextInput::make('max_uses')
-                            ->label('Максимальное количество использований')
-                            ->numeric()
-                            ->default(1)
-                            ->minValue(1)
-                            ->maxValue(1000)
-                            ->helperText('Сколько раз можно использовать этот промокод'),
+                        Forms\Components\Checkbox::make('unlimited_uses')
+                            ->label('Неограниченное количество использований')
+                            ->default(false)
+                            ->live()
+                            ->helperText('Включите, чтобы промокод можно было использовать неограниченное количество раз'),
+
+//                        Forms\Components\TextInput::make('max_uses')
+//                            ->label('Максимальное количество использований')
+//                            ->numeric()
+//                            ->default(1)
+//                            ->minValue(1)
+//                            ->maxValue(1000)
+//                            ->helperText('Сколько раз можно использовать этот промокод')
+//                            ->disabled(fn (Get $get) => $get('unlimited_uses'))
+//                            ->dehydrated(fn (Get $get) => !$get('unlimited_uses'))
+//                            ->required(fn (Get $get) => !$get('unlimited_uses')),
 
                         Forms\Components\DateTimePicker::make('expires_at')
                             ->label('Дата истечения')
                             ->nullable()
                             ->helperText('Оставьте пустым для бессрочного промокода')
                             ->minDate(now()),
-                    ])
-                    ->visible(fn (callable $get) => $get('type') === 'full'),
+                    ]),
+//                    ->visible(fn (callable $get) => $get('type') === 'full'),
 
                 Forms\Components\Section::make('Статистика использования')
                     ->schema([

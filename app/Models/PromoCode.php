@@ -20,7 +20,9 @@ class PromoCode extends Model
         'max_uses',
         'current_uses',
         'expires_at',
-        'type'
+        'type',
+        'discount',
+        'unlimited_uses'
     ];
 
     protected $casts = [
@@ -30,6 +32,8 @@ class PromoCode extends Model
         'expires_at' => 'datetime',
         'max_uses' => 'integer',
         'current_uses' => 'integer',
+        'discount' => 'integer',
+        'unlimited_uses' => 'integer'
     ];
 
     /**
@@ -103,23 +107,21 @@ class PromoCode extends Model
     public function markAsUsed($userId)
     {
         // Attach user to promo code
-        if (!$this->hasBeenUsedBy($userId)) {
-            $this->users()->attach($userId, [
-                'used_at' => now(),
-            ]);
+//        if (!$this->hasBeenUsedBy($userId)) {
+//            $this->users()->attach($userId, [
+//                'used_at' => now(),
+//            ]);
 
             // Increment current uses
             $this->increment('current_uses');
 
             // Update legacy fields for backwards compatibility
             $this->update([
-                'is_used' => ($this->type !== 'half')
-                    ? $this->current_uses >= ($this->max_uses ?? 1)
-                    : 0,
+                'is_used' => 1,
                 'used_by' => $userId,
                 'used_at' => now(),
             ]);
-        }
+//        }
     }
 
     /**

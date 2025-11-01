@@ -69,7 +69,7 @@
                             <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{__('all.test_history.headers.date')}}</th>
                             <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{__('all.test_history.headers.school')}}</th>
                             <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{__('all.test_history.headers.class')}}</th>
-                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{__('all.test_history.headers.tariff')}}</th>
+{{--                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{__('all.test_history.headers.tariff')}}</th>--}}
                             <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{__('all.test_history.headers.action')}}</th>
                         </tr>
                     </thead>
@@ -100,19 +100,19 @@
                                 <td class="px-4 py-3">
                                     <div class="text-sm text-gray-600">{{ $test['class'] }}</div>
                                 </td>
-                                <td class="px-4 py-3">
-                                    @if($test['selected_plan'])
-                                        @if($test['selected_plan'] === 'talents')
-                                            <span class="inline-flex px-2 py-1 text-xs font-medium rounded-lg bg-gray-100 text-gray-700">{{ __('all.payment.cards.middle.title') }}</span>
-                                        @elseif($test['selected_plan'] === 'talents_spheres')
-                                            <span class="inline-flex px-2 py-1 text-xs font-medium rounded-lg bg-blue-100 text-blue-700">{{ __('all.payment.cards.bottom.title') }}</span>
-                                        @elseif($test['selected_plan'] === 'talents_spheres_professions')
-                                            <span class="inline-flex px-2 py-1 text-xs font-medium rounded-lg bg-purple-100 text-purple-700">{{ __('all.payment.cards.top.title') }}</span>
-                                        @else
-                                            <span class="text-sm text-gray-400">—</span>
-                                        @endif
-                                    @endif
-                                </td>
+{{--                                <td class="px-4 py-3">--}}
+{{--                                    @if($test['selected_plan'])--}}
+{{--                                        @if($test['selected_plan'] === 'talents')--}}
+{{--                                            <span class="inline-flex px-2 py-1 text-xs font-medium rounded-lg bg-gray-100 text-gray-700">{{ __('all.payment.cards.middle.title') }}</span>--}}
+{{--                                        @elseif($test['selected_plan'] === 'talents_spheres')--}}
+{{--                                            <span class="inline-flex px-2 py-1 text-xs font-medium rounded-lg bg-blue-100 text-blue-700">{{ __('all.payment.cards.bottom.title') }}</span>--}}
+{{--                                        @elseif($test['selected_plan'] === 'talents_spheres_professions')--}}
+{{--                                            <span class="inline-flex px-2 py-1 text-xs font-medium rounded-lg bg-purple-100 text-purple-700">{{ __('all.payment.cards.top.title') }}</span>--}}
+{{--                                        @else--}}
+{{--                                            <span class="text-sm text-gray-400">—</span>--}}
+{{--                                        @endif--}}
+{{--                                    @endif--}}
+{{--                                </td>--}}
                                 <td class="px-4 py-3">
                                     @if(empty($test['action_url']))
                                         <span
@@ -125,13 +125,13 @@
                                             {{ $test['action_text'] }}
                                         </a>
                                     @endif
-                                    @if($test['selected_plan'] !== 'talents_spheres_professions' && $test['payment_status'] === 'completed')
-                                        <span class="text-sm text-gray-600">|</span>
-                                        <a href="{{route('payment', ['sessionId' => $test['session_id']])}}"
-                                           class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors">
-                                            {{ __('all.test_history.actions.change_tariff') }}
-                                        </a>
-                                    @endif
+{{--                                    @if($test['selected_plan'] !== 'talents_spheres_professions' && $test['payment_status'] === 'completed')--}}
+{{--                                        <span class="text-sm text-gray-600">|</span>--}}
+{{--                                        <a href="{{route('payment', ['sessionId' => $test['session_id']])}}"--}}
+{{--                                           class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors">--}}
+{{--                                            {{ __('all.test_history.actions.change_tariff') }}--}}
+{{--                                        </a>--}}
+{{--                                    @endif--}}
                                 </td>
                             </tr>
                         @empty
@@ -167,33 +167,33 @@
                     </div>
 
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                        <div class="flex items-center gap-4 text-xs text-gray-600">
-                            <span>{{ __('all.test_history.tariff') }}</span>
-                            @if($test['selected_plan'])
-                                @if($test['selected_plan'] === 'talents')
-                                    <span class="inline-flex px-2 py-1 text-xs font-medium rounded-lg bg-gray-100 text-gray-700">{{ __('all.payment.cards.middle.title') }}</span>
-                                @elseif($test['selected_plan'] === 'talents_spheres')
-                                    <span class="inline-flex px-2 py-1 text-xs font-medium rounded-lg bg-blue-100 text-blue-700">{{ __('all.payment.cards.bottom.title') }}</span>
-                                @elseif($test['selected_plan'] === 'talents_spheres_professions')
-                                    <span class="inline-flex px-2 py-1 text-xs font-medium rounded-lg bg-purple-100 text-purple-700">{{ __('all.payment.cards.top.title') }}</span>
-                                @else
-                                    <span class="text-sm text-gray-400">—</span>
-                                @endif
-                            @endif
+{{--                        <div class="flex items-center gap-4 text-xs text-gray-600">--}}
+{{--                            <span>{{ __('all.test_history.tariff') }}</span>--}}
+{{--                            @if($test['selected_plan'])--}}
+{{--                                @if($test['selected_plan'] === 'talents')--}}
+{{--                                    <span class="inline-flex px-2 py-1 text-xs font-medium rounded-lg bg-gray-100 text-gray-700">{{ __('all.payment.cards.middle.title') }}</span>--}}
+{{--                                @elseif($test['selected_plan'] === 'talents_spheres')--}}
+{{--                                    <span class="inline-flex px-2 py-1 text-xs font-medium rounded-lg bg-blue-100 text-blue-700">{{ __('all.payment.cards.bottom.title') }}</span>--}}
+{{--                                @elseif($test['selected_plan'] === 'talents_spheres_professions')--}}
+{{--                                    <span class="inline-flex px-2 py-1 text-xs font-medium rounded-lg bg-purple-100 text-purple-700">{{ __('all.payment.cards.top.title') }}</span>--}}
+{{--                                @else--}}
+{{--                                    <span class="text-sm text-gray-400">—</span>--}}
+{{--                                @endif--}}
+{{--                            @endif--}}
 
-                        </div>
+{{--                        </div>--}}
 
                         <div class="flex w-full justify-between items-center">
                             <a href="{{ $test['action_url'] }}"
                                class="inline-flex w-full items-center justify-center px-3 py-1.5 text-xs font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors">
                                 {{ $test['action_text'] }}
                             </a>
-                            @if($test['selected_plan'] !== 'talents_spheres_professions' && $test['payment_status'] === 'completed')
-                                <a href="{{route('payment', ['sessionId' => $test['session_id']])}}"
-                                   class="inline-flex w-full items-center justify-center px-3 py-1.5 text-xs font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors">
-                                    {{ __('all.test_history.actions.change_tariff') }}
-                                </a>
-                            @endif
+{{--                            @if($test['selected_plan'] !== 'talents_spheres_professions' && $test['payment_status'] === 'completed')--}}
+{{--                                <a href="{{route('payment', ['sessionId' => $test['session_id']])}}"--}}
+{{--                                   class="inline-flex w-full items-center justify-center px-3 py-1.5 text-xs font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors">--}}
+{{--                                    {{ __('all.test_history.actions.change_tariff') }}--}}
+{{--                                </a>--}}
+{{--                            @endif--}}
                         </div>
                     </div>
                 </div>

@@ -66,14 +66,15 @@ class TalentTestController extends Controller
                     'answered_questions' => count($answersToSave),
                     'completion_percentage' => 100,
                     'status' => 'completed',
-                    'completed_at' => now()
+                    'completed_at' => now(),
+                    'selected_plan' => 'talents_spheres_professions'
                 ]);
             }
 
             return response()->json([
                 'success' => true,
                 'message' => 'Тест успешно завершен!',
-                'redirect_url' => route('payment', ['sessionId' => $testSessionId])
+                'redirect_url' => route('payment-status', ['sessionId' => $testSessionId, 'plan' => 'talents_spheres_professions'])
             ]);
 
         } catch (\Exception $e) {

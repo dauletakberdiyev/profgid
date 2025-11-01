@@ -20,8 +20,28 @@
 {{--            </div>--}}
 
             <h1 class="text-2xl md:text-3xl lg:text-4xl font-light text-gray-900 mb-4">{{ __('all.payment_status.title') }}</h1>
-            <h2 class="text-xl md:text-2xl font-medium text-gray-800 mb-2">{{ $plans[$plan]['name'] }}</h2>
-            <p class="text-2xl md:text-3xl font-light text-gray-900">{{ number_format($plans[$plan]['price']) }} {{ $plans[$plan]['currency'] }}</p>
+{{--            <h2 class="text-xl md:text-2xl font-medium text-gray-800 mb-2">{{ $plans[$plan]['name'] }}</h2>--}}
+            <p class="text-2xl md:text-3xl font-normal text-gray-900">{{ number_format($plans[$plan]['price']) }} {{ $plans[$plan]['currency'] }}</p>
+            @if(!$halfDiscount && !$paymentConfirmed)
+            <div class="mt-6 mx-auto max-w-2xl">
+                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-6 shadow-sm">
+                    <p class="text-gray-800 text-lg leading-relaxed">
+                        {{ __('all.payment_status.promo.title') }}<br>
+                        <span class="text-2xl font-bold text-blue-600">{{ __('all.payment_status.promo.price') }}</span> {{ __('all.payment_status.promo.text') }}
+                        <span class="inline-block bg-blue-600 text-white px-3 py-1 rounded-lg font-mono font-semibold text-lg mx-1">{{ __('all.payment_status.promo.code') }}</span>
+                    </p>
+
+                    <div class="mt-4 flex flex-col items-center justify-center gap-2">
+                        <p class="text-red-600 font-semibold mt-3 text-base">
+                            {{ __('all.payment_status.promo.warning') }}
+                        </p>
+                        <div class="flex items-center gap-1 px-4 py-2 rounded-lg font-mono text-xl font-bold">
+                            <span id="minutes">10</span>:<span id="seconds">00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
         </div>
 
         @if(session('success'))
@@ -47,6 +67,199 @@
         @endif
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- Payment Confirmation -->
+            <div class="bg-white border border-gray-100 rounded-2xl p-6 md:p-8 shadow-sm">
+                <h3 class="text-xl font-medium text-gray-900 mb-6">{{ __('all.payment_status.activation.title') }}</h3>
+
+                @if(!$paymentConfirmed && $testSession->payment_status != 'completed' && !$halfDiscount)
+                    <form wire:submit.prevent="confirmPayment">
+                        <!-- PIN Input Fields -->
+                        <div class="mb-6" x-data="{
+                            handleInput(event, index) {
+                                if (event.target.value.length === 1 && index < 6) {
+                                    this.$refs['pin' + (index + 1)]?.focus();
+                                }
+                            },
+                            handleKeydown(event, index) {
+                                if (event.key === 'Backspace' && event.target.value === '' && index > 1) {
+                                    this.$refs['pin' + (index - 1)]?.focus();
+                                }
+                            },
+                            handlePaste(event) {
+                                event.preventDefault();
+                                const paste = (event.clipboardData || window.clipboardData).getData('text');
+                                const digits = paste.replace(/\D/g, '').slice(0, 6);
+                                for (let i = 0; i < digits.length && i < 6; i++) {
+                                    this.$refs['pin' + (i + 1)].value = digits[i];
+                                    this.$refs['pin' + (i + 1)].dispatchEvent(new Event('input'));
+                                }
+                                if (digits.length > 0) {
+                                    this.$refs['pin' + Math.min(digits.length, 6)]?.focus();
+                                }
+                            }
+                        }">
+                            <div class="flex justify-center gap-3 mb-4">
+                                <input type="text"
+                                       wire:model="pin1"
+                                       x-ref="pin1"
+                                       maxlength="1"
+                                       class="w-10 h-10 md:w-12 md:h-12 text-center text-lg font-medium border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                       @input="handleInput($event, 1)"
+                                       @keydown="handleKeydown($event, 1)"
+                                       @paste="handlePaste($event)">
+                                <input type="text"
+                                       wire:model="pin2"
+                                       x-ref="pin2"
+                                       maxlength="1"
+                                       class="w-10 h-10 md:w-12 md:h-12 text-center text-lg font-medium border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                       @input="handleInput($event, 2)"
+                                       @keydown="handleKeydown($event, 2)"
+                                       @paste="handlePaste($event)">
+                                <input type="text"
+                                       wire:model="pin3"
+                                       x-ref="pin3"
+                                       maxlength="1"
+                                       class="w-10 h-10 md:w-12 md:h-12 text-center text-lg font-medium border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                       @input="handleInput($event, 3)"
+                                       @keydown="handleKeydown($event, 3)"
+                                       @paste="handlePaste($event)">
+                                <input type="text"
+                                       wire:model="pin4"
+                                       x-ref="pin4"
+                                       maxlength="1"
+                                       class="w-10 h-10 md:w-12 md:h-12 text-center text-lg font-medium border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                       @input="handleInput($event, 4)"
+                                       @keydown="handleKeydown($event, 4)"
+                                       @paste="handlePaste($event)">
+                                <input type="text"
+                                       wire:model="pin5"
+                                       x-ref="pin5"
+                                       maxlength="1"
+                                       class="w-10 h-10 md:w-12 md:h-12 text-center text-lg font-medium border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                       @input="handleInput($event, 5)"
+                                       @keydown="handleKeydown($event, 5)"
+                                       @paste="handlePaste($event)">
+                                <input type="text"
+                                       wire:model="pin6"
+                                       x-ref="pin6"
+                                       maxlength="1"
+                                       class="w-10 h-10 md:w-12 md:h-12 text-center text-lg font-medium border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                       @keydown="handleKeydown($event, 6)"
+                                       @paste="handlePaste($event)">
+                            </div>
+                            <div class="text-center">
+                                <button type="submit"
+                                        class="px-8 py-3 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-colors font-medium">
+                                    <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    {{ __('all.payment_status.activation.btn') }}
+                                </button>
+                            </div>
+                            @error('pin1')
+                            <p class="text-red-500 text-sm mt-2 text-center">{{ $message }}</p>
+                            @enderror
+                            @error('pin2')
+                            <p class="text-red-500 text-sm mt-2 text-center">{{ $message }}</p>
+                            @enderror
+                            @error('pin3')
+                            <p class="text-red-500 text-sm mt-2 text-center">{{ $message }}</p>
+                            @enderror
+                            @error('pin4')
+                            <p class="text-red-500 text-sm mt-2 text-center">{{ $message }}</p>
+                            @enderror
+                            @error('pin5')
+                            <p class="text-red-500 text-sm mt-2 text-center">{{ $message }}</p>
+                            @enderror
+                            @error('pin6')
+                            <p class="text-red-500 text-sm mt-2 text-center">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <!-- No Code Section -->
+                        <div class="text-center">
+                            <p class="text-gray-600 mb-4">{{ __('all.payment_status.activation.no_code') }}</p>
+                            <button type="button"
+                                    wire:click="getPromoCode"
+                                    class="w-full py-3 px-6 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors font-medium">
+                                {{ __('all.payment_status.activation.get_code') }}
+                            </button>
+                        </div>
+                    </form>
+
+                    {{--                @elseif($testSession->payment_status === 'processing')--}}
+                    {{--                    <div class="text-center py-8">--}}
+                    {{--                        <div class="w-16 h-16 bg-blue-100 rounded-full mx-auto mb-4 flex items-center justify-center">--}}
+                    {{--                            <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">--}}
+                    {{--                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>--}}
+                    {{--                            </svg>--}}
+                    {{--                        </div>--}}
+                    {{--                        <h4 class="text-lg font-medium text-gray-900 mb-2">Обработка оплаты</h4>--}}
+                    {{--                        <p class="text-gray-600 mb-4">Ваша оплата обрабатывается. Пожалуйста, подождите...</p>--}}
+                    {{--                        <button wire:click="checkPaymentStatusWithForteBank"--}}
+                    {{--                                class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm">--}}
+                    {{--                            Проверить статус--}}
+                    {{--                        </button>--}}
+                    {{--                    </div>--}}
+
+                @elseif($testSession->payment_status === 'review')
+                    <div class="text-center py-8">
+                        <div class="w-16 h-16 bg-blue-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                            <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <h4 class="text-lg font-medium text-gray-900 mb-2">{{ __('all.payment_status.review.title') }}</h4>
+                        <p class="text-gray-600">{{ __('all.payment_status.review.desc') }}</p>
+                    </div>
+
+                @elseif($testSession->payment_status === 'completed')
+                    <div class="text-center py-8">
+                        <div class="w-16 h-16 bg-green-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                            <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        </div>
+                        <h4 class="text-lg font-medium text-gray-900 mb-2">{{ __('all.payment_status.complete.title') }}</h4>
+                        <p class="text-gray-600 mb-4">{{ __('all.payment_status.complete.desc') }}</p>
+                        <a href="{{ route('talent-test-results') }}"
+                           class="inline-flex items-center px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
+                            {{ __('all.payment_status.complete.btn') }}
+                        </a>
+                    </div>
+
+                @elseif($testSession->payment_status === 'failed')
+                    <div class="text-center py-8">
+                        <div class="w-16 h-16 bg-red-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                            <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </div>
+                        <h4 class="text-lg font-medium text-gray-900 mb-2">{{ __('all.payment_status.fail.title') }}</h4>
+                        <p class="text-gray-600 mb-4">{{ __('all.payment_status.fail.desc') }}</p>
+                        <button wire:click="processCardPayment"
+                                class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm mr-2">
+                            {{ __('all.payment_status.fail.retry_btn') }}
+                        </button>
+                        <button wire:click="getPromoCode"
+                                class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm">
+                            {{ __('all.payment_status.fail.contact_btn') }}
+                        </button>
+                    </div>
+
+                @elseif($halfDiscount)
+                    <div class="text-center py-8">
+                        <div class="w-16 h-16 bg-green-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                            <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        </div>
+                        <h4 class="text-lg font-medium text-gray-900 mb-2">{{ __('all.payment_status.half_discount.title') }}</h4>
+                        <p class="text-gray-600 mb-4">{{ __('all.payment_status.half_discount.desc') }}</p>
+                    </div>
+                @endif
+            </div>
+
             <!-- Payment Options -->
             <div class="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100" x-data="{
                 kaspiOpen: false,
@@ -160,200 +373,116 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Payment Confirmation -->
-            <div class="bg-white border border-gray-100 rounded-2xl p-6 md:p-8 shadow-sm">
-                <h3 class="text-xl font-medium text-gray-900 mb-6">{{ __('all.payment_status.activation.title') }}</h3>
-
-                @if(!$paymentConfirmed && $testSession->payment_status != 'completed' && !$halfDiscount)
-                    <form wire:submit.prevent="confirmPayment">
-                        <!-- PIN Input Fields -->
-                        <div class="mb-6" x-data="{
-                            handleInput(event, index) {
-                                if (event.target.value.length === 1 && index < 6) {
-                                    this.$refs['pin' + (index + 1)]?.focus();
-                                }
-                            },
-                            handleKeydown(event, index) {
-                                if (event.key === 'Backspace' && event.target.value === '' && index > 1) {
-                                    this.$refs['pin' + (index - 1)]?.focus();
-                                }
-                            },
-                            handlePaste(event) {
-                                event.preventDefault();
-                                const paste = (event.clipboardData || window.clipboardData).getData('text');
-                                const digits = paste.replace(/\D/g, '').slice(0, 6);
-                                for (let i = 0; i < digits.length && i < 6; i++) {
-                                    this.$refs['pin' + (i + 1)].value = digits[i];
-                                    this.$refs['pin' + (i + 1)].dispatchEvent(new Event('input'));
-                                }
-                                if (digits.length > 0) {
-                                    this.$refs['pin' + Math.min(digits.length, 6)]?.focus();
-                                }
-                            }
-                        }">
-                            <div class="flex justify-center gap-3 mb-4">
-                                <input type="text"
-                                       wire:model="pin1"
-                                       x-ref="pin1"
-                                       maxlength="1"
-                                       class="w-10 h-10 md:w-12 md:h-12 text-center text-lg font-medium border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                                       @input="handleInput($event, 1)"
-                                       @keydown="handleKeydown($event, 1)"
-                                       @paste="handlePaste($event)">
-                                <input type="text"
-                                       wire:model="pin2"
-                                       x-ref="pin2"
-                                       maxlength="1"
-                                       class="w-10 h-10 md:w-12 md:h-12 text-center text-lg font-medium border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                                       @input="handleInput($event, 2)"
-                                       @keydown="handleKeydown($event, 2)"
-                                       @paste="handlePaste($event)">
-                                <input type="text"
-                                       wire:model="pin3"
-                                       x-ref="pin3"
-                                       maxlength="1"
-                                       class="w-10 h-10 md:w-12 md:h-12 text-center text-lg font-medium border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                                       @input="handleInput($event, 3)"
-                                       @keydown="handleKeydown($event, 3)"
-                                       @paste="handlePaste($event)">
-                                <input type="text"
-                                       wire:model="pin4"
-                                       x-ref="pin4"
-                                       maxlength="1"
-                                       class="w-10 h-10 md:w-12 md:h-12 text-center text-lg font-medium border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                                       @input="handleInput($event, 4)"
-                                       @keydown="handleKeydown($event, 4)"
-                                       @paste="handlePaste($event)">
-                                <input type="text"
-                                       wire:model="pin5"
-                                       x-ref="pin5"
-                                       maxlength="1"
-                                       class="w-10 h-10 md:w-12 md:h-12 text-center text-lg font-medium border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                                       @input="handleInput($event, 5)"
-                                       @keydown="handleKeydown($event, 5)"
-                                       @paste="handlePaste($event)">
-                                <input type="text"
-                                       wire:model="pin6"
-                                       x-ref="pin6"
-                                       maxlength="1"
-                                       class="w-10 h-10 md:w-12 md:h-12 text-center text-lg font-medium border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                                       @keydown="handleKeydown($event, 6)"
-                                       @paste="handlePaste($event)">
-                            </div>
-                            <div class="text-center">
-                                <button type="submit"
-                                        class="px-8 py-3 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-colors font-medium">
-                                    <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                    </svg>
-                                    {{ __('all.payment_status.activation.btn') }}
-                                </button>
-                            </div>
-                            @error('pin1')
-                                <p class="text-red-500 text-sm mt-2 text-center">{{ $message }}</p>
-                            @enderror
-                            @error('pin2')
-                                <p class="text-red-500 text-sm mt-2 text-center">{{ $message }}</p>
-                            @enderror
-                            @error('pin3')
-                                <p class="text-red-500 text-sm mt-2 text-center">{{ $message }}</p>
-                            @enderror
-                            @error('pin4')
-                                <p class="text-red-500 text-sm mt-2 text-center">{{ $message }}</p>
-                            @enderror
-                            @error('pin5')
-                                <p class="text-red-500 text-sm mt-2 text-center">{{ $message }}</p>
-                            @enderror
-                            @error('pin6')
-                                <p class="text-red-500 text-sm mt-2 text-center">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <!-- No Code Section -->
-                        <div class="text-center">
-                            <p class="text-gray-600 mb-4">{{ __('all.payment_status.activation.no_code') }}</p>
-                            <button type="button"
-                                    wire:click="getPromoCode"
-                                    class="w-full py-3 px-6 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors font-medium">
-                                {{ __('all.payment_status.activation.get_code') }}
-                            </button>
-                        </div>
-                    </form>
-
-{{--                @elseif($testSession->payment_status === 'processing')--}}
-{{--                    <div class="text-center py-8">--}}
-{{--                        <div class="w-16 h-16 bg-blue-100 rounded-full mx-auto mb-4 flex items-center justify-center">--}}
-{{--                            <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">--}}
-{{--                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>--}}
-{{--                            </svg>--}}
-{{--                        </div>--}}
-{{--                        <h4 class="text-lg font-medium text-gray-900 mb-2">Обработка оплаты</h4>--}}
-{{--                        <p class="text-gray-600 mb-4">Ваша оплата обрабатывается. Пожалуйста, подождите...</p>--}}
-{{--                        <button wire:click="checkPaymentStatusWithForteBank"--}}
-{{--                                class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm">--}}
-{{--                            Проверить статус--}}
-{{--                        </button>--}}
-{{--                    </div>--}}
-
-                @elseif($testSession->payment_status === 'review')
-                    <div class="text-center py-8">
-                        <div class="w-16 h-16 bg-blue-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-                            <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                        </div>
-                        <h4 class="text-lg font-medium text-gray-900 mb-2">{{ __('all.payment_status.review.title') }}</h4>
-                        <p class="text-gray-600">{{ __('all.payment_status.review.desc') }}</p>
-                    </div>
-
-                @elseif($testSession->payment_status === 'completed')
-                    <div class="text-center py-8">
-                        <div class="w-16 h-16 bg-green-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-                            <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                            </svg>
-                        </div>
-                        <h4 class="text-lg font-medium text-gray-900 mb-2">{{ __('all.payment_status.complete.title') }}</h4>
-                        <p class="text-gray-600 mb-4">{{ __('all.payment_status.complete.desc') }}</p>
-                        <a href="{{ route('talent-test-results') }}"
-                           class="inline-flex items-center px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors">
-                            {{ __('all.payment_status.complete.btn') }}
-                        </a>
-                    </div>
-
-                @elseif($testSession->payment_status === 'failed')
-                    <div class="text-center py-8">
-                        <div class="w-16 h-16 bg-red-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-                            <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                        </div>
-                        <h4 class="text-lg font-medium text-gray-900 mb-2">{{ __('all.payment_status.fail.title') }}</h4>
-                        <p class="text-gray-600 mb-4">{{ __('all.payment_status.fail.desc') }}</p>
-                        <button wire:click="processCardPayment"
-                                class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm mr-2">
-                            {{ __('all.payment_status.fail.retry_btn') }}
-                        </button>
-                        <button wire:click="getPromoCode"
-                                class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors text-sm">
-                            {{ __('all.payment_status.fail.contact_btn') }}
-                        </button>
-                    </div>
-
-                @elseif($halfDiscount)
-                    <div class="text-center py-8">
-                        <div class="w-16 h-16 bg-green-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-                            <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                            </svg>
-                        </div>
-                        <h4 class="text-lg font-medium text-gray-900 mb-2">{{ __('all.payment_status.half_discount.title') }}</h4>
-                        <p class="text-gray-600 mb-4">{{ __('all.payment_status.half_discount.desc') }}</p>
-                    </div>
-                @endif
-            </div>
         </div>
+
+        <section class="py-4 md:py-8 bg-white mb-8">
+            <div class="mx-auto max-w-7xl text-blue-700 space-y-8">
+                <div class="mx-auto max-w-2xl text-center">
+                    <h2 class="mt-2 text-2xl md:text-3xl font-bold sm:text-4xl xl:text-4xl text-gray-900 uppercase">{{ __('all.home.middle.accordion_4.title') }}</h2>
+                </div>
+                <div class="mx-auto px-4 sm:px-6 lg:px-8 space-y-8 md:flex align-middle items-center">
+                    <div class="w-full">
+                        <div class="text-gray-600 text-md md:text-lg">
+                            <ul>
+                                <li class="flex items-center gap-3 mb-2">
+                                    <div class="flex-shrink-0 w-6 h-6 mt-0.5 bg-blue-50 rounded-md flex items-center justify-center">
+                                        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                    </div>
+                                    <span>{{ __('all.home.middle.accordion_4.desc_1') }}</span>
+                                </li>
+                                <li class="flex items-center gap-3 mb-2">
+                                    <div class="flex-shrink-0 w-6 h-6 mt-0.5 bg-blue-50 rounded-md flex items-center justify-center">
+                                        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                    </div>
+                                    <span>{{ __('all.home.middle.accordion_4.desc_2') }}</span>
+                                </li>
+                                <li class="flex items-center gap-3 mb-2">
+                                    <div class="flex-shrink-0 w-6 h-6 mt-0.5 bg-blue-50 rounded-md flex items-center justify-center">
+                                        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                    </div>
+                                    <span>{{ __('all.home.middle.accordion_4.desc_3') }}</span>
+                                </li>
+                                <li class="flex items-center gap-3 mb-2">
+                                    <div class="flex-shrink-0 w-6 h-6 mt-0.5 bg-blue-50 rounded-md flex items-center justify-center">
+                                        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                    </div>
+                                    <span>{{ __('all.home.middle.accordion_4.desc_4') }}</span>
+                                </li>
+                                <li class="flex items-center gap-3">
+                                    <div class="flex-shrink-0 w-6 h-6 mt-0.5 bg-blue-50 rounded-md flex items-center justify-center">
+                                        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                    </div>
+                                    <span>{{ __('all.home.middle.accordion_4.desc_5') }}</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div>
+                        <img src="{{ asset('assets/images/screens.png') }}"
+                             class="w-full h-auto"
+                             alt="">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-4 md:py-8 bg-white mb-8">
+            <div class="mx-auto max-w-7xl text-blue-700 space-y-8">
+                <div class="mx-auto max-w-2xl text-center">
+                    <h2 class="mt-2 text-2xl md:text-3xl font-bold sm:text-4xl xl:text-4xl text-gray-900 uppercase">{{ __('all.payment_status.bottom.title') }}</h2>
+                </div>
+                <div class="mx-auto px-4 sm:px-6 lg:px-8 space-y-8 md:flex align-middle items-center">
+                    <div class="w-full">
+                        <div class="text-gray-600 text-md md:text-lg">
+                            <ul>
+                                <li class="flex items-center gap-3 mb-2">
+                                    <div class="flex-shrink-0 w-6 h-6 mt-0.5 bg-blue-50 rounded-md flex items-center justify-center">
+                                        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                    </div>
+                                    <span>{{ __('all.payment_status.bottom.desc_1') }}</span>
+                                </li>
+                                <li class="flex items-center gap-3 mb-2">
+                                    <div class="flex-shrink-0 w-6 h-6 mt-0.5 bg-blue-50 rounded-md flex items-center justify-center">
+                                        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                    </div>
+                                    <span>{{ __('all.payment_status.bottom.desc_2') }}</span>
+                                </li>
+                                <li class="flex items-center gap-3 mb-2">
+                                    <div class="flex-shrink-0 w-6 h-6 mt-0.5 bg-blue-50 rounded-md flex items-center justify-center">
+                                        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                    </div>
+                                    <span>{{ __('all.payment_status.bottom.desc_3') }}</span>
+                                </li>
+                                <li class="flex items-center gap-3 mb-2">
+                                    <div class="flex-shrink-0 w-6 h-6 mt-0.5 bg-blue-50 rounded-md flex items-center justify-center">
+                                        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                    </div>
+                                    <span>{{ __('all.payment_status.bottom.desc_4') }}</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
 
         <!-- Back Button -->
         <div class="text-center">
@@ -373,5 +502,27 @@
                 window.open(url, '_blank');
             });
         });
+
+        let totalSeconds = 600; // 10 minutes in seconds
+
+        function updateTimer() {
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+
+            document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+            document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+
+            if (totalSeconds === 0) {
+                totalSeconds = 600; // Reset to 10 minutes
+            } else {
+                totalSeconds--;
+            }
+        }
+
+        // Update immediately
+        updateTimer();
+
+        // Then update every second
+        setInterval(updateTimer, 1000);
     </script>
 </div>

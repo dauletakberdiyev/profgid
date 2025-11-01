@@ -61,7 +61,7 @@
 
         <div>
             <h1 class="text-2xl font-medium text-gray-900 mb-4 leading-relaxed">
-                {{ __('all.test_result.talents.lead') }} <span class="font-extrabold">{{ $localizedDomains[app()->getLocale()][$topDomain] }}</span> {{ __('all.test_result.talents.theme') }}.
+                {{ __('all.test_result.talents.lead') }} <span class="font-extrabold">{{ $localizedDomains[app()->getLocale()][$topDomain] }}</span>.
             </h1>
         </div>
 

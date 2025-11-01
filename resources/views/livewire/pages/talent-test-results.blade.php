@@ -3,8 +3,8 @@
 
 <div class="min-h-screen bg-gray-50 py-4 md:py-8 px-4" x-data="{
     activeTab: 'talents',
-    canViewSpheresTab: {{ $this->canViewSpheresTab ? 'true' : 'false' }},
-    canViewProfessionsTab: {{ $this->canViewProfessionsTab ? 'true' : 'false' }},
+    canViewSpheresTab: 'true',
+    canViewProfessionsTab: 'true',
     modalSphere: null,
     modalProfession: null,
     expandedSpheres: [],

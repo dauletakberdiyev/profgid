@@ -107,17 +107,17 @@ class PaymentStatus extends Component
     public $plans = [
         "talents" => [
             "name" => "Мои Таланты",
-            "price" => 15000,
+            "price" => 18990,
             "currency" => "тг",
         ],
         "talents_spheres" => [
             "name" => "Мои Профессии",
-            "price" => 15000,
+            "price" => 18990,
             "currency" => "тг",
         ],
         "talents_spheres_professions" => [
             "name" => "Мои таланты + Профессии",
-            "price" => 20000,
+            "price" => 18990,
             "currency" => "тг",
         ],
     ];
@@ -309,16 +309,19 @@ class PaymentStatus extends Component
             ->first();
 
         if ($promoCodeRecord) {
-            if ($promoCodeRecord->type === 'half') {
-                $this->plans[$this->plan]['price'] = $this->plans[$this->plan]['price'] / 2;
+            if ($promoCodeRecord->discount > 0 && $promoCodeRecord->discount < 100) {
+                $this->plans[$this->plan]['price'] = $this->plans[$this->plan]['price'] - ($this->plans[$this->plan]['price'] * $promoCodeRecord->discount) / 100;
 
-                $promoCodeRecord->markAsUsed(auth()->id());
                 $this->testSession->update([
                     "promo_code" => $promoCode,
                     'payment_amount' => $this->plans[$this->plan]['price'],
                 ]);
 
                 $this->halfDiscount = true;
+
+                if ($promoCodeRecord->unlimited_uses === 0) {
+                    $promoCodeRecord->markAsUsed(auth()->id());
+                }
 
 //                session()->flash(
 //                    "success",
@@ -329,7 +332,9 @@ class PaymentStatus extends Component
             }
 
             // Mark promo code as used
-            $promoCodeRecord->markAsUsed(auth()->id());
+            if ($promoCodeRecord->unlimited_uses === 0) {
+                $promoCodeRecord->markAsUsed(auth()->id());
+            }
 
             // Update test session as completed
             $this->testSession->update([

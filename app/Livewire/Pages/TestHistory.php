@@ -145,10 +145,8 @@ class TestHistory extends Component
     {
         if (in_array($session->payment_status, ['completed', 'free'])) {
             return route('talent-test-results', ['sessionId' => $session->session_id]);
-        } elseif ($session->payment_status === 'pending') {
-            return route('payment', ['sessionId' => $session->session_id]);
-        } elseif (in_array($session->payment_status ,['processing', 'cancelled', 'failed'])) {
-            return route('payment-status', ['sessionId' => $session->session_id, 'plan' => $session->selected_plan]);
+        } elseif (in_array($session->payment_status ,['processing', 'cancelled', 'failed', 'pending'])) {
+            return route('payment-status', ['sessionId' => $session->session_id, 'plan' => $session->selected_plan ?? 'talents_spheres_professions']);
         } else {
             return route('talent-test');
         }
