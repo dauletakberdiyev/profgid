@@ -484,6 +484,117 @@
             </div>
         </section>
 
+        <section class="py-4 md:py-8 bg-white mb-8" x-data="{ openItem: null }">
+            <div class="mx-auto max-w-7xl text-blue-700">
+                <div class="mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+                    <div class="mx-auto max-w-2xl text-center">
+                        <h2 class="mt-2 text-2xl md:text-3xl font-bold sm:text-4xl xl:text-4xl text-gray-900 uppercase">
+                            {{ __('all.payment_status.faq.title') }}
+                        </h2>
+                    </div>
+
+                    <div class="w-full">
+                        <!-- Accordion item 1 -->
+                        <div class="bg-white rounded-lg shadow mt-3 py-3 px-6">
+                            <button
+                                @click="openItem === 1 ? openItem = null : openItem = 1"
+                                class="flex justify-between items-center w-full py-3 text-left text-gray-800 font-semibold">
+                                {{ __('all.payment_status.faq.accordion_1.title') }}
+                                <span
+                                    x-text="openItem === 1 ? '-' : '+'"
+                                    class="inline-block transform transition-all duration-100 ease-in-out font-normal"
+                                    :class="openItem === 1 ? 'rotate-180 scale-125 opacity-100' : 'rotate-0 scale-100 opacity-80'"
+                                ></span>
+                            </button>
+                            <div x-show="openItem === 1"
+                                 x-transition:enter="transition ease-out duration-300"
+                                 x-transition:enter-start="opacity-0 transform -translate-y-2"
+                                 x-transition:enter-end="opacity-100 transform translate-y-0"
+                                 x-transition:leave="transition ease-in duration-200"
+                                 x-transition:leave-start="opacity-100 transform translate-y-0"
+                                 x-transition:leave-end="opacity-0 transform -translate-y-2"
+                                 class="overflow-hidden pb-3 text-gray-600"
+                            >
+                                {{ __('all.payment_status.faq.accordion_1.desc') }}
+                            </div>
+                        </div>
+
+                        <!-- Accordion item 2 -->
+                        <div class="bg-white rounded-lg shadow mt-3 py-3 px-6">
+                            <button
+                                @click="openItem === 2 ? openItem = null : openItem = 2"
+                                class="flex justify-between items-center w-full py-3 text-left text-gray-800 font-semibold">
+                                {{ __('all.payment_status.faq.accordion_2.title') }}
+                                <span
+                                    x-text="openItem === 2 ? '-' : '+'"
+                                    class="inline-block transform transition-all duration-100 ease-in-out font-normal"
+                                    :class="openItem === 2 ? 'rotate-180 scale-125 opacity-100' : 'rotate-0 scale-100 opacity-80'"
+                                ></span>
+                            </button>
+                            <div x-show="openItem === 2"
+                                 x-transition:enter="transition ease-out duration-300"
+                                 x-transition:enter-start="opacity-0 transform -translate-y-2"
+                                 x-transition:enter-end="opacity-100 transform translate-y-0"
+                                 x-transition:leave="transition ease-in duration-200"
+                                 x-transition:leave-start="opacity-100 transform translate-y-0"
+                                 x-transition:leave-end="opacity-0 transform -translate-y-2"
+                                 class="overflow-hidden pb-3 text-gray-600">
+                                {{ __('all.payment_status.faq.accordion_2.desc') }}
+                            </div>
+                        </div>
+
+                        <!-- Accordion item 3 -->
+                        <div class="bg-white rounded-lg shadow mt-3 py-3 px-6">
+                            <button
+                                @click="openItem === 3 ? openItem = null : openItem = 3"
+                                class="flex justify-between items-center w-full py-3 text-left text-gray-800 font-semibold">
+                                {{ __('all.payment_status.faq.accordion_3.title') }}
+                                <span
+                                    x-text="openItem === 3 ? '-' : '+'"
+                                    class="inline-block transform transition-all duration-100 ease-in-out font-normal"
+                                    :class="openItem === 3 ? 'rotate-180 scale-125 opacity-100' : 'rotate-0 scale-100 opacity-80'"
+                                ></span>
+                            </button>
+                            <div x-show="openItem === 3"
+                                 x-transition:enter="transition ease-out duration-300"
+                                 x-transition:enter-start="opacity-0 transform -translate-y-2"
+                                 x-transition:enter-end="opacity-100 transform translate-y-0"
+                                 x-transition:leave="transition ease-in duration-200"
+                                 x-transition:leave-start="opacity-100 transform translate-y-0"
+                                 x-transition:leave-end="opacity-0 transform -translate-y-2"
+                                 class="overflow-hidden pb-3 text-gray-600">
+                                {{ __('all.payment_status.faq.accordion_3.desc') }}
+                            </div>
+                        </div>
+
+                        <!-- Accordion item 4 -->
+                        <div class="bg-white rounded-lg shadow mt-3 py-3 px-6">
+                            <button
+                                @click="openItem === 4 ? openItem = null : openItem = 4"
+                                class="flex justify-between items-center w-full py-3 text-left text-gray-800 font-semibold">
+                                {{ __('all.payment_status.faq.accordion_4.title') }}
+                                <span
+                                    x-text="openItem === 4 ? '-' : '+'"
+                                    class="inline-block transform transition-all duration-100 ease-in-out font-normal"
+                                    :class="openItem === 4 ? 'rotate-180 scale-125 opacity-100' : 'rotate-0 scale-100 opacity-80'"
+                                ></span>
+                            </button>
+                            <div x-show="openItem === 4"
+                                 x-transition:enter="transition ease-out duration-300"
+                                 x-transition:enter-start="opacity-0 transform -translate-y-2"
+                                 x-transition:enter-end="opacity-100 transform translate-y-0"
+                                 x-transition:leave="transition ease-in duration-200"
+                                 x-transition:leave-start="opacity-100 transform translate-y-0"
+                                 x-transition:leave-end="opacity-0 transform -translate-y-2"
+                                 class="overflow-hidden pb-3 text-gray-600">
+                                {{ __('all.payment_status.faq.accordion_4.desc') }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Back Button -->
         <div class="text-center">
             <a href="{{ route('profile') }}"
