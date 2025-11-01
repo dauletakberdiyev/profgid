@@ -323,10 +323,10 @@ class PaymentStatus extends Component
                     $promoCodeRecord->markAsUsed(auth()->id());
                 }
 
-//                session()->flash(
-//                    "success",
-//                    "Промокод принят! Скидка применена успешно."
-//                );
+                session()->flash(
+                    "halfDiscount",
+                    "Промокод {$promoCodeRecord->code} активирован! Скидка применена успешно."
+                );
 
                 return;
             }

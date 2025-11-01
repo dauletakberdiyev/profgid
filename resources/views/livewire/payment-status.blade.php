@@ -19,23 +19,23 @@
 {{--                {{ $this->getStatusText() }}--}}
 {{--            </div>--}}
 
-            <h1 class="text-2xl md:text-3xl lg:text-4xl font-light text-gray-900 mb-4">{{ __('all.payment_status.title') }}</h1>
+{{--            <h1 class="text-2xl md:text-3xl lg:text-4xl font-light text-gray-900 mb-4">{{ __('all.payment_status.title') }}</h1>--}}
 {{--            <h2 class="text-xl md:text-2xl font-medium text-gray-800 mb-2">{{ $plans[$plan]['name'] }}</h2>--}}
-            <p class="text-2xl md:text-3xl font-normal text-gray-900">{{ number_format($plans[$plan]['price']) }} {{ $plans[$plan]['currency'] }}</p>
+{{--            <p class="text-2xl md:text-3xl font-normal text-gray-900">{{ number_format($plans[$plan]['price']) }} {{ $plans[$plan]['currency'] }}</p>--}}
             @if(!$halfDiscount && !$paymentConfirmed)
-            <div class="mt-6 mx-auto max-w-2xl">
-                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-6 shadow-sm">
-                    <p class="text-gray-800 text-lg leading-relaxed">
+            <div class="mt-2 mx-auto max-w-2xl">
+                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-4 shadow-sm">
+                    <p class="text-gray-800 text-base leading-relaxed">
                         {{ __('all.payment_status.promo.title') }}<br>
-                        <span class="text-2xl font-bold text-blue-600">{{ __('all.payment_status.promo.price') }}</span> {{ __('all.payment_status.promo.text') }}
-                        <span class="inline-block bg-blue-600 text-white px-3 py-1 rounded-lg font-mono font-semibold text-lg mx-1">{{ __('all.payment_status.promo.code') }}</span>
+                        <span class="text-base font-bold text-blue-600">{{ __('all.payment_status.promo.price') }}</span> {{ __('all.payment_status.promo.text') }}
+                        <span class="inline-block bg-blue-600 text-white px-3 py-1 rounded-lg font-mono font-semibold text-base mx-1">{{ __('all.payment_status.promo.code') }}</span>
                     </p>
 
-                    <div class="mt-4 flex flex-col items-center justify-center gap-2">
+                    <div class="mt-2 flex flex-col items-center justify-center gap-2">
                         <p class="text-red-600 font-semibold mt-3 text-base">
                             {{ __('all.payment_status.promo.warning') }}
                         </p>
-                        <div class="flex items-center gap-1 px-4 py-2 rounded-lg font-mono text-xl font-bold">
+                        <div class="flex items-center gap-1 px-4 py-2 rounded-lg font-mono text-lg font-bold">
                             <span id="minutes">10</span>:<span id="seconds">00</span>
                         </div>
                     </div>
@@ -66,15 +66,43 @@
             </div>
         @endif
 
+        @if(session('halfDiscount'))
+            <div class="hidden md:flex bg-green-50 border border-green-200 rounded-xl p-4">
+                <div class="flex items-center">
+                    <p class="text-green-800 font-medium">{{ session('halfDiscount') }}</p>
+                </div>
+            </div>
+        @endif
+
+        <div class="hidden md:flex items-center justify-between p-6">
+            <div class="text-gray-900 text-base md:text-xl font-normal">
+                {{ __('all.payment_status.pay') }}
+            </div>
+            <div class="flex items-center gap-3">
+                @if($halfDiscount)
+                    <span class="text-gray-400 text-sm md:text-xl line-through font-normal">
+                            18,990 {{ $plans[$plan]['currency'] }}
+                        </span>
+                    <span class="text-gray-900 text-base md:text-xl font-bold">
+                            {{ number_format($plans[$plan]['price']) }} {{ $plans[$plan]['currency'] }}
+                        </span>
+                @else
+                    <span class="text-gray-900 text-sm md:text-xl font-bold">
+                            {{ number_format($plans[$plan]['price']) }} {{ $plans[$plan]['currency'] }}
+                        </span>
+                @endif
+            </div>
+        </div>
+
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
             <!-- Payment Confirmation -->
             <div class="bg-white border border-gray-100 rounded-2xl p-6 md:p-8 shadow-sm">
-                <h3 class="text-xl font-medium text-gray-900 mb-6">{{ __('all.payment_status.activation.title') }}</h3>
+                <h3 class="text-lg font-medium text-gray-900 mb-6">{{ __('all.payment_status.activation.title') }}</h3>
 
                 @if(!$paymentConfirmed && $testSession->payment_status != 'completed' && !$halfDiscount)
                     <form wire:submit.prevent="confirmPayment">
                         <!-- PIN Input Fields -->
-                        <div class="mb-6" x-data="{
+                        <div x-data="{
                             handleInput(event, index) {
                                 if (event.target.value.length === 1 && index < 6) {
                                     this.$refs['pin' + (index + 1)]?.focus();
@@ -177,14 +205,14 @@
                         </div>
 
                         <!-- No Code Section -->
-                        <div class="text-center">
-                            <p class="text-gray-600 mb-4">{{ __('all.payment_status.activation.no_code') }}</p>
-                            <button type="button"
-                                    wire:click="getPromoCode"
-                                    class="w-full py-3 px-6 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors font-medium">
-                                {{ __('all.payment_status.activation.get_code') }}
-                            </button>
-                        </div>
+{{--                        <div class="text-center">--}}
+{{--                            <p class="text-gray-600 mb-4">{{ __('all.payment_status.activation.no_code') }}</p>--}}
+{{--                            <button type="button"--}}
+{{--                                    wire:click="getPromoCode"--}}
+{{--                                    class="w-full py-3 px-6 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors font-medium">--}}
+{{--                                {{ __('all.payment_status.activation.get_code') }}--}}
+{{--                            </button>--}}
+{{--                        </div>--}}
                     </form>
 
                     {{--                @elseif($testSession->payment_status === 'processing')--}}
@@ -260,6 +288,35 @@
                 @endif
             </div>
 
+            @if(session('halfDiscount'))
+                <div class="flex md:hidden bg-green-50 border border-green-200 rounded-xl p-4">
+                    <div class="flex items-center">
+                        <p class="text-green-800 font-medium">{{ session('halfDiscount') }}</p>
+                    </div>
+                </div>
+            @endif
+
+            <div class="flex md:hidden items-center justify-between p-6"
+                style="margin-top: -25px; margin-bottom: -25px">
+                <div class="text-gray-900 text-base md:text-xl font-normal">
+                    {{ __('all.payment_status.pay') }}
+                </div>
+                <div class="flex items-center gap-3">
+                    @if($halfDiscount)
+                        <span class="text-gray-400 text-sm md:text-xl line-through font-normal">
+                            18,990 {{ $plans[$plan]['currency'] }}
+                        </span>
+                        <span class="text-gray-900 text-base md:text-3xl font-bold">
+                            {{ number_format($plans[$plan]['price']) }} {{ $plans[$plan]['currency'] }}
+                        </span>
+                    @else
+                        <span class="text-gray-900 text-sm md:text-xl font-bold">
+                            {{ number_format($plans[$plan]['price']) }} {{ $plans[$plan]['currency'] }}
+                        </span>
+                    @endif
+                </div>
+            </div>
+
             <!-- Payment Options -->
             <div class="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100" x-data="{
                 kaspiOpen: false,
@@ -273,7 +330,7 @@
                     if (this.cardOpen) this.kaspiOpen = false;
                 }
             }">
-                <h3 class="text-xl font-medium text-gray-900 mb-6">{{ __('all.payment_status.payment_methods') }}</h3>
+                <h3 class="text-lg font-medium text-gray-900 mb-6">{{ __('all.payment_status.payment_methods') }}</h3>
 
                 <!-- Kaspi QR Accordion -->
 {{--                <div class="mb-4">--}}
@@ -332,7 +389,7 @@
 {{--                </div>--}}
 
                 <!-- Card Payment Accordion -->
-                <div class="mb-4">
+                <div>
 {{--                    <button @click="openCard()"--}}
 {{--                            class="w-full flex items-center justify-between px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-all duration-200 text-gray-700">--}}
 {{--                        <div class="flex items-center">--}}
@@ -378,11 +435,11 @@
         <section class="py-4 md:py-8 bg-white mb-8">
             <div class="mx-auto max-w-7xl text-blue-700 space-y-8">
                 <div class="mx-auto max-w-2xl text-center">
-                    <h2 class="mt-2 text-2xl md:text-3xl font-bold sm:text-4xl xl:text-4xl text-gray-900 uppercase">{{ __('all.home.middle.accordion_4.title') }}</h2>
+                    <h2 class="mt-2 text-lg md:text-2xl font-bold sm:text-4xl xl:text-4xl text-gray-900 uppercase">{{ __('all.home.middle.accordion_4.title') }}</h2>
                 </div>
                 <div class="mx-auto px-4 sm:px-6 lg:px-8 space-y-8 md:flex align-middle items-center">
                     <div class="w-full">
-                        <div class="text-gray-600 text-md md:text-lg">
+                        <div class="text-gray-600 text-sm md:text-lg">
                             <ul>
                                 <li class="flex items-center gap-3 mb-2">
                                     <div class="flex-shrink-0 w-6 h-6 mt-0.5 bg-blue-50 rounded-md flex items-center justify-center">
@@ -439,11 +496,11 @@
         <section class="py-4 md:py-8 bg-white mb-8">
             <div class="mx-auto max-w-7xl text-blue-700 space-y-8">
                 <div class="mx-auto max-w-2xl text-center">
-                    <h2 class="mt-2 text-2xl md:text-3xl font-bold sm:text-4xl xl:text-4xl text-gray-900 uppercase">{{ __('all.payment_status.bottom.title') }}</h2>
+                    <h2 class="mt-2 text-lg md:text-2xl font-bold sm:text-4xl xl:text-4xl text-gray-900 uppercase">{{ __('all.payment_status.bottom.title') }}</h2>
                 </div>
                 <div class="mx-auto px-4 sm:px-6 lg:px-8 space-y-8 md:flex align-middle items-center">
                     <div class="w-full">
-                        <div class="text-gray-600 text-md md:text-lg">
+                        <div class="text-gray-600 text-sm md:text-lg">
                             <ul>
                                 <li class="flex items-center gap-3 mb-2">
                                     <div class="flex-shrink-0 w-6 h-6 mt-0.5 bg-blue-50 rounded-md flex items-center justify-center">
@@ -486,107 +543,131 @@
 
         <section class="py-4 md:py-8 bg-white mb-8" x-data="{ openItem: null }">
             <div class="mx-auto max-w-7xl text-blue-700">
-                <div class="mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+                <div class="mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
                     <div class="mx-auto max-w-2xl text-center">
-                        <h2 class="mt-2 text-2xl md:text-3xl font-bold sm:text-4xl xl:text-4xl text-gray-900 uppercase">
+                        <h2 class="mt-2 text-lg md:text-2xl font-bold text-gray-900">
                             {{ __('all.payment_status.faq.title') }}
                         </h2>
                     </div>
 
-                    <div class="w-full">
+                    <div class="w-full max-w-3xl mx-auto space-y-0 divide-y divide-gray-200">
                         <!-- Accordion item 1 -->
-                        <div class="bg-white rounded-lg shadow mt-3 py-3 px-6">
+                        <div class="bg-white">
                             <button
                                 @click="openItem === 1 ? openItem = null : openItem = 1"
-                                class="flex justify-between items-center w-full py-3 text-left text-gray-800 font-semibold">
+                                class="flex justify-between items-center w-full py-5 text-left group hover:bg-gray-50 transition-colors">
+                            <span class="text-gray-900 font-normal text-sm md:text-lg pr-4">
                                 {{ __('all.payment_status.faq.accordion_1.title') }}
-                                <span
-                                    x-text="openItem === 1 ? '-' : '+'"
-                                    class="inline-block transform transition-all duration-100 ease-in-out font-normal"
-                                    :class="openItem === 1 ? 'rotate-180 scale-125 opacity-100' : 'rotate-0 scale-100 opacity-80'"
-                                ></span>
+                            </span>
+                                <svg
+                                    class="w-5 h-5 text-gray-400 transition-transform duration-200 flex-shrink-0"
+                                    :class="openItem === 1 ? 'rotate-90' : ''"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
                             </button>
-                            <div x-show="openItem === 1"
-                                 x-transition:enter="transition ease-out duration-300"
-                                 x-transition:enter-start="opacity-0 transform -translate-y-2"
-                                 x-transition:enter-end="opacity-100 transform translate-y-0"
-                                 x-transition:leave="transition ease-in duration-200"
-                                 x-transition:leave-start="opacity-100 transform translate-y-0"
-                                 x-transition:leave-end="opacity-0 transform -translate-y-2"
-                                 class="overflow-hidden pb-3 text-gray-600"
+                            <div
+                                x-show="openItem === 1"
+                                x-transition:enter="transition ease-out duration-200"
+                                x-transition:enter-start="opacity-0 -translate-y-2"
+                                x-transition:enter-end="opacity-100 translate-y-0"
+                                x-transition:leave="transition ease-in duration-150"
+                                x-transition:leave-start="opacity-100"
+                                x-transition:leave-end="opacity-0"
+                                class="overflow-hidden pb-5 text-gray-600 text-sm md:text-base leading-relaxed pr-10"
                             >
                                 {{ __('all.payment_status.faq.accordion_1.desc') }}
                             </div>
                         </div>
 
                         <!-- Accordion item 2 -->
-                        <div class="bg-white rounded-lg shadow mt-3 py-3 px-6">
+                        <div class="bg-white">
                             <button
                                 @click="openItem === 2 ? openItem = null : openItem = 2"
-                                class="flex justify-between items-center w-full py-3 text-left text-gray-800 font-semibold">
+                                class="flex justify-between items-center w-full py-5 text-left group hover:bg-gray-50 transition-colors">
+                            <span class="text-gray-900 font-normal text-sm md:text-lg pr-4">
                                 {{ __('all.payment_status.faq.accordion_2.title') }}
-                                <span
-                                    x-text="openItem === 2 ? '-' : '+'"
-                                    class="inline-block transform transition-all duration-100 ease-in-out font-normal"
-                                    :class="openItem === 2 ? 'rotate-180 scale-125 opacity-100' : 'rotate-0 scale-100 opacity-80'"
-                                ></span>
+                            </span>
+                                <svg
+                                    class="w-5 h-5 text-gray-400 transition-transform duration-200 flex-shrink-0"
+                                    :class="openItem === 2 ? 'rotate-90' : ''"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
                             </button>
-                            <div x-show="openItem === 2"
-                                 x-transition:enter="transition ease-out duration-300"
-                                 x-transition:enter-start="opacity-0 transform -translate-y-2"
-                                 x-transition:enter-end="opacity-100 transform translate-y-0"
-                                 x-transition:leave="transition ease-in duration-200"
-                                 x-transition:leave-start="opacity-100 transform translate-y-0"
-                                 x-transition:leave-end="opacity-0 transform -translate-y-2"
-                                 class="overflow-hidden pb-3 text-gray-600">
+                            <div
+                                x-show="openItem === 2"
+                                x-transition:enter="transition ease-out duration-200"
+                                x-transition:enter-start="opacity-0 -translate-y-2"
+                                x-transition:enter-end="opacity-100 translate-y-0"
+                                x-transition:leave="transition ease-in duration-150"
+                                x-transition:leave-start="opacity-100"
+                                x-transition:leave-end="opacity-0"
+                                class="overflow-hidden pb-5 text-gray-600 text-sm md:text-base leading-relaxed pr-10">
                                 {{ __('all.payment_status.faq.accordion_2.desc') }}
                             </div>
                         </div>
 
                         <!-- Accordion item 3 -->
-                        <div class="bg-white rounded-lg shadow mt-3 py-3 px-6">
+                        <div class="bg-white">
                             <button
                                 @click="openItem === 3 ? openItem = null : openItem = 3"
-                                class="flex justify-between items-center w-full py-3 text-left text-gray-800 font-semibold">
+                                class="flex justify-between items-center w-full py-5 text-left group hover:bg-gray-50 transition-colors">
+                            <span class="text-gray-900 font-normal text-sm md:text-lg pr-4">
                                 {{ __('all.payment_status.faq.accordion_3.title') }}
-                                <span
-                                    x-text="openItem === 3 ? '-' : '+'"
-                                    class="inline-block transform transition-all duration-100 ease-in-out font-normal"
-                                    :class="openItem === 3 ? 'rotate-180 scale-125 opacity-100' : 'rotate-0 scale-100 opacity-80'"
-                                ></span>
+                            </span>
+                                <svg
+                                    class="w-5 h-5 text-gray-400 transition-transform duration-200 flex-shrink-0"
+                                    :class="openItem === 3 ? 'rotate-90' : ''"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
                             </button>
-                            <div x-show="openItem === 3"
-                                 x-transition:enter="transition ease-out duration-300"
-                                 x-transition:enter-start="opacity-0 transform -translate-y-2"
-                                 x-transition:enter-end="opacity-100 transform translate-y-0"
-                                 x-transition:leave="transition ease-in duration-200"
-                                 x-transition:leave-start="opacity-100 transform translate-y-0"
-                                 x-transition:leave-end="opacity-0 transform -translate-y-2"
-                                 class="overflow-hidden pb-3 text-gray-600">
+                            <div
+                                x-show="openItem === 3"
+                                x-transition:enter="transition ease-out duration-200"
+                                x-transition:enter-start="opacity-0 -translate-y-2"
+                                x-transition:enter-end="opacity-100 translate-y-0"
+                                x-transition:leave="transition ease-in duration-150"
+                                x-transition:leave-start="opacity-100"
+                                x-transition:leave-end="opacity-0"
+                                class="overflow-hidden pb-5 text-gray-600 text-sm md:text-base leading-relaxed pr-10">
                                 {{ __('all.payment_status.faq.accordion_3.desc') }}
                             </div>
                         </div>
 
                         <!-- Accordion item 4 -->
-                        <div class="bg-white rounded-lg shadow mt-3 py-3 px-6">
+                        <div class="bg-white">
                             <button
                                 @click="openItem === 4 ? openItem = null : openItem = 4"
-                                class="flex justify-between items-center w-full py-3 text-left text-gray-800 font-semibold">
+                                class="flex justify-between items-center w-full py-5 text-left group hover:bg-gray-50 transition-colors">
+                            <span class="text-gray-900 font-normal text-sm md:text-lg pr-4">
                                 {{ __('all.payment_status.faq.accordion_4.title') }}
-                                <span
-                                    x-text="openItem === 4 ? '-' : '+'"
-                                    class="inline-block transform transition-all duration-100 ease-in-out font-normal"
-                                    :class="openItem === 4 ? 'rotate-180 scale-125 opacity-100' : 'rotate-0 scale-100 opacity-80'"
-                                ></span>
+                            </span>
+                                <svg
+                                    class="w-5 h-5 text-gray-400 transition-transform duration-200 flex-shrink-0"
+                                    :class="openItem === 4 ? 'rotate-90' : ''"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
                             </button>
-                            <div x-show="openItem === 4"
-                                 x-transition:enter="transition ease-out duration-300"
-                                 x-transition:enter-start="opacity-0 transform -translate-y-2"
-                                 x-transition:enter-end="opacity-100 transform translate-y-0"
-                                 x-transition:leave="transition ease-in duration-200"
-                                 x-transition:leave-start="opacity-100 transform translate-y-0"
-                                 x-transition:leave-end="opacity-0 transform -translate-y-2"
-                                 class="overflow-hidden pb-3 text-gray-600">
+                            <div
+                                x-show="openItem === 4"
+                                x-transition:enter="transition ease-out duration-200"
+                                x-transition:enter-start="opacity-0 -translate-y-2"
+                                x-transition:enter-end="opacity-100 translate-y-0"
+                                x-transition:leave="transition ease-in duration-150"
+                                x-transition:leave-start="opacity-100"
+                                x-transition:leave-end="opacity-0"
+                                class="overflow-hidden pb-5 text-gray-600 text-sm md:text-base leading-relaxed pr-10">
                                 {{ __('all.payment_status.faq.accordion_4.desc') }}
                             </div>
                         </div>
