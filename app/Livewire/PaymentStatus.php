@@ -22,6 +22,8 @@ class PaymentStatus extends Component
     public $paymentConfirmed = false;
     public $halfDiscount = false;
     public $showPromoCodeForm = false;
+    public $promoCodeGlobal = '';
+    public $promoCodeGlobalPercent = 0;
 
     public function processCardPayment()
     {
@@ -302,12 +304,15 @@ class PaymentStatus extends Component
             $this->pin5 .
             $this->pin6;
 
+        $this->promoCodeGlobal = $promoCode;
+
         // Find the promo code in database
         $promoCodeRecord = PromoCode::query()->where("code", $promoCode)
             ->where("is_active", true)
             ->where("is_used", false)
             ->first();
 
+        $this->promoCodeGlobalPercent = $promoCodeRecord->discount;
         if ($promoCodeRecord) {
             if ($promoCodeRecord->discount > 0 && $promoCodeRecord->discount < 100) {
                 $this->plans[$this->plan]['price'] = $this->plans[$this->plan]['price'] - ($this->plans[$this->plan]['price'] * $promoCodeRecord->discount) / 100;
@@ -323,10 +328,10 @@ class PaymentStatus extends Component
                     $promoCodeRecord->markAsUsed(auth()->id());
                 }
 
-                session()->flash(
-                    "halfDiscount",
-                    "Промокод {$promoCodeRecord->code} активирован! Скидка применена успешно."
-                );
+//                session()->flash(
+//                    "halfDiscount",
+//                    "Промокод {$promoCodeRecord->code} активирован! Скидка применена успешно."
+//                );
 
                 return;
             }

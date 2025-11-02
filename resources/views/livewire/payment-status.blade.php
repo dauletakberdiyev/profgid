@@ -23,22 +23,13 @@
 {{--            <h2 class="text-xl md:text-2xl font-medium text-gray-800 mb-2">{{ $plans[$plan]['name'] }}</h2>--}}
 {{--            <p class="text-2xl md:text-3xl font-normal text-gray-900">{{ number_format($plans[$plan]['price']) }} {{ $plans[$plan]['currency'] }}</p>--}}
             @if(!$halfDiscount && !$paymentConfirmed)
-            <div class="mt-2 mx-auto max-w-2xl">
+            <div class="mx-auto max-w-2xl">
                 <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-4 shadow-sm">
                     <p class="text-gray-800 text-base leading-relaxed">
                         {{ __('all.payment_status.promo.title') }}<br>
                         <span class="text-base font-bold text-blue-600">{{ __('all.payment_status.promo.price') }}</span> {{ __('all.payment_status.promo.text') }}
                         <span class="inline-block bg-blue-600 text-white px-3 py-1 rounded-lg font-mono font-semibold text-base mx-1">{{ __('all.payment_status.promo.code') }}</span>
                     </p>
-
-                    <div class="mt-2 flex flex-col items-center justify-center gap-2">
-                        <p class="text-red-600 font-semibold mt-3 text-base">
-                            {{ __('all.payment_status.promo.warning') }}
-                        </p>
-                        <div class="flex items-center gap-1 px-4 py-2 rounded-lg font-mono text-lg font-bold">
-                            <span id="minutes">10</span>:<span id="seconds">00</span>
-                        </div>
-                    </div>
                 </div>
             </div>
             @endif
@@ -66,10 +57,18 @@
             </div>
         @endif
 
-        @if(session('halfDiscount'))
-            <div class="hidden md:flex bg-green-50 border border-green-200 rounded-xl p-4">
-                <div class="flex items-center">
-                    <p class="text-green-800 font-medium">{{ session('halfDiscount') }}</p>
+        @if($halfDiscount)
+            <div class="hidden md:flex items-center gap-3 bg-blue-50 rounded-xl p-4">
+                <div class="text-blue-600 flex-shrink-0">
+                    <x-simpleline-present class="w-6 h-6"/>
+                </div>
+                <div class="flex flex-col">
+                    <p class="font-medium">
+                        {{ __('all.payment_status.discount.title' , ['promo_code' => $promoCodeGlobal]) }}
+                    </p>
+                    <span class="text-sm">
+                            {{ __('all.payment_status.discount.desc', ['percent' => $promoCodeGlobalPercent]) }}
+                        </span>
                 </div>
             </div>
         @endif
@@ -97,7 +96,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
             <!-- Payment Confirmation -->
             <div class="bg-white border border-gray-100 rounded-2xl p-6 md:p-8 shadow-sm">
-                <h3 class="text-lg font-medium text-gray-900 mb-6">{{ __('all.payment_status.activation.title') }}</h3>
+                <h3 class="text-lg font-medium text-center text-gray-900 mb-6">{{ __('all.payment_status.activation.title') }}</h3>
 
                 @if(!$paymentConfirmed && $testSession->payment_status != 'completed' && !$halfDiscount)
                     <form wire:submit.prevent="confirmPayment">
@@ -288,10 +287,18 @@
                 @endif
             </div>
 
-            @if(session('halfDiscount'))
-                <div class="flex md:hidden bg-green-50 border border-green-200 rounded-xl p-4">
-                    <div class="flex items-center">
-                        <p class="text-green-800 font-medium">{{ session('halfDiscount') }}</p>
+            @if($halfDiscount)
+                <div class="flex md:hidden items-center gap-3 bg-blue-50 rounded-xl p-4">
+                    <div class="text-blue-600 flex-shrink-0">
+                        <x-simpleline-present class="w-6 h-6"/>
+                    </div>
+                    <div class="flex flex-col">
+                        <p class="font-medium">
+                            {{ __('all.payment_status.discount.title' , ['promo_code' => $promoCodeGlobal]) }}
+                        </p>
+                        <span class="text-sm">
+                            {{ __('all.payment_status.discount.desc', ['percent' => $promoCodeGlobalPercent]) }}
+                        </span>
                     </div>
                 </div>
             @endif
@@ -330,8 +337,6 @@
                     if (this.cardOpen) this.kaspiOpen = false;
                 }
             }">
-                <h3 class="text-lg font-medium text-gray-900 mb-6">{{ __('all.payment_status.payment_methods') }}</h3>
-
                 <!-- Kaspi QR Accordion -->
 {{--                <div class="mb-4">--}}
 {{--                    <button @click="openKaspi()"--}}
@@ -410,7 +415,7 @@
                          x-transition:leave="transition ease-in duration-200"
                          x-transition:leave-start="opacity-100 transform scale-100"
                          x-transition:leave-end="opacity-0 transform scale-95"
-                         class="mt-3 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                         class="rounded-lg">
 
                         <div class="text-center">
                             <p class="text-sm text-gray-600 mb-4">{{ __('all.payment_status.bank_card.title') }}</p>
@@ -694,27 +699,5 @@
                 window.open(url, '_blank');
             });
         });
-
-        let totalSeconds = 600; // 10 minutes in seconds
-
-        function updateTimer() {
-            const minutes = Math.floor(totalSeconds / 60);
-            const seconds = totalSeconds % 60;
-
-            document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
-            document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
-
-            if (totalSeconds === 0) {
-                totalSeconds = 600; // Reset to 10 minutes
-            } else {
-                totalSeconds--;
-            }
-        }
-
-        // Update immediately
-        updateTimer();
-
-        // Then update every second
-        setInterval(updateTimer, 1000);
     </script>
 </div>
