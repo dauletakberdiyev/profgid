@@ -27,9 +27,18 @@ class EditProfession extends EditRecord
                 'coefficient' => $talent->pivot->coefficient,
             ];
         }
-        
+
         $data['talent_coefficients'] = $talentCoefficients;
-        
+
+        $intellectCoefficients = [];
+        foreach ($this->record->intellects as $intellect) {
+            $intellectCoefficients[] = [
+                'intellect_id' => $intellect->id,
+            ];
+        }
+
+        $data['intellect_coefficients'] = $intellectCoefficients;
+
         return $data;
     }
 
@@ -38,10 +47,16 @@ class EditProfession extends EditRecord
         // Extract talent coefficients from form data
         $talentCoefficients = $data['talent_coefficients'] ?? [];
         unset($data['talent_coefficients']);
-        
+
         // Store talent coefficients for after save
         $this->talentCoefficients = $talentCoefficients;
-        
+
+        $intellectCoefficients = $data['intellect_coefficients'] ?? [];
+        unset($data['intellect_coefficients']);
+
+        // Store talent coefficients for after save
+        $this->intellectCoefficients = $intellectCoefficients;
+
         return $data;
     }
 
@@ -49,7 +64,7 @@ class EditProfession extends EditRecord
     {
         // Sync talents with coefficients
         $syncData = [];
-        
+
         if (isset($this->talentCoefficients)) {
             foreach ($this->talentCoefficients as $item) {
                 if (isset($item['talent_id']) && isset($item['coefficient'])) {
@@ -59,7 +74,19 @@ class EditProfession extends EditRecord
                 }
             }
         }
-        
+
+        $syncIntellect = [];
+        if (isset($this->intellectCoefficients)) {
+            foreach ($this->intellectCoefficients as $item) {
+                if (isset($item['intellect_id'])) {
+                    $syncIntellect[$item['intellect_id']] = [
+                        'coefficient' => 0
+                    ];
+                }
+            }
+        }
+
         $this->record->talents()->sync($syncData);
+        $this->record->intellects()->sync($syncIntellect);
     }
 }

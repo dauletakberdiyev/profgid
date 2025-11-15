@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProfessionResource\Pages;
+use App\Models\Intellect;
 use App\Models\Profession;
 use App\Models\Sphere;
 use App\Models\Talent;
@@ -93,6 +94,25 @@ class ProfessionResource extends Resource
                     ->collapsible()
                     ->itemLabel(fn (array $state): ?string =>
                         $state['talent_id'] ? Talent::find($state['talent_id'])?->name . ' (коэф.: ' . ($state['coefficient'] ?? '1.00') . ')' : null
+                    ),
+
+                Forms\Components\Repeater::make('intellect_coefficients')
+                    ->label('Интелект и коэффициенты')
+                    ->schema([
+                        Forms\Components\Select::make('intellect_id')
+                            ->label('Интелект')
+                            ->options(Intellect::pluck('name', 'id'))
+                            ->required()
+                            ->distinct(),
+                    ])
+                    ->minItems(1)
+                    ->maxItems(2)
+                    ->defaultItems(0)
+                    ->columnSpanFull()
+                    ->addActionLabel('Добавить интелект')
+                    ->collapsible()
+                    ->itemLabel(fn (array $state): ?string =>
+                        $state['intellect_id'] ? Intellect::find($state['intellect_id'])?->name : null
                     ),
             ]);
     }
