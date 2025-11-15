@@ -32,7 +32,11 @@ class AnswerResource extends Resource
                 Forms\Components\Select::make('talent_id')
                     ->relationship('talent', 'name')
                     ->label('Талант')
-                    ->required()
+                    ->searchable()
+                    ->preload(),
+                Forms\Components\Select::make('intellect_id')
+                    ->relationship('intellect', 'name')
+                    ->label('Интеллект')
                     ->searchable()
                     ->preload(),
                 Forms\Components\TextInput::make('question')
@@ -53,6 +57,10 @@ class AnswerResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('talent.name')
+                    ->label('Интеллект')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('intellect.name')
                     ->label('Талант')
                     ->searchable()
                     ->sortable(),
