@@ -36,7 +36,8 @@ class User extends Authenticatable
         'class',
         'gender',
         'phone',
-        'is_pupil'
+        'is_pupil',
+        'is_admin',
     ];
 
     /**

@@ -66,22 +66,22 @@ class PromoCodeResource extends Resource
 
                 Forms\Components\Section::make('Настройки использования')
                     ->schema([
-                        Forms\Components\Checkbox::make('unlimited_uses')
-                            ->label('Неограниченное количество использований')
-                            ->default(false)
-                            ->live()
-                            ->helperText('Включите, чтобы промокод можно было использовать неограниченное количество раз'),
+//                        Forms\Components\Checkbox::make('unlimited_uses')
+//                            ->label('Неограниченное количество использований')
+//                            ->default(false)
+//                            ->live()
+//                            ->helperText('Включите, чтобы промокод можно было использовать неограниченное количество раз'),
 
-//                        Forms\Components\TextInput::make('max_uses')
-//                            ->label('Максимальное количество использований')
-//                            ->numeric()
-//                            ->default(1)
-//                            ->minValue(1)
-//                            ->maxValue(1000)
-//                            ->helperText('Сколько раз можно использовать этот промокод')
-//                            ->disabled(fn (Get $get) => $get('unlimited_uses'))
-//                            ->dehydrated(fn (Get $get) => !$get('unlimited_uses'))
-//                            ->required(fn (Get $get) => !$get('unlimited_uses')),
+                        Forms\Components\TextInput::make('max_uses')
+                            ->label('Максимальное количество использований')
+                            ->numeric()
+                            ->default(1)
+                            ->minValue(1)
+                            ->maxValue(1000)
+                            ->helperText('Сколько раз можно использовать этот промокод')
+                            ->disabled(fn (Get $get) => $get('unlimited_uses'))
+                            ->dehydrated(fn (Get $get) => !$get('unlimited_uses'))
+                            ->required(fn (Get $get) => !$get('unlimited_uses')),
 
                         Forms\Components\DateTimePicker::make('expires_at')
                             ->label('Дата истечения')

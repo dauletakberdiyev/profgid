@@ -66,54 +66,54 @@ class ProfessionResource extends Resource
                             ->default(true),
                     ])->columns(2),
 
-                Forms\Components\Repeater::make('talent_coefficients')
-                    ->label('Таланты и коэффициенты')
-                    ->schema([
-                        Forms\Components\Select::make('talent_id')
-                            ->label('Талант')
-                            ->options(Talent::pluck('name', 'id'))
-                            ->required()
-                            ->distinct()
-                            ->disableOptionsWhenSelectedInSiblingRepeaterItems(),
+                // Forms\Components\Repeater::make('talent_coefficients')
+                //     ->label('Таланты и коэффициенты')
+                //     ->schema([
+                //         Forms\Components\Select::make('talent_id')
+                //             ->label('Талант')
+                //             ->options(Talent::pluck('name', 'id'))
+                //             ->required()
+                //             ->distinct()
+                //             ->disableOptionsWhenSelectedInSiblingRepeaterItems(),
+                //
+                //         Forms\Components\TextInput::make('coefficient')
+                //             ->label('Коэффициент')
+                //             ->numeric()
+                //             ->step(0.01)
+                //             ->minValue(0)
+                //             ->maxValue(9.99)
+                //             ->default(1.00)
+                //             ->required(),
+                //     ])
+                //     ->columns(2)
+                //     ->minItems(1)
+                //     ->maxItems(8)
+                //     ->defaultItems(0)
+                //     ->columnSpanFull()
+                //     ->addActionLabel('Добавить талант')
+                //     ->collapsible()
+                //     ->itemLabel(fn (array $state): ?string =>
+                //         $state['talent_id'] ? Talent::find($state['talent_id'])?->name . ' (коэф.: ' . ($state['coefficient'] ?? '1.00') . ')' : null
+                //     ),
 
-                        Forms\Components\TextInput::make('coefficient')
-                            ->label('Коэффициент')
-                            ->numeric()
-                            ->step(0.01)
-                            ->minValue(0)
-                            ->maxValue(9.99)
-                            ->default(1.00)
-                            ->required(),
-                    ])
-                    ->columns(2)
-                    ->minItems(1)
-                    ->maxItems(8)
-                    ->defaultItems(0)
-                    ->columnSpanFull()
-                    ->addActionLabel('Добавить талант')
-                    ->collapsible()
-                    ->itemLabel(fn (array $state): ?string =>
-                        $state['talent_id'] ? Talent::find($state['talent_id'])?->name . ' (коэф.: ' . ($state['coefficient'] ?? '1.00') . ')' : null
-                    ),
-
-                Forms\Components\Repeater::make('intellect_coefficients')
-                    ->label('Интелект и коэффициенты')
-                    ->schema([
-                        Forms\Components\Select::make('intellect_id')
-                            ->label('Интелект')
-                            ->options(Intellect::pluck('name', 'id'))
-                            ->required()
-                            ->distinct(),
-                    ])
-                    ->minItems(1)
-                    ->maxItems(2)
-                    ->defaultItems(0)
-                    ->columnSpanFull()
-                    ->addActionLabel('Добавить интелект')
-                    ->collapsible()
-                    ->itemLabel(fn (array $state): ?string =>
-                        $state['intellect_id'] ? Intellect::find($state['intellect_id'])?->name : null
-                    ),
+                // Forms\Components\Repeater::make('intellect_coefficients')
+                //     ->label('Интелект и коэффициенты')
+                //     ->schema([
+                //         Forms\Components\Select::make('intellect_id')
+                //             ->label('Интелект')
+                //             ->options(Intellect::pluck('name', 'id'))
+                //             ->required()
+                //             ->distinct(),
+                //     ])
+                //     ->minItems(1)
+                //     ->maxItems(2)
+                //     ->defaultItems(0)
+                //     ->columnSpanFull()
+                //     ->addActionLabel('Добавить интелект')
+                //     ->collapsible()
+                //     ->itemLabel(fn (array $state): ?string =>
+                //         $state['intellect_id'] ? Intellect::find($state['intellect_id'])?->name : null
+                //     )
             ]);
     }
 
@@ -175,4 +175,4 @@ class ProfessionResource extends Resource
             'edit' => Pages\EditProfession::route('/{record}/edit'),
         ];
     }
-}
+} 

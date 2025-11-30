@@ -167,16 +167,16 @@ function talentTest(questions, timePerQuestion, testSessionId) {
                         this.stopTimer();
 
                         // Автоматический переход по таймеру
-                        if (this.currentQuestionIndex < this.allQuestions.length - 1) {
-                            this.currentQuestionIndex++;
-                            this.selectedAnswer = this.answers[this.currentQuestionIndex] || null;
-                            this.timeRemaining = this.timePerQuestion;
-                            this.questionStartTime = Date.now();
-                            this.updateProgress();
-                            this.startTimer();
-                        } else {
-                            this.submitTest();
-                        }
+                        //if (this.currentQuestionIndex < this.allQuestions.length - 1) {
+                        //    this.currentQuestionIndex++;
+                        //    this.selectedAnswer = this.answers[this.currentQuestionIndex] || null;
+                        //    this.timeRemaining = this.timePerQuestion;
+                        //    this.questionStartTime = Date.now();
+                        //    this.updateProgress();
+                        //    this.startTimer();
+                        //} else {
+                        //    this.submitTest();
+                        //}
                         this.isTransitioning = false;
                     }
                 }

@@ -4,10 +4,14 @@
     <section class="relative py-6 sm:py-8 md:py-12 lg:py-16 xl:py-20">
         <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div class="mx-auto max-w-4xl text-center">
-                <h1 class="text-xl sm:text-2xl md:text-4xl lg:text-5xl xl:text-6xl font-light leading-tight text-gray-900">
+
+                {{-- ✅ LCP-элемент вынесен НАВЕРХ — отрисовывается сразу --}}
+                <p class="text-sm md:text-base text-gray-600 max-w-2xl mx-auto">
+                    {{ __('all.home.top.text_1') }}
+                </p>
+                <h1 class="mt-4 text-xl sm:text-2xl md:text-4xl lg:text-5xl xl:text-6xl font-light leading-tight text-gray-900">
                     <span id="typed-output" class="text-black font-bold"></span>
                 </h1>
-
                 <div class="group relative mt-6 md:mt-10 inline-flex">
                     <a href="{{ route('test-preparation') }}" title=""
                         class="w-full sm:w-auto rounded-xl bg-blue-700 px-8 md:px-10 py-3 md:py-4 font-medium text-white transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:ring-offset-2 hover:bg-blue-600 text-base md:text-lg">
@@ -24,16 +28,14 @@
                         </svg>
                     </div>
                 </div>
-
             </div>
         </div>
 
+        {{-- Остальные два текстовых блока — перемещены ВНИЗ, чтобы не дублировать text_1 --}}
         <div
-            class="mt-6 md:mt-16 mb-6 md:mb-16 flex flex-col items-center justify-center space-y-6 sm:flex-row sm:space-y-0 sm:space-x-4 divide-y divide-gray-300 sm:divide-x sm:divide-y-0">
+            class="mt-10 md:mt-16 mb-6 md:mb-16 flex flex-col items-center justify-center space-y-6 sm:flex-row sm:space-y-0 sm:space-x-4 divide-y divide-gray-300 sm:divide-x sm:divide-y-0">
             <div class="flex max-w-xs px-4 py-4 text-center">
-                <p class="text-sm md:text-base text-gray-600">{{ __('all.home.top.text_1') }}</p>
-            </div>
-            <div class="flex max-w-xs px-4 py-4 text-center">
+                
                 <p class="text-sm md:text-base text-gray-600">{{ __('all.home.top.text_2') }}</p>
             </div>
             <div class="flex max-w-xs px-4 py-4 text-center">

@@ -1,7 +1,7 @@
 <!-- HTML2Canvas CDN -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
-<div class="min-h-screen bg-gray-50 py-4 md:py-8 px-4" x-data="{
+<div class="min-h-screen px-4 py-4 bg-gray-50 md:py-8" x-data="{
     activeTab: 'talents',
     canViewSpheresTab: 'true',
     canViewProfessionsTab: 'true',
@@ -293,13 +293,13 @@
         }, 3000);
     }
 }">
-    <div class="max-w-7xl mx-auto bg-white rounded-xl p-4 md:p-8 my-4 md:my-8" id="main-results-container">
+    <div class="p-4 mx-auto my-4 bg-white max-w-7xl rounded-xl md:p-8 md:my-8" id="main-results-container">
         @if (count($userResults) > 0)
             <!-- Tabs Navigation -->
             <div class="mb-6 md:mb-8">
                 <div class="border-b border-gray-200">
-                    <div class="flex-col md:flex md:flex-row justify-between md:items-center">
-                        <div class="flex md:hidden mt-2 mb-2">
+                    <div class="flex-col justify-between md:flex md:flex-row md:items-center">
+                        <div class="flex mt-2 mb-2 md:hidden">
                             @php
                                 $canDownloadTalents = true; // Таланты доступны всегда
                                 $canDownloadSpheres = $this->canViewSpheresTab;
@@ -324,17 +324,17 @@
                                 <a
                                     x-show="canDownload()"
                                     href="{{ route('talent.pdf.download', ['session_id' => $testSessionId ?? request()->get('session_id'), 'plan' => $testSession->selected_plan ?? '']) }}"
-                                    class="flex items-center gap-2 px-3 py-2 md:px-4 md:py-3 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors group"
+                                    class="flex items-center gap-2 px-3 py-2 transition-colors bg-gray-100 rounded-lg md:px-4 md:py-3 hover:bg-gray-200 group"
                                     title="Скачать результаты в PDF"
                                     target="_blank"
                                 >
-                                    <svg class="w-5 h-5 md:w-6 md:h-6 text-gray-600 group-hover:text-gray-800" fill="none"
+                                    <svg class="w-5 h-5 text-gray-600 md:w-6 md:h-6 group-hover:text-gray-800" fill="none"
                                          stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                               d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
                                         </path>
                                     </svg>
-                                    <span class="text-sm text-gray-600 group-hover:text-gray-800 font-medium">
+                                    <span class="text-sm font-medium text-gray-600 group-hover:text-gray-800">
                                         {{ __('all.test_result.download') }}
                                     </span>
                                 </a>
@@ -342,36 +342,36 @@
                                 <!-- Кнопка скачивания (неактивная) - показывается когда скачивание недоступно -->
                                 <div x-show="!canDownload()" class="relative">
                                     <button
-                                        class="flex items-center gap-2 px-3 py-2 md:px-4 md:py-3 bg-gray-300 rounded-lg cursor-not-allowed opacity-60"
+                                        class="flex items-center gap-2 px-3 py-2 bg-gray-300 rounded-lg cursor-not-allowed md:px-4 md:py-3 opacity-60"
                                         title="Обновите тариф для скачивания этого раздела"
                                         disabled
                                     >
-                                        <svg class="w-5 h-5 md:w-6 md:h-6 text-gray-500" fill="none"
+                                        <svg class="w-5 h-5 text-gray-500 md:w-6 md:h-6" fill="none"
                                              stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                   d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
                                             </path>
                                         </svg>
-                                        <span class="text-sm md:text-base text-gray-500 font-medium">
+                                        <span class="text-sm font-medium text-gray-500 md:text-base">
                                             {{ __('all.test_result.download') }}
                                         </span>
                                     </button>
 
                                     <!-- Подсказка о необходимости обновления тарифа -->
-                                    <div class="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10">
+                                    <div class="absolute z-10 px-3 py-2 mt-2 text-xs text-white transition-opacity duration-200 transform -translate-x-1/2 bg-gray-800 rounded-lg opacity-0 top-full left-1/2 group-hover:opacity-100 whitespace-nowrap">
                                         <span>{{ __('all.test_result.update') }}</span>
-                                        <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-b-gray-800"></div>
+                                        <div class="absolute transform -translate-x-1/2 border-4 border-transparent bottom-full left-1/2 border-b-gray-800"></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+                        <nav class="flex -mb-px space-x-8" aria-label="Tabs">
                             <!-- Вкладка "Таланты" - всегда доступна -->
                             <button @click="setActiveTab('talents')"
                                 :class="activeTab === 'talents' ? 'border-blue-600 text-blue-600' :
                                     'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-                                class="py-3 px-1 border-b-2 font-medium text-xs md:text-sm transition-colors duration-200">
+                                class="px-1 py-3 text-xs font-medium transition-colors duration-200 border-b-2 md:text-sm">
                                 {{ __('all.test_result.talents.title') }}
                             </button>
 
@@ -380,7 +380,7 @@
                                 <button @click="setActiveTab('spheres')"
                                     :class="activeTab === 'spheres' ? 'border-blue-600 text-blue-600' :
                                         'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-                                    class="py-3 px-1 border-b-2 font-medium text-xs md:text-sm transition-colors duration-200">
+                                    class="px-1 py-3 text-xs font-medium transition-colors duration-200 border-b-2 md:text-sm">
                                     {{ __('all.test_result.spheres.title') }}
                                 </button>
                             @endif
@@ -390,14 +390,14 @@
                                 <button @click="setActiveTab('professions')"
                                     :class="activeTab === 'professions' ? 'border-blue-600 text-blue-600' :
                                         'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
-                                    class="py-3 px-1 border-b-2 font-medium text-xs md:text-sm transition-colors duration-200">
+                                    class="px-1 py-3 text-xs font-medium transition-colors duration-200 border-b-2 md:text-sm">
                                     {{ __('all.test_result.professions.title') }}
                                 </button>
                             @endif
                         </nav>
 
                         <!-- Кнопка скачать рядом с табами -->
-                        <div class="hidden md:flex flex-col items-center">
+                        <div class="flex-col items-center hidden md:flex">
                             @php
                                 $canDownloadTalents = true; // Таланты доступны всегда
                                 $canDownloadSpheres = $this->canViewSpheresTab;
@@ -422,17 +422,17 @@
                                 <a
                                     x-show="canDownload()"
                                     href="{{ route('talent.pdf.download', ['session_id' => $testSessionId ?? request()->get('session_id'), 'plan' => $testSession->selected_plan ?? '']) }}"
-                                    class="flex items-center gap-2 px-3 py-2 md:px-4 md:py-3 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors group"
+                                    class="flex items-center gap-2 px-3 py-2 transition-colors bg-gray-100 rounded-lg md:px-4 md:py-3 hover:bg-gray-200 group"
                                     title="Скачать результаты в PDF"
                                     target="_blank"
                                 >
-                                    <svg class="w-5 h-5 md:w-6 md:h-6 text-gray-600 group-hover:text-gray-800" fill="none"
+                                    <svg class="w-5 h-5 text-gray-600 md:w-6 md:h-6 group-hover:text-gray-800" fill="none"
                                         stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
                                         </path>
                                     </svg>
-                                    <span class="text-sm md:text-base text-gray-600 group-hover:text-gray-800 hidden md:block font-medium">
+                                    <span class="hidden text-sm font-medium text-gray-600 md:text-base group-hover:text-gray-800 md:block">
                                         {{ __('all.test_result.download') }}
                                     </span>
                                 </a>
@@ -440,25 +440,25 @@
                                 <!-- Кнопка скачивания (неактивная) - показывается когда скачивание недоступно -->
                                 <div x-show="!canDownload()" class="relative">
                                     <button
-                                        class="flex items-center gap-2 px-3 py-2 md:px-4 md:py-3 bg-gray-300 rounded-lg cursor-not-allowed opacity-60"
+                                        class="flex items-center gap-2 px-3 py-2 bg-gray-300 rounded-lg cursor-not-allowed md:px-4 md:py-3 opacity-60"
                                         title="Обновите тариф для скачивания этого раздела"
                                         disabled
                                     >
-                                        <svg class="w-5 h-5 md:w-6 md:h-6 text-gray-500" fill="none"
+                                        <svg class="w-5 h-5 text-gray-500 md:w-6 md:h-6" fill="none"
                                             stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                 d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
                                             </path>
                                         </svg>
-                                        <span class="text-sm md:text-base text-gray-500 font-medium">
+                                        <span class="text-sm font-medium text-gray-500 md:text-base">
                                             {{ __('all.test_result.download') }}
                                         </span>
                                     </button>
 
                                     <!-- Подсказка о необходимости обновления тарифа -->
-                                    <div class="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-10">
+                                    <div class="absolute z-10 px-3 py-2 mt-2 text-xs text-white transition-opacity duration-200 transform -translate-x-1/2 bg-gray-800 rounded-lg opacity-0 top-full left-1/2 group-hover:opacity-100 whitespace-nowrap">
                                         <span>{{ __('all.test_result.update') }}</span>
-                                        <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-b-gray-800"></div>
+                                        <div class="absolute transform -translate-x-1/2 border-4 border-transparent bottom-full left-1/2 border-b-gray-800"></div>
                                     </div>
                                 </div>
                             </div>
@@ -479,7 +479,7 @@
                         $topDomain = array_keys($domainScores, max($domainScores))[0] ?? 'executing';
                         $topDomainName = $localizedDomains[app()->getLocale()][$topDomain] ?? 'EXECUTING';
                     @endphp
-                    <h1 class="text-sm md:text-2xl font-medium text-gray-900 mb-2 md:mb-4 leading-relaxed">
+                    <h1 class="mb-2 text-sm font-medium leading-relaxed text-gray-900 md:text-2xl md:mb-4">
                         {{ __('all.test_result.talents.lead') }} <span class="font-extrabold">{{ $topDomainName }}</span>.
                     </h1>
                 </div>
@@ -569,7 +569,7 @@
                     @endphp
 
                     <!-- Temporary Debug Info (remove in production) -->
-{{--                    <div class="mb-4 p-3 bg-yellow-100 border border-yellow-400 rounded text-sm">--}}
+{{--                    <div class="p-3 mb-4 text-sm bg-yellow-100 border border-yellow-400 rounded">--}}
 {{--                        <strong>Debug Info:</strong><br>--}}
 {{--                        Domain Scores: {{ json_encode($domainScores) }}<br>--}}
 {{--                        Complete Domain Scores: {{ json_encode($completeDomainScores) }}<br>--}}
@@ -580,7 +580,7 @@
 
 
                     <!-- Single horizontal bar -->
-                    <div class="flex gap-1 w-full h-6 md:h-8 overflow-hidden mb-3 md:mb-4 rounded hidden md:flex">
+                    <div class="flex hidden w-full h-6 gap-1 mb-3 overflow-hidden rounded md:h-8 md:mb-4 md:flex">
                         @foreach ($sortedForTop as $domain => $score)
                             @php
                                 $percentage = $percentages[$i] ?? 10; // default to 10 if more domains
@@ -593,14 +593,14 @@
                     </div>
 
                     <!-- Domain labels with scores and percentages -->
-                    <div class="flex gap-1 w-full hidden md:flex">
+                    <div class="flex hidden w-full gap-1 md:flex">
                         @foreach ($sortedForTop as $domain => $score)
                             @php
                                 $percentage = $percentages[$j] ?? 10; // default to 10 if more domains
                                 $j++;
                             @endphp
-                            <div class="text-left flex-shrink-0" style="width: {{ $percentage }}%; min-width: 10%;">
-                                <div class="text-xs md:text-sm font-medium text-gray-700 truncate">
+                            <div class="flex-shrink-0 text-left" style="width: {{ $percentage }}%; min-width: 10%;">
+                                <div class="text-xs font-medium text-gray-700 truncate md:text-sm">
                                     {{ $localizedDomains[app()->getLocale()][$domain] ?? $domain }}
                                 </div>
 
@@ -608,13 +608,13 @@
                         @endforeach
                     </div>
 
-                    <div class="flex w-full flex-col md:hidden">
+                    <div class="flex flex-col w-full md:hidden">
                         @foreach ($sortedForTop as $domain => $score)
                             @php
                                 $percentage = $percentages[$k] ?? 10; // default to 10 if more domains
                                 $k++;
                             @endphp
-                            <div class="flex flex-col text-left flex-shrink-0 mb-2">
+                            <div class="flex flex-col flex-shrink-0 mb-2 text-left">
                                 <div class="text-sm font-medium text-gray-700 truncate">
                                     {{ $localizedDomains[app()->getLocale()][$domain] ?? $domain }}
                                 </div>
@@ -626,18 +626,18 @@
                     </div>
                 </div>
 
-                <p class="text-sm md:text-sm text-gray-600 mb-6 md:mb-8 leading-relaxed">
+                <p class="mb-6 text-sm leading-relaxed text-gray-600 md:text-sm md:mb-8">
                     {{ $domainsDescription[app()->getLocale()][$topDomain] }}
                 </p>
 
-                <h2 class="text-lg md:text-xl font-semibold mb-3 md:mb-4">
+                <h2 class="mb-3 text-lg font-semibold md:text-xl md:mb-4">
                     {{ __('all.test_result.talents.by_domains') }}
                 </h2>
 
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-3 md:gap-1 mb-6 md:mb-8">
+                <div class="grid grid-cols-1 gap-3 mb-6 md:grid-cols-4 md:gap-1 md:mb-8">
                     @foreach ($domains as $domain => $name)
                         <div class="mb-4 md:mb-0">
-                            <div class="text-center font-semibold uppercase text-xs md:text-sm mb-2 md:mb-3 pb-1 md:pb-2 text-gray-800 p-1 md:p-2 border-b-4 md:border-b-8"
+                            <div class="p-1 pb-1 mb-2 text-xs font-semibold text-center text-gray-800 uppercase border-b-4 md:text-sm md:mb-3 md:pb-2 md:p-2 md:border-b-8"
                                 style="border-color: {{ $domainColors[$domain] }}">
                                 {{ $localizedDomains[app()->getLocale()][$domain] ?? $name }}
                             </div>
@@ -672,8 +672,8 @@
                                     @endphp
                                     <div
                                         class="{{ $bgColor }} {{ $textColor }} text-center aspect-square flex flex-col items-center justify-center p-1">
-                                        <div class="text-lg md:text-xl font-semibold">{{ $talent['rank'] }}</div>
-                                        <div class="text-xs md:text-xs text-center leading-tight mt-1">{{ $talent['name'] }}
+                                        <div class="text-lg font-semibold md:text-xl">{{ $talent['rank'] }}</div>
+                                        <div class="mt-1 text-xs leading-tight text-center md:text-xs">{{ $talent['name'] }}
                                         </div>
                                     </div>
                                 @endforeach
@@ -684,7 +684,7 @@
 
 
                 <div class="space-y-5">
-                    <h2 class="text-lg md:text-xl font-semibold mb-3 md:mb-4">{{ __('all.test_result.talents.desc_title') }}</h2>
+                    <h2 class="mb-3 text-lg font-semibold md:text-xl md:mb-4">{{ __('all.test_result.talents.desc_title') }}</h2>
 
                     <span class="block text-sm md:text-base">
                         {{ __('all.test_result.talents.desc_1') }}
@@ -701,7 +701,7 @@
 
                 <!-- Таланты блок -->
                 <div class="mt-6 space-y-6" x-data="{ expandedTalents: [] }">
-                    <h2 class="text-lg md:text-xl font-semibold text-center">{{ __('all.test_result.talents.content') }}</h2>
+                    <h2 class="text-lg font-semibold text-center md:text-xl">{{ __('all.test_result.talents.content') }}</h2>
 
                     @php
                         $topTenTalents = collect($userResults)->take(10)->toArray();
@@ -712,7 +712,7 @@
                         $maxScore = $maxScore > 0 ? $maxScore : 1; // Избегаем деления на 0
                     @endphp
 
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
                         <!-- Левая колонка - Топ 10 талантов -->
                         <div>
                             <div class="space-y-1">
@@ -727,19 +727,19 @@
                                     @endphp
 
                                     <!-- Все топ 10 талантов с аккордеоном -->
-                                    <div class="border-gray-200 transition-all overflow-hidden"
+                                    <div class="overflow-hidden transition-all border-gray-200"
                                          x-data="{ open: false }"
                                     >
                                         <!-- Заголовок таланта -->
-                                        <div class="flex items-center p-3 justify-between cursor-pointer"
+                                        <div class="flex items-center justify-between p-3 cursor-pointer"
                                              style="background-color: {{$talentDomainColor}}"
                                              @click="open = !open">
                                             <div class="flex items-center flex-1 min-w-0">
-                                                <div class="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-semibold mr-2">
+                                                <div class="flex items-center justify-center w-6 h-6 mr-2 text-xs font-semibold text-white rounded-full">
                                                     {{ $talent['rank'] }}
                                                 </div>
                                                 <div class="flex-1 min-w-0">
-                                                    <h3 class="text-sm text-white font-semibold text-gray-900 truncate">
+                                                    <h3 class="text-sm font-semibold text-white text-gray-900 truncate">
                                                         {{ $talent['name'] }}
                                                     </h3>
                                                 </div>
@@ -761,9 +761,9 @@
                                         >
                                             @if (!empty($talent['description']))
                                                 <div class="mb-3">
-                                                    <p class="text-xs text-gray-950 leading-tight mb-2">{{ $talent['short_description'] }}</p>
-                                                    <h4 class="text-xs text-gray-950 font-semibold mb-1">{{ __('all.test_result.talents.review') }}</h4>
-                                                    <p class="text-xs text-gray-950 leading-tight">{{ $talent['description'] }}</p>
+                                                    <p class="mb-2 text-xs leading-tight text-gray-950">{{ $talent['short_description'] }}</p>
+                                                    <h4 class="mb-1 text-xs font-semibold text-gray-950">{{ __('all.test_result.talents.review') }}</h4>
+                                                    <p class="text-xs leading-tight text-gray-950">{{ $talent['description'] }}</p>
                                                 </div>
                                             @endif
                                         </div>
@@ -786,7 +786,7 @@
 
                                     <!-- Остальные таланты - с аккордеоном для краткого описания -->
                                     <div
-                                        class="bg-gray-50 p-3 transition-all hover:bg-gray-100"
+                                        class="p-3 transition-all bg-gray-50 hover:bg-gray-100"
                                         style="border: 1px solid {{ $talentDomainColor }}"
                                         x-data="{ open: false }"
                                     >
@@ -795,7 +795,7 @@
                                              @click="open = !open"
                                         >
                                             <div class="flex items-center flex-1 min-w-0">
-                                                <div class="w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold mr-2"
+                                                <div class="flex items-center justify-center w-6 h-6 mr-2 text-xs font-semibold rounded-full"
                                                      style="color: {{ $talentDomainColor }}">
                                                     {{ $remTalent['rank'] }}
                                                 </div>
@@ -818,12 +818,12 @@
 
                                         <!-- Контент -->
                                         @if (!empty($talent['short_description']))
-                                            <div class="overflow-hidden mt-2"
+                                            <div class="mt-2 overflow-hidden"
                                                  x-show="open"
                                             >
                                                 <div class="mb-3">
-                                                    <h4 class="text-xs font-semibold text-gray-900 mb-1">{{ __('all.test_result.talents.short_desc') }}</h4>
-                                                    <p class="text-xs text-gray-700 leading-tight">{{ $remTalent['short_description'] }}</p>
+                                                    <h4 class="mb-1 text-xs font-semibold text-gray-900">{{ __('all.test_result.talents.short_desc') }}</h4>
+                                                    <p class="text-xs leading-tight text-gray-700">{{ $remTalent['short_description'] }}</p>
                                                 </div>
                                             </div>
                                         @endif
@@ -846,8 +846,8 @@
 
             <div id="spheres-section" x-show="activeTab === 'spheres'" x-transition:enter="transition ease-out duration-200"
                 x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100">
-                <h2 class="text-lg md:text-xl font-semibold mb-3 md:mb-4">{{ __('all.test_result.spheres.recommendation_title') }}</h2>
-                <p class="text-sm md:text-sm text-gray-600 mb-6 leading-relaxed">
+                <h2 class="mb-3 text-lg font-semibold md:text-xl md:mb-4">{{ __('all.test_result.spheres.recommendation_title') }}</h2>
+                <p class="mb-6 text-sm leading-relaxed text-gray-600 md:text-sm">
                     {{ __('all.test_result.spheres.recommendation_desc') }}
                 </p>
 
@@ -856,7 +856,7 @@
                     $remainingSpheres = collect($topSpheres)->skip(10)->toArray();
                 @endphp
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
                     <!-- Левая колонка - Топ 10 сфер -->
 {{--                    @if ($this->isFullPlan)--}}
                         <!-- Профессии из ваших топ-10 сфер блок -->
@@ -883,12 +883,12 @@
                         @endphp
 
                             <!-- Responsive Accordion Layout -->
-                        <div class="bg-white rounded-lg overflow-hidden">
+                        <div class="overflow-hidden bg-white rounded-lg">
                             <!-- Desktop Table View -->
                             <div class="space-y-1">
                                 @foreach ($professionsGroupedBySphere as $index => $sphereData)
                                     <div x-data="{ open: false }"
-                                         class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                                         class="overflow-hidden bg-white border border-gray-200 rounded-lg">
                                         <!-- Заголовок сферы для мобильной версии -->
                                         <div @click="open = !open" class="p-4 cursor-pointer">
                                             <div class="flex items-center justify-between">
@@ -904,9 +904,9 @@
                                                     </div>
                                                 </div>
 
-                                                <div class="flex items-center space-x-2 flex-shrink-0">
+                                                <div class="flex items-center flex-shrink-0 space-x-2">
                                                     <!-- Percentage -->
-                                                    <span class="text-xs px-2 py-1 bg-blue-100 text-blue-600 rounded">
+                                                    <span class="px-2 py-1 text-xs text-blue-600 bg-blue-100 rounded">
                                                     {{ round($sphereData['sphere']['compatibility_percentage']) }}%
                                                 </span>
 
@@ -931,14 +931,14 @@
                                              style="display: none;">
                                             @if (count($sphereData['professions']) > 0)
                                                 <div class="space-y-2">
-                                                    <div class="text-sm md:text-base mb-3">
+                                                    <div class="mb-3 text-sm md:text-base">
                                                         {{$sphereData['sphere']['description']}}
                                                     </div>
                                                     @foreach ($sphereData['professions'] as $profession)
-                                                        <div class="bg-white border border-gray-200 rounded-lg px-3 py-1 hover:bg-gray-50 transition-colors">
+                                                        <div class="px-3 py-1 transition-colors bg-white border border-gray-200 rounded-lg hover:bg-gray-50">
                                                             <div class="flex items-center justify-between">
                                                                 <div class="flex-1 min-w-0">
-                                                                    <h5 class="text-sm font-normal text-gray-900 mb-1">
+                                                                    <h5 class="mb-1 text-sm font-normal text-gray-900">
                                                                         {{ $profession['name'] }}
                                                                     </h5>
 
@@ -953,7 +953,7 @@
                                                                 @if (isset($profession['description']) && $profession['description'])
                                                                     <button
                                                                         @click.stop="openProfessionModal({{ json_encode($profession) }})"
-                                                                        class="ml-2 p-1 text-gray-400 hover:text-blue-500 transition-colors flex-shrink-0"
+                                                                        class="flex-shrink-0 p-1 ml-2 text-gray-400 transition-colors hover:text-blue-500"
                                                                         title="Показать описание профессии">
                                                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -976,16 +976,16 @@
                             </div>
 
                             @if (empty($professionsGroupedBySphere))
-                                <div class="text-center py-8 md:py-12 px-4">
-                                    <div class="text-gray-400 mb-3">
-                                        <svg class="w-12 h-12 md:w-16 md:h-16 mx-auto" fill="none"
+                                <div class="px-4 py-8 text-center md:py-12">
+                                    <div class="mb-3 text-gray-400">
+                                        <svg class="w-12 h-12 mx-auto md:w-16 md:h-16" fill="none"
                                              stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                   d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-2.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 009.586 13H7" />
                                         </svg>
                                     </div>
-                                    <h3 class="text-lg md:text-xl font-medium text-gray-900 mb-2">Нет доступных сфер</h3>
-                                    <p class="text-sm md:text-base text-gray-500">Сферы профессий пока не созданы.</p>
+                                    <h3 class="mb-2 text-lg font-medium text-gray-900 md:text-xl">Нет доступных сфер</h3>
+                                    <p class="text-sm text-gray-500 md:text-base">Сферы профессий пока не созданы.</p>
                                 </div>
                             @endif
                         </div>
@@ -1001,7 +1001,7 @@
                                     $sphereColor = '#316EC6';
                                 @endphp
 
-                                <div class="bg-white border border-gray-200 rounded-lg overflow-hidden">
+                                <div class="overflow-hidden bg-white border border-gray-200 rounded-lg">
                                     <div class="flex items-center justify-between p-4">
                                         <div class="flex-1">
                                             <div class="flex items-center flex-1 min-w-0">
@@ -1020,13 +1020,13 @@
                                             @if ($this->isFullPlan)
                                                 <!-- Progress Bar для полного тарифа - скрыт на мобильных -->
 {{--                                                <div class="hidden md:flex flex-1 min-w-[80px]">--}}
-{{--                                                    <div class="w-full bg-gray-200 rounded-full h-1">--}}
-{{--                                                        <div class="h-1 rounded-full transition-all duration-500"--}}
+{{--                                                    <div class="w-full h-1 bg-gray-200 rounded-full">--}}
+{{--                                                        <div class="h-1 transition-all duration-500 rounded-full"--}}
 {{--                                                            style="width: {{ round($sphere['compatibility_percentage']) }}%; background-color: {{ $sphereColor }}">--}}
 {{--                                                        </div>--}}
 {{--                                                    </div>--}}
 {{--                                                </div>--}}
-                                                <span class="text-xs px-2 py-1 bg-blue-100 text-blue-600 rounded">
+                                                <span class="px-2 py-1 text-xs text-blue-600 bg-blue-100 rounded">
                                                     {{ round($sphere['compatibility_percentage']) }}%
                                                 </span>
                                             @endif
@@ -1042,7 +1042,7 @@
                 <div x-show="modalProfession" x-transition:enter="transition ease-out duration-300"
                     x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
                     x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100"
-                    x-transition:leave-end="opacity-0" class="fixed inset-0 flex items-center justify-center z-50 p-4"
+                    x-transition:leave-end="opacity-0" class="fixed inset-0 z-50 flex items-center justify-center p-4"
                     style="background-color: rgba(0, 0, 0, 0.5);" @click="closeProfessionModal()">
                     <div @click.stop x-transition:enter="transition ease-out duration-300"
                         x-transition:enter-start="opacity-0 transform scale-95"
@@ -1050,18 +1050,18 @@
                         x-transition:leave="transition ease-in duration-200"
                         x-transition:leave-start="opacity-100 transform scale-100"
                         x-transition:leave-end="opacity-0 transform scale-95"
-                        class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+                        class="w-full max-w-md p-6 mx-4 bg-white rounded-lg shadow-xl">
                         <div class="flex items-start justify-between mb-4">
                             <h3 class="text-lg font-semibold text-gray-900" x-text="modalProfession?.name"></h3>
                             <button @click="closeProfessionModal()"
-                                class="text-gray-400 hover:text-gray-600 transition-colors">
+                                class="text-gray-400 transition-colors hover:text-gray-600">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M6 18L18 6M6 6l12 12" />
                                 </svg>
                             </button>
                         </div>
-                        <p class="text-sm text-gray-700 leading-relaxed"
+                        <p class="text-sm leading-relaxed text-gray-700"
                             x-text="modalProfession?.description || 'Описание отсутствует'"></p>
                     </div>
                 </div>
@@ -1078,28 +1078,28 @@
                     $professionColor = '#8B5CF6';
                 @endphp
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
                 <!-- Топ 30 профессий на полную ширину -->
                 @if (count($topThirtyProfessions) > 0)
                     <div class="mb-8">
                         <div class="flex flex-col items-start">
                             <h3 class="text-lg font-semibold text-gray-900">{{ __('all.test_result.professions.recommendation') }}</h3>
-                            <p class="text-xs md:text-sm text-gray-600 leading-relaxed">
+                            <p class="text-xs leading-relaxed text-gray-600 md:text-sm">
                                 {{ __('all.result.professions.desc') }}
                             </p>
                         </div>
                         <!-- Desktop Table View -->
-                        <div class="hidden md:block space-y-2" style="margin-top: 1.8rem">
+                        <div class="hidden space-y-2 md:block" style="margin-top: 1.8rem">
                             @foreach ($topThirtyProfessions as $index => $profession)
-                                <div class="bg-white px-4 py-2 transition-all border border-gray-200 rounded-lg" x-data="{ open: false }">
+                                <div class="px-4 py-2 transition-all bg-white border border-gray-200 rounded-lg" x-data="{ open: false }">
                                     <div class="flex items-center justify-between" @click="open = !open">
-                                        <div class="flex align-middle space-x-2">
+                                        <div class="flex space-x-2 align-middle">
                                             <span class="text-sm font-medium text-gray-900">{{ $index + 1 }}</span>
                                             <span class="text-sm font-medium text-gray-900">{{ $profession['name'] }}</span>
                                         </div>
                                         <div class="flex items-center space-x-2">
-                                            <div class="w-12 bg-gray-200 rounded-full h-1">
-                                                <div class="h-1 rounded-full transition-all duration-500 bg-blue-500"
+                                            <div class="w-12 h-1 bg-gray-200 rounded-full">
+                                                <div class="h-1 transition-all duration-500 bg-blue-500 rounded-full"
                                                     style="width: {{ round($profession['compatibility_percentage']) }}%"></div>
                                             </div>
                                             <span class="text-xs text-blue-600 min-w-[30px]">{{ round($profession['compatibility_percentage']) }}%</span>
@@ -1122,13 +1122,13 @@
                             @endforeach
                         </div>
                         <!-- Mobile Card View -->
-                        <div class="md:hidden space-y-2 mt-2">
+                        <div class="mt-2 space-y-2 md:hidden">
                             @foreach ($topThirtyProfessions as $index => $profession)
-                                <div class="bg-white px-3 py-2 transition-all border border-gray-200 rounded-lg" x-data="{ open: false }">
+                                <div class="px-3 py-2 transition-all bg-white border border-gray-200 rounded-lg" x-data="{ open: false }">
                                     <div class="flex items-center justify-between space-x-1" @click="open = !open">
                                         <div class="flex items-center space-x-2">
-                                            <span class="text-xs font-medium text-gray-900 inline-block">{{ $index + 1 }}</span>
-                                        <span class="text-xs font-medium text-gray-900 inline-block leading-none">{{ $profession['name'] }}</span>
+                                            <span class="inline-block text-xs font-medium text-gray-900">{{ $index + 1 }}</span>
+                                        <span class="inline-block text-xs font-medium leading-none text-gray-900">{{ $profession['name'] }}</span>
                                         </div>
                                         <div class="flex space-x-1">
                                             <span class="text-xs text-blue-600 font-base">{{ round($profession['compatibility_percentage']) }}%</span>
@@ -1159,7 +1159,7 @@
                     <div class="">
                         <div class="flex flex-col items-start">
                             <h3 class="text-lg font-semibold text-black">{{ __('all.result.professions.least.title') }}</h3>
-                            <p class="text-xs md:text-sm text-gray-600 leading-relaxed">
+                            <p class="text-xs leading-relaxed text-gray-600 md:text-sm">
                                 {{ __('all.result.professions.least.desc') }}
                             </p>
                         </div>
@@ -1172,19 +1172,19 @@
                             @endphp
 
                             @foreach ($nextTenProfessions as $index => $profession)
-                                <div class="bg-white border border-red-400 px-4 py-2 rounded-lg opacity-60">
+                                <div class="px-4 py-2 bg-white border border-red-400 rounded-lg opacity-60">
                                     <div class="flex items-center justify-between">
                                         <div class="flex-1">
                                             <div class="flex items-center space-x-2">
-                                                <span class="text-xs md:text-sm font-medium text-red-600">{{ $professionIndex = $professionIndex + 1 }}</span>
-                                                <h4 class="text-xs md:text-sm text-gray-900">{{ $profession['name'] }}</h4>
+                                                <span class="text-xs font-medium text-red-600 md:text-sm">{{ $professionIndex = $professionIndex + 1 }}</span>
+                                                <h4 class="text-xs text-gray-900 md:text-sm">{{ $profession['name'] }}</h4>
                                             </div>
                                         </div>
                                         <div class="flex items-center space-x-2">
                                             <!-- Прогресс-бар только для десктопа -->
                                             <div class="hidden lg:block flex-1 min-w-[60px]">
-                                                <div class="w-full bg-red-100 rounded-full h-1">
-                                                    <div class="h-1 rounded-full transition-all duration-500 bg-red-500"
+                                                <div class="w-full h-1 bg-red-100 rounded-full">
+                                                    <div class="h-1 transition-all duration-500 bg-red-500 rounded-full"
                                                         style="width: {{ round($profession['compatibility_percentage']) }}%">
                                                     </div>
                                                 </div>
@@ -1206,7 +1206,7 @@
                 <div x-show="modalProfession" x-transition:enter="transition ease-out duration-300"
                     x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
                     x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100"
-                    x-transition:leave-end="opacity-0" class="fixed inset-0 flex items-center justify-center z-50 p-4"
+                    x-transition:leave-end="opacity-0" class="fixed inset-0 z-50 flex items-center justify-center p-4"
                     style="background-color: rgba(0, 0, 0, 0.5);" @click="closeProfessionModal()">
                     <div @click.stop x-transition:enter="transition ease-out duration-300"
                         x-transition:enter-start="opacity-0 transform scale-95"
@@ -1214,40 +1214,40 @@
                         x-transition:leave="transition ease-in duration-200"
                         x-transition:leave-start="opacity-100 transform scale-100"
                         x-transition:leave-end="opacity-0 transform scale-95"
-                        class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+                        class="w-full max-w-md p-6 mx-4 bg-white rounded-lg shadow-xl">
                         <div class="flex items-start justify-between mb-4">
                             <div>
                                 <h3 class="text-lg font-semibold text-gray-900" x-text="modalProfession?.name"></h3>
-                                <div class="text-sm text-blue-600 mt-1" x-text="modalProfession?.sphere_name || ''">
+                                <div class="mt-1 text-sm text-blue-600" x-text="modalProfession?.sphere_name || ''">
                                 </div>
                             </div>
                             <button @click="closeProfessionModal()"
-                                class="text-gray-400 hover:text-gray-600 transition-colors">
+                                class="text-gray-400 transition-colors hover:text-gray-600">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M6 18L18 6M6 6l12 12" />
                                 </svg>
                             </button>
                         </div>
-                        <p class="text-sm text-gray-700 leading-relaxed"
+                        <p class="text-sm leading-relaxed text-gray-700"
                             x-text="modalProfession?.description || 'Описание отсутствует'"></p>
                     </div>
                 </div>
             </div>
         @else
-            <div class="text-center py-12">
-                <h2 class="text-2xl font-bold mb-4">У вас пока нет результатов</h2>
-                <p class="text-gray-600 mb-8">Вы еще не прошли тест или не сохранили ответы.</p>
+            <div class="py-12 text-center">
+                <h2 class="mb-4 text-2xl font-bold">У вас пока нет результатов</h2>
+                <p class="mb-8 text-gray-600">Вы еще не прошли тест или не сохранили ответы.</p>
                 <a href="{{ route('test') }}"
-                    class="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors">Пройти
+                    class="px-6 py-3 font-medium text-white transition-colors bg-blue-600 rounded-lg hover:bg-blue-700">Пройти
                     тест</a>
             </div>
         @endif
 
         <!-- Модальное окно для обновления тарифа -->
         @if (session('show_upgrade_modal'))
-            <div class="fixed inset-0 flex items-center justify-center z-50 p-4" style="background-color: rgba(0, 0, 0, 0.5);">
-                <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+            <div class="fixed inset-0 z-50 flex items-center justify-center p-4" style="background-color: rgba(0, 0, 0, 0.5);">
+                <div class="w-full max-w-md p-6 mx-4 bg-white rounded-lg shadow-xl">
                     <div class="flex items-start justify-between mb-4">
                         <div class="flex items-center">
                             <div class="flex-shrink-0">
@@ -1259,7 +1259,7 @@
                                 <h3 class="text-lg font-medium text-gray-900">Обновление тарифа</h3>
                             </div>
                         </div>
-                        <button onclick="this.parentElement.parentElement.parentElement.remove()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                        <button onclick="this.parentElement.parentElement.parentElement.remove()" class="text-gray-400 transition-colors hover:text-gray-600">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                             </svg>
@@ -1269,10 +1269,10 @@
                         <p class="text-sm text-gray-700">{{ session('upgrade_message', 'Для доступа к этой функции необходимо обновить тарифный план.') }}</p>
                     </div>
                     <div class="flex justify-end space-x-3">
-                        <button onclick="this.parentElement.parentElement.parentElement.remove()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors">
+                        <button onclick="this.parentElement.parentElement.parentElement.remove()" class="px-4 py-2 text-sm font-medium text-gray-700 transition-colors bg-gray-100 rounded-md hover:bg-gray-200">
                             Закрыть
                         </button>
-                        <a href="{{ route('pricing') }}" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors">
+                        <a href="{{ route('pricing') }}" class="px-4 py-2 text-sm font-medium text-white transition-colors bg-blue-600 rounded-md hover:bg-blue-700">
                             Посмотреть тарифы
                         </a>
                     </div>

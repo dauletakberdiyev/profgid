@@ -79,8 +79,8 @@ class Talent extends Model
         $locale = app()->getLocale();
 
         return match($locale) {
-            'kk' => $this->description_kz ?? $this->description,
-            default => $this->description
+            'kk' => $this->description_kz ?? $this->description ?? '',
+            default => $this->description ?? '',
         };
     }
 
