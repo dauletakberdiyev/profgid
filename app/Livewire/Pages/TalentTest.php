@@ -3,7 +3,6 @@
 namespace App\Livewire\Pages;
 
 use Livewire\Component;
-use App\Models\Talent;
 use App\Models\Answer;
 use App\Models\TestSession;
 use App\Models\UserAnswer;
@@ -25,7 +24,7 @@ class TalentTest extends Component
         /** @var Answer[] $answers */
         $answers = Answer::with('talent')->orderBy('id')->get();
 
-        // Добавляем все 120 вопросов в массив
+        // Добавляем все 145 вопросов в массив
         foreach ($answers as $index => $answer) {
             $this->allQuestions[] = [
                 'id' => $answer->id,

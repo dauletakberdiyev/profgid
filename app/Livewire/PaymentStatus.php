@@ -312,8 +312,8 @@ class PaymentStatus extends Component
             ->where("is_used", false)
             ->first();
 
-        $this->promoCodeGlobalPercent = $promoCodeRecord->discount;
         if ($promoCodeRecord) {
+            $this->promoCodeGlobalPercent = $promoCodeRecord->discount;
             if ($promoCodeRecord->discount > 0 && $promoCodeRecord->discount < 100) {
                 $this->plans[$this->plan]['price'] = $this->plans[$this->plan]['price'] - ($this->plans[$this->plan]['price'] * $promoCodeRecord->discount) / 100;
 
